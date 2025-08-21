@@ -1,0 +1,82 @@
+# Simone Feature Flags Configuration
+# Feature flags for progressive rollout and A/B testing
+
+flags:
+  # Core Features
+  claude_code_assistant:
+    enabled: true
+    description: "Main Claude Code assistant functionality"
+    rollout_percentage: 100
+    
+  memory_context:
+    enabled: true
+    description: "Long-term memory and context retention"
+    rollout_percentage: 100
+    
+  theme_system:
+    enabled: true
+    description: "Dynamic theming and appearance customization"
+    rollout_percentage: 100
+    
+  # Advanced Features
+  multi_file_editing:
+    enabled: false
+    description: "Edit multiple files simultaneously"
+    rollout_percentage: 0
+    
+  voice_input:
+    enabled: false
+    description: "Voice-to-text for code input"
+    rollout_percentage: 0
+    
+  collaborative_sessions:
+    enabled: false
+    description: "Share coding sessions with team members"
+    rollout_percentage: 0
+    
+  # Experimental Features
+  ai_code_review:
+    enabled: false
+    description: "Automated code review suggestions"
+    rollout_percentage: 0
+    variants:
+      - name: "basic"
+        weight: 70
+      - name: "advanced"
+        weight: 30
+    
+  smart_autocomplete:
+    enabled: false
+    description: "Context-aware code completion"
+    rollout_percentage: 0
+    
+  # Debug Features
+  debug_mode:
+    enabled: true
+    description: "Enable debug logging and diagnostics"
+    conditions:
+      - environment: "development"
+    
+  performance_monitoring:
+    enabled: true
+    description: "Track app performance metrics"
+    rollout_percentage: 100
+    
+# Feature Flag Rules
+rules:
+  - name: "beta_users"
+    description: "Enable experimental features for beta testers"
+    conditions:
+      - user_group: "beta"
+    overrides:
+      ai_code_review: true
+      smart_autocomplete: true
+      
+  - name: "internal_users"
+    description: "Enable all features for internal testing"
+    conditions:
+      - user_group: "internal"
+    overrides:
+      multi_file_editing: true
+      voice_input: true
+      collaborative_sessions: true

@@ -1,0 +1,170 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - testflight
+          - appstore
+          - both
+
+env:
+  XCODE_VERSION: '15.0'
+
+jobs:
+  build-and-archive:
+    runs-on: macos-14
+    outputs:
+      archive-path: ${{ steps.archive.outputs.path }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+      
+    - name: Install dependencies
+      run: |
+        brew install xcodegen
+        gem install fastlane
+        
+    - name: Setup provisioning profiles
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+      run: |
+        fastlane match appstore --readonly
+        
+    - name: Generate Xcode project
+      run: xcodegen generate
+      
+    - name: Increment build number
+      run: |
+        BUILD_NUMBER=$(date +%Y%m%d%H%M)
+        agvtool new-version -all $BUILD_NUMBER
+        
+    - name: Archive app
+      id: archive
+      run: |
+        xcodebuild archive \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -configuration Release \
+          -archivePath build/ClaudeCode.xcarchive \
+          -destination "generic/platform=iOS" \
+          CODE_SIGN_IDENTITY="iPhone Distribution" \
+          CODE_SIGN_STYLE="Manual"
+        echo "path=build/ClaudeCode.xcarchive" >> $GITHUB_OUTPUT
+        
+    - name: Export IPA
+      run: |
+        xcodebuild -exportArchive \
+          -archivePath build/ClaudeCode.xcarchive \
+          -exportPath build \
+          -exportOptionsPlist ExportOptions.plist
+          
+    - name: Upload archive
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-archive
+        path: build/ClaudeCode.xcarchive
+        
+    - name: Upload IPA
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-ipa
+        path: build/ClaudeCode.ipa
+        
+  deploy-testflight:
+    needs: build-and-archive
+    runs-on: macos-14
+    if: github.event.inputs.release_type == 'testflight' || github.event.inputs.release_type == 'both'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download IPA
+      uses: actions/download-artifact@v3
+      with:
+        name: app-ipa
+        path: build
+        
+    - name: Install Fastlane
+      run: gem install fastlane
+      
+    - name: Upload to TestFlight
+      env:
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      run: |
+        fastlane pilot upload \
+          --ipa build/ClaudeCode.ipa \
+          --skip_waiting_for_build_processing \
+          --changelog "Version ${{ github.event.inputs.version || github.ref_name }}"
+          
+  deploy-appstore:
+    needs: build-and-archive
+    runs-on: macos-14
+    if: github.event.inputs.release_type == 'appstore' || github.event.inputs.release_type == 'both'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download IPA
+      uses: actions/download-artifact@v3
+      with:
+        name: app-ipa
+        path: build
+        
+    - name: Install Fastlane
+      run: gem install fastlane
+      
+    - name: Submit to App Store
+      env:
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      run: |
+        fastlane deliver \
+          --ipa build/ClaudeCode.ipa \
+          --submit_for_review \
+          --automatic_release \
+          --force
+          
+  create-github-release:
+    needs: build-and-archive
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download IPA
+      uses: actions/download-artifact@v3
+      with:
+        name: app-ipa
+        path: build
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/ClaudeCode.ipa
+        generate_release_notes: true
+        draft: false
+        prerelease: false

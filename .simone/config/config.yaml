@@ -1,0 +1,112 @@
+# Simone Configuration
+# Main configuration file for the Simone framework
+
+app:
+  name: "ClaudeCode"
+  version: "1.0.0"
+  bundle_id: "com.shannon.ClaudeCode"
+  environment: "development"
+  
+api:
+  base_url: "https://api.anthropic.com"
+  timeout: 30
+  retry_attempts: 3
+  retry_delay: 1000
+  
+  endpoints:
+    chat: "/v1/messages"
+    completions: "/v1/complete"
+    models: "/v1/models"
+    
+  headers:
+    content_type: "application/json"
+    anthropic_version: "2023-06-01"
+    
+cache:
+  enabled: true
+  ttl: 3600
+  max_size: 100MB
+  strategy: "LRU"
+  
+  types:
+    responses: 
+      ttl: 1800
+      max_size: 50MB
+    contexts:
+      ttl: 7200
+      max_size: 30MB
+    files:
+      ttl: 86400
+      max_size: 20MB
+      
+security:
+  api_key_storage: "keychain"
+  enable_biometric_auth: true
+  session_timeout: 1800
+  max_login_attempts: 5
+  lockout_duration: 300
+  
+  encryption:
+    algorithm: "AES-256-GCM"
+    key_derivation: "PBKDF2"
+    iterations: 100000
+    
+performance:
+  max_concurrent_requests: 3
+  request_timeout: 30
+  background_sync: true
+  prefetch_enabled: true
+  
+  optimization:
+    lazy_loading: true
+    code_splitting: true
+    image_compression: true
+    
+analytics:
+  enabled: true
+  providers:
+    - name: "internal"
+      enabled: true
+    - name: "crashlytics"
+      enabled: false
+      
+  events:
+    track_sessions: true
+    track_errors: true
+    track_performance: true
+    
+ui:
+  default_theme: "system"
+  animations_enabled: true
+  haptic_feedback: true
+  
+  layout:
+    sidebar_width: 300
+    editor_font_size: 14
+    line_height: 1.5
+    tab_size: 2
+    
+storage:
+  documents_dir: "~/Documents/ClaudeCode"
+  cache_dir: "~/Library/Caches/ClaudeCode"
+  temp_dir: "~/Library/Caches/ClaudeCode/tmp"
+  
+  limits:
+    max_file_size: 10MB
+    max_total_storage: 1GB
+    
+logging:
+  level: "debug"
+  destinations:
+    - console
+    - file
+  file_path: "~/Library/Logs/ClaudeCode"
+  max_file_size: 10MB
+  max_files: 5
+  
+  format:
+    timestamp: true
+    level: true
+    category: true
+    message: true
+    metadata: true

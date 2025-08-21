@@ -1,6 +1,64 @@
 
-# Claude Code frameworks (exclude all)
-.claude/
+# Xcode
+*.xcodeproj
+*.xcworkspace
+!default.xcworkspace
+xcuserdata/
+DerivedData/
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+Carthage/Checkouts
+
+# macOS
+.DS_Store
+*.swp
+*~.nib
+
+# AppCode
+.idea/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Code Injection
+iOSInjectionProject/
+
+# Environment
+.env
+.env.local
+
+# Build artifacts
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Provisioning profiles
+*.mobileprovision
+*.certSigningRequest
+
+# Temporary files
+*.orig
+*.rej
+*~
+.*.sw?
+
+# Claude Code frameworks (keep .claude for commands)
+# .claude/
 
 # Logs
 logs
@@ -12,7 +70,6 @@ dev-debug.log
 # Dependency directories
 node_modules/
 # Environment variables
-.env
 # Editor directories and files
 .idea
 .vscode
@@ -22,7 +79,6 @@ node_modules/
 *.sln
 *.sw?
 # OS specific
-.DS_Store
 
 # Task files
 # tasks.json

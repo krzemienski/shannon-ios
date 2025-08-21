@@ -1,0 +1,167 @@
+//
+//  AppState.swift
+//  ClaudeCode
+//
+//  Global application state management
+//
+
+import SwiftUI
+import Combine
+import BackgroundTasks
+
+/// Global application state manager
+@MainActor
+class AppState: ObservableObject {
+    // MARK: - Published Properties (Original)
+    @Published var selectedChatId: String?
+    @Published var selectedProjectId: String?
+    @Published var isConnected: Bool = false
+    @Published var currentModel: String = "claude-3-5-haiku-20241022"
+    @Published var apiKey: String = ""
+    @Published var baseURL: String = "http://localhost:8000/v1"
+    
+    // MARK: - Published Properties (Enhanced)
+    @Published var isActive = true
+    @Published var isInitialized = false
+    @Published var isLoading = false
+    @Published var error: AppError?
+    @Published var apiHealth: APIHealth?
+    
+    // MARK: - Settings
+    @AppStorage("enableTelemetry") var enableTelemetry = true
+    @AppStorage("enableBackgroundRefresh") var enableBackgroundRefresh = true
+    @AppStorage("sshMonitoringEnabled") var sshMonitoringEnabled = false
+    
+    // MARK: - Private Properties
+    private var cancellables = Set<AnyCancellable>()
+    private let userDefaults = UserDefaults.standard
+    
+    // MARK: - Initialization
+    init() {
+        setupObservers()
+        loadSavedState()
+    }
+    
+    // MARK: - Public Methods
+    
+    /// Initialize app state on launch
+    func initialize() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            // Check API health
+            await checkAPIHealth()
+            
+            // Load user preferences
+            loadUserPreferences()
+            
+            isInitialized = true
+            print("AppState initialized successfully")
+            
+        } catch {
+            self.error = AppError.initialization(error.localizedDescription)
+            print("AppState initialization failed: \(error)")
+        }
+    }
+    
+    /// Resume operations when app becomes active
+    func resumeOperations() async {
+        // Refresh API health
+        await checkAPIHealth()
+        
+        // Resume any paused SSE connections
+        NotificationCenter.default.post(name: .resumeSSEConnections, object: nil)
+    }
+    
+    /// Save current app state
+    func saveState() async {
+        // Save current IDs
+        userDefaults.set(selectedChatId, forKey: "selectedChatId")
+        userDefaults.set(selectedProjectId, forKey: "selectedProjectId")
+        userDefaults.set(currentModel, forKey: "currentModel")
+        userDefaults.set(baseURL, forKey: "baseURL")
+        userDefaults.synchronize()
+        print("AppState saved successfully")
+    }
+    
+    /// Sync telemetry data in background
+    func syncTelemetry() async {
+        guard enableTelemetry else { return }
+        
+        // TODO: Implement telemetry sync
+        print("Syncing telemetry data...")
+    }
+    
+    /// Check API health status
+    func checkAPIHealth() async {
+        do {
+            // TODO: Implement actual API health check
+            // For now, create a mock health status
+            apiHealth = APIHealth(
+                status: "healthy",
+                version: "1.0.0",
+                timestamp: Date(),
+                services: [:]
+            )
+            isConnected = true
+        } catch {
+            apiHealth = APIHealth(
+                status: "unhealthy",
+                version: "unknown",
+                timestamp: Date(),
+                services: [:]
+            )
+            isConnected = false
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func setupObservers() {
+        // Observe app lifecycle notifications
+        NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in
+                Task {
+                    await self?.saveState()
+                }
+            }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                Task {
+                    await self?.resumeOperations()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func loadSavedState() {
+        // Load saved IDs
+        selectedChatId = userDefaults.string(forKey: "selectedChatId")
+        selectedProjectId = userDefaults.string(forKey: "selectedProjectId")
+        
+        // Load saved settings
+        if let savedModel = userDefaults.string(forKey: "currentModel") {
+            currentModel = savedModel
+        }
+        if let savedURL = userDefaults.string(forKey: "baseURL") {
+            baseURL = savedURL
+        }
+    }
+    
+    private func loadUserPreferences() {
+        // Load any additional user preferences
+        // This is where we'd load theme preferences, shortcuts, etc.
+    }
+}
+
+// MARK: - Supporting Types
+
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let resumeSSEConnections = Notification.Name("resumeSSEConnections")
+    static let pauseSSEConnections = Notification.Name("pauseSSEConnections")
+}

@@ -1,0 +1,188 @@
+# Simone Service Registry
+# Service definitions and dependency injection configuration
+
+services:
+  # Core Services
+  api_client:
+    class: "APIClient"
+    singleton: true
+    dependencies:
+      - network_manager
+      - auth_manager
+      - cache_manager
+    config:
+      base_url: "${api.base_url}"
+      timeout: "${api.timeout}"
+      
+  network_manager:
+    class: "NetworkManager"
+    singleton: true
+    dependencies:
+      - logger
+    config:
+      max_concurrent: "${performance.max_concurrent_requests}"
+      
+  auth_manager:
+    class: "AuthenticationManager"
+    singleton: true
+    dependencies:
+      - keychain_service
+      - biometric_service
+      - logger
+    config:
+      session_timeout: "${security.session_timeout}"
+      
+  cache_manager:
+    class: "CacheManager"
+    singleton: true
+    dependencies:
+      - storage_service
+      - logger
+    config:
+      strategy: "${cache.strategy}"
+      max_size: "${cache.max_size}"
+      
+  # Storage Services
+  storage_service:
+    class: "StorageService"
+    singleton: true
+    dependencies:
+      - file_manager
+      - logger
+    config:
+      documents_dir: "${storage.documents_dir}"
+      cache_dir: "${storage.cache_dir}"
+      
+  keychain_service:
+    class: "KeychainService"
+    singleton: true
+    dependencies:
+      - logger
+    config:
+      service_name: "${app.bundle_id}"
+      
+  # UI Services
+  theme_manager:
+    class: "ThemeManager"
+    singleton: true
+    dependencies:
+      - storage_service
+      - logger
+    config:
+      default_theme: "${ui.default_theme}"
+      
+  navigation_coordinator:
+    class: "NavigationCoordinator"
+    singleton: true
+    dependencies:
+      - logger
+    lifecycle: "eager"
+    
+  # Feature Services
+  claude_assistant:
+    class: "ClaudeAssistant"
+    singleton: false
+    dependencies:
+      - api_client
+      - context_manager
+      - logger
+    config:
+      model: "claude-3-opus-20240229"
+      
+  context_manager:
+    class: "ContextManager"
+    singleton: true
+    dependencies:
+      - cache_manager
+      - storage_service
+      - logger
+    config:
+      max_context_size: 100000
+      
+  # Analytics Services
+  analytics_manager:
+    class: "AnalyticsManager"
+    singleton: true
+    dependencies:
+      - logger
+    config:
+      enabled: "${analytics.enabled}"
+      providers: "${analytics.providers}"
+      
+  # Utility Services
+  logger:
+    class: "Logger"
+    singleton: true
+    factory: "LoggerFactory.create"
+    config:
+      level: "${logging.level}"
+      destinations: "${logging.destinations}"
+      
+  biometric_service:
+    class: "BiometricService"
+    singleton: true
+    dependencies:
+      - logger
+    config:
+      enabled: "${security.enable_biometric_auth}"
+      
+  file_manager:
+    class: "FileManager"
+    singleton: true
+    dependencies:
+      - logger
+    config:
+      max_file_size: "${storage.limits.max_file_size}"
+      
+  feature_flag_service:
+    class: "FeatureFlagService"
+    singleton: true
+    dependencies:
+      - storage_service
+      - logger
+    config:
+      config_path: ".simone/features/flags.yaml"
+      
+  error_handler:
+    class: "ErrorHandler"
+    singleton: true
+    dependencies:
+      - logger
+      - analytics_manager
+    config:
+      report_to_analytics: true
+      
+# Service Groups
+groups:
+  core:
+    - api_client
+    - network_manager
+    - auth_manager
+    - cache_manager
+    - storage_service
+    
+  ui:
+    - theme_manager
+    - navigation_coordinator
+    
+  features:
+    - claude_assistant
+    - context_manager
+    - feature_flag_service
+    
+  utilities:
+    - logger
+    - error_handler
+    - analytics_manager
+    
+# Initialization Order
+initialization:
+  priority:
+    1: [logger, error_handler]
+    2: [storage_service, keychain_service, file_manager]
+    3: [cache_manager, biometric_service]
+    4: [auth_manager, network_manager]
+    5: [api_client, analytics_manager]
+    6: [theme_manager, feature_flag_service]
+    7: [context_manager, claude_assistant]
+    8: [navigation_coordinator]

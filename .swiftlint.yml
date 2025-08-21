@@ -1,0 +1,188 @@
+# SwiftLint Configuration for ClaudeCode iOS
+# SwiftUI + MVVM + Coordinator Pattern
+# iOS 17+ Target with HSL Theme System
+
+# Paths to include
+included:
+  - Sources
+  - Tests
+  - UITests
+
+# Paths to exclude
+excluded:
+  - Carthage
+  - Pods
+  - DerivedData
+  - .build
+  - Scripts
+  - vendor
+  - fastlane
+  - "Sources/Preview Content"
+  - "**/*.generated.swift"
+  - "**/Package.swift"
+
+# Rule configuration
+opt_in_rules:
+  - array_init
+  - attributes
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - convenience_type
+  - discouraged_object_literal
+  - empty_collection_literal
+  - empty_count
+  - empty_string
+  - enum_case_associated_values_count
+  - fatal_error_message
+  - first_where
+  - flatmap_over_map_reduce
+  - identical_operands
+  - joined_default_parameter
+  - last_where
+  - legacy_multiple
+  - legacy_random
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - modifier_order
+  - nimble_operator
+  - nslocalizedstring_key
+  - number_separator
+  - object_literal
+  - operator_usage_whitespace
+  - overridden_super_call
+  - prefer_self_type_over_type_of_self
+  - private_action
+  - private_outlet
+  - prohibited_super_call
+  - quick_discouraged_call
+  - quick_discouraged_focused_test
+  - quick_discouraged_pending_test
+  - reduce_into
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - sorted_first_last
+  - static_operator
+  - strong_iboutlet
+  - toggle_bool
+  - unavailable_function
+  - unneeded_parentheses_in_closure_argument
+  - unowned_variable_capture
+  - untyped_error_in_catch
+  - vertical_parameter_alignment_on_call
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - yoda_condition
+
+disabled_rules:
+  - todo  # We want to keep TODO comments for now
+  - line_length  # SwiftUI views can have long lines
+  - file_length  # Some files will be naturally large
+  - type_body_length  # ViewModels and Coordinators can be large
+  - function_body_length  # Some SwiftUI body functions are complex
+
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+
+# Rule parameters
+type_name:
+  min_length: 3
+  max_length:
+    warning: 45
+    error: 50
+
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 45
+    error: 50
+  excluded:
+    - id
+    - URL
+    - url
+    - URI
+    - uri
+    - x
+    - y
+    - z
+    - w
+    - h
+
+function_parameter_count:
+  warning: 6
+  error: 8
+
+large_tuple:
+  warning: 3
+  error: 4
+
+trailing_whitespace:
+  ignores_empty_lines: true
+
+vertical_whitespace:
+  max_empty_lines: 2
+
+nesting:
+  type_level:
+    warning: 2
+    error: 3
+  function_level:
+    warning: 3
+    error: 4
+
+cyclomatic_complexity:
+  warning: 15
+  error: 20
+
+# Custom Rules
+custom_rules:
+  no_print_statements:
+    name: "Print statements"
+    regex: "(^\\s*print\\()|(NSLog\\()"
+    match_kinds:
+      - identifier
+    message: "Use proper logging instead of print statements"
+    severity: warning
+  
+  mark_format:
+    name: "MARK format"
+    regex: "//\\s*MARK:(?![\\s-])"
+    message: "MARK should be followed by a space and hyphen"
+    severity: warning
+  
+  swiftui_state_private:
+    name: "SwiftUI State Properties"
+    regex: "@(State|StateObject|ObservedObject)\\s+(var|let)"
+    message: "SwiftUI state properties should be private"
+    severity: warning
+  
+  viewmodel_naming:
+    name: "ViewModel Naming"
+    regex: "class\\s+\\w+(?<!ViewModel)\\s*:\\s*ObservableObject"
+    message: "ObservableObject classes should be named with 'ViewModel' suffix"
+    severity: warning
+  
+  coordinator_naming:
+    name: "Coordinator Naming"
+    regex: "class\\s+\\w+(?<!Coordinator)\\s*:\\s*Coordinator"
+    message: "Coordinator classes should be named with 'Coordinator' suffix"
+    severity: warning
+  
+  hsl_color_usage:
+    name: "HSL Color Usage"
+    regex: "Color\\(red:|UIColor\\(red:"
+    message: "Use HSL colors from Theme instead of RGB values"
+    severity: warning
+  
+  async_await_pattern:
+    name: "Async/Await Pattern"
+    regex: "completion:\\s*@escaping"
+    message: "Consider using async/await instead of completion handlers"
+    severity: info

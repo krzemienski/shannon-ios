@@ -1,0 +1,479 @@
+name: ClaudeCode
+
+# XcodeGen Configuration for Claude Code iOS
+# Tasks 101-106: Complete Project Configuration
+
+options:
+  bundleIdPrefix: com.claudecode
+  deploymentTarget:
+    iOS: 17.0
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  useBaseInternationalization: false
+  defaultConfig: Debug
+  transitivelyLinkDependencies: true
+  developmentLanguage: en
+  xcodeVersion: "15.2"
+  minimumXcodeGenVersion: "2.38.0"
+  groupSortPosition: top
+  generateManifest: true
+  findCarthageFrameworks: false
+  usesTabs: false
+  indentWidth: 4
+  tabWidth: 4
+  
+configs:
+  Debug:
+    xcconfig: Configs/Debug.xcconfig
+  Release:
+    xcconfig: Configs/Release.xcconfig
+  TestFlight:
+    xcconfig: Configs/TestFlight.xcconfig
+
+settings:
+  base:
+    # Deployment
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+    TARGETED_DEVICE_FAMILY: 1,2
+    SUPPORTS_MACCATALYST: NO
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+    SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+    
+    # Swift Settings
+    SWIFT_VERSION: 5.9
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    SWIFT_SUPPRESS_WARNINGS: NO
+    SWIFT_EMIT_LOC_STRINGS: YES
+    
+    # Code Signing
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    
+    # App Info
+    MARKETING_VERSION: 1.0.0
+    CURRENT_PROJECT_VERSION: 1
+    VERSIONING_SYSTEM: apple-generic
+    
+    # Build Settings
+    ENABLE_BITCODE: NO
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES: YES
+    CLANG_ENABLE_MODULES: YES
+    ENABLE_MODULE_VERIFIER: YES
+    MODULE_VERIFIER_SUPPORTED_LANGUAGES: objective-c objective-c++
+    MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS: gnu11 gnu++20
+    
+    # Warnings
+    CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING: YES
+    CLANG_WARN_BOOL_CONVERSION: YES
+    CLANG_WARN_COMMA: YES
+    CLANG_WARN_CONSTANT_CONVERSION: YES
+    CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS: YES
+    CLANG_WARN_DIRECT_OBJC_ISA_USAGE: YES_ERROR
+    CLANG_WARN_DOCUMENTATION_COMMENTS: YES
+    CLANG_WARN_EMPTY_BODY: YES
+    CLANG_WARN_ENUM_CONVERSION: YES
+    CLANG_WARN_INFINITE_RECURSION: YES
+    CLANG_WARN_INT_CONVERSION: YES
+    CLANG_WARN_NON_LITERAL_NULL_CONVERSION: YES
+    CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF: YES
+    CLANG_WARN_OBJC_LITERAL_CONVERSION: YES
+    CLANG_WARN_OBJC_ROOT_CLASS: YES_ERROR
+    CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER: YES
+    CLANG_WARN_RANGE_LOOP_ANALYSIS: YES
+    CLANG_WARN_STRICT_PROTOTYPES: YES
+    CLANG_WARN_SUSPICIOUS_MOVE: YES
+    CLANG_WARN_UNGUARDED_AVAILABILITY: YES_AGGRESSIVE
+    CLANG_WARN_UNREACHABLE_CODE: YES
+    CLANG_WARN__DUPLICATE_METHOD_MATCH: YES
+    GCC_WARN_64_TO_32_BIT_CONVERSION: YES
+    GCC_WARN_ABOUT_RETURN_TYPE: YES_ERROR
+    GCC_WARN_UNDECLARED_SELECTOR: YES
+    GCC_WARN_UNINITIALIZED_AUTOS: YES_AGGRESSIVE
+    GCC_WARN_UNUSED_FUNCTION: YES
+    GCC_WARN_UNUSED_VARIABLE: YES
+    
+    # Localization
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    
+targets:
+  ClaudeCode:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+        excludes:
+          - "**/.DS_Store"
+          - "**/Thumbs.db"
+          - "**/*.swp"
+        createIntermediateGroups: true
+      - path: Resources
+        type: folder
+        buildPhase: resources
+        excludes:
+          - "**/.DS_Store"
+    resources:
+      - path: Resources
+        excludes:
+          - "**/.DS_Store"
+    dependencies:
+      # Core Dependencies
+      - package: KeychainAccess
+      - package: swift-log
+        product: Logging
+      - package: Citadel
+      # Additional Dependencies (to be added as needed)
+      # - package: swift-collections
+      #   product: Collections
+      # - package: swift-algorithms
+      #   product: Algorithms
+    settings:
+      base:
+        # Bundle Settings
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios
+        PRODUCT_NAME: ClaudeCode
+        INFOPLIST_FILE: Info.plist
+        
+        # UI Settings
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleLightContent
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+        INFOPLIST_KEY_UIRequiresFullScreen: NO
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+        
+        # App Information
+        INFOPLIST_KEY_CFBundleDisplayName: Claude Code
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2024 Claude Code"
+        
+        # Development
+        ENABLE_PREVIEWS: YES
+        DEVELOPMENT_ASSET_PATHS: "\"Sources/Preview Content\""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: RELEASE
+        # TestFlight configuration will be added later
+        # TestFlight:
+        #   SWIFT_ACTIVE_COMPILATION_CONDITIONS: TESTFLIGHT RELEASE
+        #   CODE_SIGN_STYLE: Manual
+    info:
+      path: Info.plist
+      properties:
+        # Launch Screen
+        UILaunchScreen:
+          UIColorName: LaunchScreenBackground
+          UIImageName: LaunchImage
+        
+        # Interface Orientations
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        
+        # Version Information
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        
+        # System Requirements
+        LSRequiresIPhoneOS: true
+        MinimumOSVersion: 17.0
+        UIApplicationSupportsIndirectInputEvents: true
+        UIRequiredDeviceCapabilities:
+          - arm64
+        
+        # Network Security
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: false
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            localhost:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+              NSTemporaryExceptionAllowsInsecureHTTPLoads: true
+        
+        # Privacy & Security
+        ITSAppUsesNonExemptEncryption: false
+        NSFaceIDUsageDescription: "Claude Code uses Face ID to secure your API keys and sensitive data."
+        NSContactsUsageDescription: "Claude Code needs access to contacts for sharing features."
+        NSCameraUsageDescription: "Claude Code uses the camera for scanning QR codes and capturing images."
+        NSPhotoLibraryUsageDescription: "Claude Code needs access to your photo library to save and load images."
+        NSPhotoLibraryAddUsageDescription: "Claude Code needs permission to save images to your photo library."
+        NSMicrophoneUsageDescription: "Claude Code uses the microphone for voice input features."
+        
+        # Background Modes
+        UIBackgroundModes:
+          - fetch
+          - processing
+          - remote-notification
+          - audio
+        
+        # Background Tasks
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.claudecode.ios.ssh-monitor
+          - com.claudecode.ios.telemetry-sync
+          - com.claudecode.ios.background-refresh
+        
+        # URL Schemes
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - claudecode
+              - claude-code
+            CFBundleURLName: com.claudecode.ios
+        
+        # App Features
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default Configuration
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        
+        # Status Bar
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIViewControllerBasedStatusBarAppearance: false
+        
+        # User Interface
+        UIUserInterfaceStyle: Dark
+        UIWhitePointAdaptivityStyle: UIWhitePointAdaptivityStyleStandard
+        
+    entitlements:
+      path: ClaudeCode.entitlements
+      properties:
+        # Security
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.network.server: false
+        com.apple.security.files.user-selected.read-write: true
+        
+        # Keychain
+        keychain-access-groups:
+          - $(AppIdentifierPrefix)com.claudecode.ios
+        
+        # Associated Domains (for future Universal Links)
+        com.apple.developer.associated-domains:
+          - applinks:claudecode.app
+          - webcredentials:claudecode.app
+        
+        # Push Notifications (for future use)
+        aps-environment: development
+        
+        # Background Modes
+        com.apple.developer.usernotifications.time-sensitive: true
+        
+        # Data Protection
+        com.apple.developer.default-data-protection: NSFileProtectionComplete
+    preBuildScripts:
+      - name: SwiftLint
+        script: |
+          # SwiftLint check with proper configuration
+          if which swiftlint >/dev/null; then
+            echo "Running SwiftLint..."
+            swiftlint --config "${PROJECT_DIR}/.swiftlint.yml" --quiet || true
+          else
+            echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+          fi
+        basedOnDependencyAnalysis: false
+        runOnlyWhenInstalling: false
+      
+      - name: Build Info
+        script: |
+          echo "Building ${PRODUCT_NAME} v${MARKETING_VERSION} (${CURRENT_PROJECT_VERSION})"
+          echo "Configuration: ${CONFIGURATION}"
+          echo "SDK: ${SDK_NAME}"
+          echo "Destination: ${PLATFORM_NAME}"
+        basedOnDependencyAnalysis: false
+    
+    postBuildScripts:
+      - name: Build Notification
+        script: |
+          echo "✅ Build completed successfully!"
+          echo "Product: ${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app"
+          echo "Configuration: ${CONFIGURATION}"
+          echo "Architecture: ${ARCHS}"
+        basedOnDependencyAnalysis: false
+      
+      - name: Copy Build Logs
+        script: |
+          # Copy build logs to logs directory for debugging
+          LOG_DIR="${PROJECT_DIR}/logs"
+          mkdir -p "$LOG_DIR"
+          echo "Build completed at $(date)" >> "$LOG_DIR/build_history.log"
+        basedOnDependencyAnalysis: false
+
+  ClaudeCodeTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests
+    dependencies:
+      - target: ClaudeCode
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/ClaudeCode.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ClaudeCode
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: RELEASE
+        # TestFlight:
+        #   SWIFT_ACTIVE_COMPILATION_CONDITIONS: TESTFLIGHT RELEASE
+
+  ClaudeCodeUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - UITests
+    dependencies:
+      - target: ClaudeCode
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: ClaudeCode
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: RELEASE
+        # TestFlight:
+        #   SWIFT_ACTIVE_COMPILATION_CONDITIONS: TESTFLIGHT RELEASE
+
+packages:
+  KeychainAccess:
+    url: https://github.com/kishikawakatsumi/KeychainAccess
+    from: 4.2.2
+  swift-log:
+    url: https://github.com/apple/swift-log
+    from: 1.5.3
+  Citadel:
+    url: https://github.com/orlandos-nl/Citadel
+    from: 0.7.0
+
+schemes:
+  ClaudeCode:
+    build:
+      targets:
+        ClaudeCode: all
+        ClaudeCodeTests: [test]
+      parallelizeBuild: true
+      buildImplicitDependencies: true
+      preActions:
+        - name: Check Dependencies
+          script: |
+            echo "🔍 Checking dependencies..."
+            # Bootstrap script check disabled for now
+            # if [ -f "${PROJECT_DIR}/Scripts/bootstrap.sh" ]; then
+            #   "${PROJECT_DIR}/Scripts/bootstrap.sh" check
+            # fi
+          settingsTarget: ClaudeCode
+        - name: Pre-Build Info
+          script: echo "🚀 Starting build for ${PRODUCT_NAME}..."
+          settingsTarget: ClaudeCode
+      postActions:
+        - name: Post-Build Info
+          script: echo "✅ Build completed for ${PRODUCT_NAME}"
+          settingsTarget: ClaudeCode
+    run:
+      config: Debug
+      simulateLocation:
+        identifier: "San Francisco, CA, USA"
+      commandLineArguments:
+        "-com.apple.CoreData.SQLDebug 1": false
+        "-com.apple.CoreData.Logging.stderr 1": false
+        "-FIRAnalyticsDebugEnabled": true
+        "-FIRDebugEnabled": true
+      environmentVariables:
+        API_BASE_URL: http://localhost:8000/v1
+        LOG_LEVEL: debug
+        ENABLE_TESTING_FEATURES: YES
+        SIMULATOR_UUID: A707456B-44DB-472F-9722-C88153CDFFA1
+        OS_ACTIVITY_MODE: ${DEBUG_ACTIVITY_MODE}
+      disableMainThreadChecker: false
+      stopOnEveryMainThreadCheckerIssue: true
+      launchAutomaticallySubstyle: 2
+    test:
+      config: Debug
+      targets:
+        - name: ClaudeCodeTests
+          parallelizable: true
+          randomExecutionOrder: true
+        - name: ClaudeCodeUITests
+          parallelizable: false
+      gatherCoverageData: true
+      coverageTargets:
+        - ClaudeCode
+      disableMainThreadChecker: false
+      commandLineArguments:
+        "-UITest": true
+      environmentVariables:
+        API_BASE_URL: http://localhost:8000/v1/test
+        TEST_MODE: YES
+      language: en
+      region: US
+      preActions:
+        - name: Prepare Test Environment
+          script: |
+            echo "🧪 Preparing test environment..."
+            # Start mock server or prepare test data
+          settingsTarget: ClaudeCode
+    profile:
+      config: Release
+      askForAppToLaunch: false
+      launchAutomaticallySubstyle: 2
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+      customArchiveName: ClaudeCode-${MARKETING_VERSION}
+      revealArchiveInOrganizer: true
+      postActions:
+        - name: Archive Notification
+          script: |
+            echo "📦 Archive created: ClaudeCode-${MARKETING_VERSION}"
+            echo "Location: ${ARCHIVE_PATH}"
+          settingsTarget: ClaudeCode
+  
+  # ClaudeCode-TestFlight scheme will be added once TestFlight configuration is properly set up
+  # ClaudeCode-TestFlight:
+  #   build:
+  #     targets:
+  #       ClaudeCode: all
+  #     config: TestFlight
+  #   run:
+  #     config: TestFlight
+  #     environmentVariables:
+  #       API_BASE_URL: http://localhost:8000/v1
+  #       LOG_LEVEL: info
+  #       ENABLE_CRASH_REPORTING: YES
+  #   test:
+  #     config: TestFlight
+  #     targets:
+  #       - ClaudeCodeTests
+  #     gatherCoverageData: true
+  #   profile:
+  #     config: TestFlight
+  #   analyze:
+  #     config: TestFlight
+  #   archive:
+  #     config: TestFlight
+  #     customArchiveName: ClaudeCode-TestFlight-${MARKETING_VERSION}
+  #     revealArchiveInOrganizer: true

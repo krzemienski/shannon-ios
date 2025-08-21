@@ -1,0 +1,12 @@
+{
+  "version": "2.3.5",
+  "project_name": "claude-code-ios-swift2",
+  "initialized": "2025-08-21T11:26:50.173Z",
+  "memory": {
+    "max_archived_sessions": 10,
+    "max_archived_working_plans": 10
+  },
+  "hooks": {
+    "session_start_enabled": true
+  }
+}

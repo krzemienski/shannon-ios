@@ -1,0 +1,149 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  XCODE_VERSION: '15.0'
+  IOS_VERSION: '17.0'
+  SIMULATOR_NAME: 'iPhone 15 Pro'
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+      
+    - name: Show Xcode version
+      run: xcodebuild -version
+      
+    - name: Install dependencies
+      run: |
+        brew install xcodegen xcbeautify swiftlint
+        gem install xcov jazzy
+        
+    - name: Generate Xcode project
+      run: xcodegen generate
+      
+    - name: Build for testing
+      run: |
+        xcodebuild build-for-testing \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_NAME }},OS=${{ env.IOS_VERSION }}" \
+          -derivedDataPath build \
+          | xcbeautify
+          
+    - name: Run tests
+      run: |
+        xcodebuild test-without-building \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_NAME }},OS=${{ env.IOS_VERSION }}" \
+          -derivedDataPath build \
+          -enableCodeCoverage YES \
+          | xcbeautify --report junit --report-path test-results/
+          
+    - name: Generate coverage report
+      run: |
+        xcov \
+          --project ClaudeCode.xcodeproj \
+          --scheme ClaudeCode \
+          --output_directory coverage \
+          --derived_data_path build
+          
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: test-results/
+        
+    - name: Upload coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage
+        path: coverage/
+        
+    - name: Run SwiftLint
+      run: swiftlint --reporter github-actions-logging
+      
+  static-analysis:
+    runs-on: macos-14
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+      
+    - name: Install tools
+      run: |
+        brew install xcodegen swiftlint periphery
+        
+    - name: Generate Xcode project
+      run: xcodegen generate
+      
+    - name: Run static analysis
+      run: |
+        xcodebuild analyze \
+          -project ClaudeCode.xcodeproj \
+          -scheme ClaudeCode \
+          -destination "platform=iOS Simulator,name=${{ env.SIMULATOR_NAME }}" \
+          CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER=YES \
+          CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND=YES \
+          CLANG_ANALYZER_SECURITY_KEYCHAIN_API=YES
+          
+    - name: Check for unused code
+      run: |
+        periphery scan \
+          --project ClaudeCode.xcodeproj \
+          --schemes ClaudeCode \
+          --targets ClaudeCode \
+          --format github-actions
+          
+  documentation:
+    runs-on: macos-14
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
+      
+    - name: Install documentation tools
+      run: |
+        brew install xcodegen sourcedocs
+        gem install jazzy
+        
+    - name: Generate Xcode project
+      run: xcodegen generate
+      
+    - name: Generate documentation
+      run: |
+        jazzy \
+          --clean \
+          --author "Claude Code Team" \
+          --author_url https://github.com/claudecode \
+          --github_url https://github.com/claudecode/ios \
+          --module ClaudeCode \
+          --output docs/api \
+          --theme fullwidth
+          
+    - name: Upload documentation
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/api/

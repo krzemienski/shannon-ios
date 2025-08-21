@@ -3,6 +3,44 @@
 
 ---
 
+# SIMULATOR CONFIGURATION
+
+## iPhone 16 Pro Max (iOS 18.6) Simulator
+- **UUID**: `A707456B-44DB-472F-9722-C88153CDFFA1`
+- **Device**: iPhone 16 Pro Max
+- **iOS Version**: 18.6
+- **Purpose**: Primary development and testing device
+
+## Simulator Automation Workflow
+```bash
+# 1. Start log capture BEFORE any build (background process)
+xcrun simctl spawn A707456B-44DB-472F-9722-C88153CDFFA1 log stream \
+    --level=debug --style=syslog > logs/simulator_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+LOG_PID=$!
+
+# 2. Build with explicit destination
+xcodebuild -scheme ClaudeCode \
+    -destination "platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1" \
+    build
+
+# 3. Install and launch on simulator
+xcrun simctl install A707456B-44DB-472F-9722-C88153CDFFA1 path/to/ClaudeCode.app
+xcrun simctl launch A707456B-44DB-472F-9722-C88153CDFFA1 com.shannon.ClaudeCode
+```
+
+# SSH LIBRARY STATUS
+
+## Solution Implemented
+- **Citadel Package**: Pure Swift SSH framework built on NIOSSH
+- **iOS Compatible**: Works on iOS, macOS, tvOS, watchOS, and Linux
+- **Integration**: Added to Project.yml as Swift Package dependency
+- **Features**:
+  - SSH client functionality
+  - SFTP support
+  - Port forwarding
+  - Pure Swift implementation (no C dependencies)
+- **Status**: Integrated and ready for testing
+
 # BACKEND REQUIREMENTS
 
 ## Claude Code API Gateway

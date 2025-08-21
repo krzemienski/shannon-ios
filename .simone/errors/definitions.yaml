@@ -1,0 +1,253 @@
+# Simone Error Definitions
+# Centralized error codes and messages
+
+errors:
+  # Network Errors (1000-1999)
+  NETWORK_UNAVAILABLE:
+    code: 1001
+    message: "Network connection is unavailable"
+    severity: "warning"
+    recoverable: true
+    retry: true
+    
+  API_TIMEOUT:
+    code: 1002
+    message: "API request timed out"
+    severity: "warning"
+    recoverable: true
+    retry: true
+    
+  API_RATE_LIMIT:
+    code: 1003
+    message: "API rate limit exceeded"
+    severity: "warning"
+    recoverable: true
+    retry: true
+    retry_after: 60
+    
+  API_UNAUTHORIZED:
+    code: 1004
+    message: "API authentication failed"
+    severity: "error"
+    recoverable: false
+    action: "reauthenticate"
+    
+  API_SERVER_ERROR:
+    code: 1005
+    message: "Server error occurred"
+    severity: "error"
+    recoverable: true
+    retry: true
+    
+  # Authentication Errors (2000-2999)
+  AUTH_INVALID_CREDENTIALS:
+    code: 2001
+    message: "Invalid credentials provided"
+    severity: "error"
+    recoverable: false
+    
+  AUTH_SESSION_EXPIRED:
+    code: 2002
+    message: "Session has expired"
+    severity: "warning"
+    recoverable: true
+    action: "refresh_token"
+    
+  AUTH_BIOMETRIC_FAILED:
+    code: 2003
+    message: "Biometric authentication failed"
+    severity: "warning"
+    recoverable: true
+    
+  AUTH_ACCOUNT_LOCKED:
+    code: 2004
+    message: "Account has been locked due to multiple failed attempts"
+    severity: "error"
+    recoverable: false
+    
+  # Storage Errors (3000-3999)
+  STORAGE_FULL:
+    code: 3001
+    message: "Storage space is full"
+    severity: "error"
+    recoverable: false
+    action: "clear_cache"
+    
+  STORAGE_FILE_NOT_FOUND:
+    code: 3002
+    message: "File not found"
+    severity: "warning"
+    recoverable: false
+    
+  STORAGE_PERMISSION_DENIED:
+    code: 3003
+    message: "Permission denied to access storage"
+    severity: "error"
+    recoverable: false
+    
+  STORAGE_CORRUPTED_DATA:
+    code: 3004
+    message: "Data corruption detected"
+    severity: "critical"
+    recoverable: false
+    action: "clear_data"
+    
+  # Cache Errors (4000-4999)
+  CACHE_MISS:
+    code: 4001
+    message: "Requested item not found in cache"
+    severity: "info"
+    recoverable: true
+    
+  CACHE_EXPIRED:
+    code: 4002
+    message: "Cached item has expired"
+    severity: "info"
+    recoverable: true
+    
+  CACHE_CORRUPTED:
+    code: 4003
+    message: "Cache data is corrupted"
+    severity: "warning"
+    recoverable: true
+    action: "clear_cache"
+    
+  # AI/Claude Errors (5000-5999)
+  AI_MODEL_UNAVAILABLE:
+    code: 5001
+    message: "AI model is currently unavailable"
+    severity: "error"
+    recoverable: true
+    retry: true
+    
+  AI_CONTEXT_TOO_LARGE:
+    code: 5002
+    message: "Context exceeds maximum size"
+    severity: "warning"
+    recoverable: true
+    action: "reduce_context"
+    
+  AI_INVALID_RESPONSE:
+    code: 5003
+    message: "Invalid response from AI model"
+    severity: "error"
+    recoverable: true
+    retry: true
+    
+  AI_CONTENT_FILTERED:
+    code: 5004
+    message: "Content was filtered by safety systems"
+    severity: "warning"
+    recoverable: false
+    
+  # UI Errors (6000-6999)
+  UI_COMPONENT_FAILED:
+    code: 6001
+    message: "UI component failed to load"
+    severity: "warning"
+    recoverable: true
+    
+  UI_THEME_INVALID:
+    code: 6002
+    message: "Invalid theme configuration"
+    severity: "warning"
+    recoverable: true
+    action: "reset_theme"
+    
+  UI_ANIMATION_FAILED:
+    code: 6003
+    message: "Animation failed to execute"
+    severity: "info"
+    recoverable: true
+    
+  # Configuration Errors (7000-7999)
+  CONFIG_INVALID:
+    code: 7001
+    message: "Invalid configuration detected"
+    severity: "error"
+    recoverable: false
+    action: "reset_config"
+    
+  CONFIG_MISSING:
+    code: 7002
+    message: "Required configuration is missing"
+    severity: "error"
+    recoverable: false
+    
+  CONFIG_VERSION_MISMATCH:
+    code: 7003
+    message: "Configuration version mismatch"
+    severity: "warning"
+    recoverable: true
+    action: "migrate_config"
+    
+  # System Errors (8000-8999)
+  SYSTEM_LOW_MEMORY:
+    code: 8001
+    message: "Low memory warning"
+    severity: "warning"
+    recoverable: true
+    action: "free_memory"
+    
+  SYSTEM_LOW_BATTERY:
+    code: 8002
+    message: "Low battery warning"
+    severity: "info"
+    recoverable: true
+    
+  SYSTEM_BACKGROUND_RESTRICTED:
+    code: 8003
+    message: "Background processing is restricted"
+    severity: "warning"
+    recoverable: false
+    
+  # Generic Errors (9000-9999)
+  UNKNOWN_ERROR:
+    code: 9001
+    message: "An unknown error occurred"
+    severity: "error"
+    recoverable: false
+    
+  NOT_IMPLEMENTED:
+    code: 9002
+    message: "Feature not yet implemented"
+    severity: "info"
+    recoverable: false
+    
+  DEPRECATED:
+    code: 9003
+    message: "This feature has been deprecated"
+    severity: "warning"
+    recoverable: false
+    
+# Error Categories
+categories:
+  network: [1001, 1002, 1003, 1004, 1005]
+  authentication: [2001, 2002, 2003, 2004]
+  storage: [3001, 3002, 3003, 3004]
+  cache: [4001, 4002, 4003]
+  ai: [5001, 5002, 5003, 5004]
+  ui: [6001, 6002, 6003]
+  configuration: [7001, 7002, 7003]
+  system: [8001, 8002, 8003]
+  generic: [9001, 9002, 9003]
+  
+# Error Handling Strategies
+strategies:
+  retry:
+    max_attempts: 3
+    backoff_multiplier: 2
+    initial_delay: 1000
+    
+  circuit_breaker:
+    threshold: 5
+    timeout: 30000
+    
+  fallback:
+    cache_fallback: true
+    offline_mode: true
+    
+  reporting:
+    log_all: true
+    report_critical: true
+    report_to_analytics: true

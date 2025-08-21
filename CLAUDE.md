@@ -8,6 +8,60 @@
 - App Design: @.taskmaster/docs/app-design-document.md
 - Tech Stack: @.taskmaster/docs/tech-stack.md
 
+## Simulator Configuration
+
+### iPhone 16 Pro Max (iOS 18.6)
+- **Simulator UUID**: `A707456B-44DB-472F-9722-C88153CDFFA1`
+- **Logs Path**: `logs/simulator_*.log`
+- **Build Destination**: `platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1`
+
+### REQUIRED: Use Simulator Automation Script
+**CRITICAL - MANDATORY**: You MUST ALWAYS use the `Scripts/simulator_automation.sh` script for ALL building, testing, and launching operations. NEVER use manual xcodebuild or xcrun commands directly. This script handles all the complexity of simulator management, logging, and build configuration.
+
+**DO NOT USE MANUAL COMMANDS - USE THE SCRIPT!**
+
+#### Available Commands:
+```bash
+# Complete workflow (recommended)
+./Scripts/simulator_automation.sh all
+
+# Individual commands
+./Scripts/simulator_automation.sh build    # Build with logging
+./Scripts/simulator_automation.sh launch   # Install and launch
+./Scripts/simulator_automation.sh logs     # Capture logs only
+./Scripts/simulator_automation.sh status   # Check simulator status
+./Scripts/simulator_automation.sh clean    # Clean build artifacts
+./Scripts/simulator_automation.sh help     # Show all options
+```
+
+#### Key Features:
+- Automatic simulator boot if needed
+- Log capture with filtering for ClaudeCode
+- Proper PKG_CONFIG_PATH for libssh2 (Citadel/SSH dependencies)
+- XcodeGen project generation if missing
+- Clean build and installation
+- Color-coded output for easy debugging
+
+### Manual Build & Launch (Fallback Only)
+```bash
+# Only use if automation script fails
+export SIMULATOR_UUID="A707456B-44DB-472F-9722-C88153CDFFA1"
+export APP_BUNDLE_ID="com.claudecode.ios"
+
+# 1. Start log capture (background)
+xcrun simctl spawn $SIMULATOR_UUID log stream \
+    --level=debug --style=syslog > logs/simulator_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+# 2. Build with Xcode
+xcodebuild -scheme ClaudeCode \
+    -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
+    build
+
+# 3. Install and launch
+xcrun simctl install $SIMULATOR_UUID path/to/ClaudeCode.app
+xcrun simctl launch $SIMULATOR_UUID $APP_BUNDLE_ID
+```
+
 ## Project Status
 
 <!-- **Current Stage**: Pre-MVP -->

@@ -1,0 +1,33 @@
+//
+//  TestFlight.xcconfig
+//  ClaudeCode
+//
+//  TestFlight build configuration settings
+//
+
+// Inherit from Release
+#include "Release.xcconfig"
+
+// Override specific settings for TestFlight
+GCC_PREPROCESSOR_DEFINITIONS = TESTFLIGHT=1 $(inherited)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = TESTFLIGHT RELEASE
+
+// Code Signing
+CODE_SIGN_IDENTITY = iPhone Distribution
+CODE_SIGN_STYLE = Manual
+PROVISIONING_PROFILE_SPECIFIER = 
+
+// API Configuration
+API_ENVIRONMENT = staging
+API_BASE_URL = http://localhost:8000/v1
+ENABLE_LOGGING = YES
+LOG_LEVEL = info
+
+// TestFlight specific
+ENABLE_BITCODE = NO
+ENABLE_TESTABILITY = NO
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+
+// Analytics and Crash Reporting
+ENABLE_CRASH_REPORTING = YES
+ENABLE_ANALYTICS = YES

@@ -1,0 +1,386 @@
+PRODUCT REQUIREMENTS DOCUMENT
+Claude Code iOS - Native AI Development Assistant
+Version 1.0 | December 2024
+
+===========================================
+EXECUTIVE SUMMARY
+===========================================
+
+Claude Code iOS is a native SwiftUI client for interacting with a Claude Code gateway (OpenAI-compatible API). The application provides real-time streaming chat capabilities with sophisticated tool execution visualization, comprehensive monitoring features, and an advanced Model Context Protocol (MCP) integration system.
+
+Target Users: iOS developers, AI engineers, and technical professionals who need mobile access to Claude's coding capabilities with full tool execution transparency and system monitoring.
+
+Core Value Proposition: A professional-grade iOS application that brings the full power of Claude Code to mobile devices, with real-time streaming, comprehensive tool execution tracking, SSH-based system monitoring, and sophisticated session management.
+
+===========================================
+PRODUCT VISION & GOALS
+===========================================
+
+PRIMARY OBJECTIVES:
+1. Create a native iOS experience for Claude Code interactions with zero web dependencies
+2. Provide real-time streaming SSE capabilities with robust error handling and reconnection
+3. Implement comprehensive tool execution visualization and timeline tracking
+4. Enable SSH-based remote system monitoring with live metrics visualization
+5. Support full MCP (Model Context Protocol) configuration and per-session tool customization
+6. Deliver enterprise-grade security with Keychain integration and secure credential management
+
+SUCCESS METRICS:
+- Sub-100ms UI response time for all user interactions
+- <3 second initial connection time to gateway
+- 99.9% streaming stability with automatic reconnection
+- Support for 10,000+ tokens per session without performance degradation
+- Zero credential leakage through secure Keychain storage
+- Full feature parity with web-based Claude Code interfaces
+
+===========================================
+TECHNICAL ARCHITECTURE
+===========================================
+
+PLATFORM REQUIREMENTS:
+- iOS 17.0+ minimum deployment target
+- iPhone and iPad universal app
+- Native SwiftUI implementation
+- Async/await concurrency model
+- Structured concurrency with actors
+
+CORE TECHNOLOGIES:
+- SwiftUI for all UI components
+- URLSession for networking (no third-party HTTP libraries)
+- Server-Sent Events (SSE) for streaming
+- SwiftNIO + NIOSSH for SSH monitoring
+- Swift Charts for analytics visualization
+- KeychainAccess for secure credential storage
+- Swift Package Manager (SPM) for dependencies
+
+API INTEGRATION:
+- OpenAI-compatible chat completions endpoint
+- SSE streaming with chunked responses
+- Tool execution event frames
+- Session and project management REST APIs
+- MCP server and tool configuration endpoints
+
+DESIGN SYSTEM:
+- HSL-based color tokens for consistent theming
+- Dark mode only initially
+- Responsive layouts for all device sizes
+- Bottom tab navigation (not drawer)
+- Native iOS design patterns throughout
+
+===========================================
+FEATURE SPECIFICATIONS
+===========================================
+
+1. AUTHENTICATION & SETTINGS
+- Base URL configuration with validation
+- API key secure storage in Keychain
+- Health check endpoint validation
+- SSE buffer size configuration (16-512 KiB)
+- Streaming mode defaults
+- Server version and status display
+
+2. PROJECT MANAGEMENT
+- Create, list, and delete projects
+- Project metadata (name, description, path)
+- Project-level environment variables
+- Session history per project
+- Token usage tracking per project
+- Cost analytics per project
+
+3. SESSION MANAGEMENT
+- Create sessions with model selection
+- System prompt configuration
+- Title and metadata management
+- Session state persistence
+- Message history tracking
+- Token usage and cost tracking per session
+
+4. CHAT INTERFACE
+- Real-time streaming with SSE
+- Non-streaming fallback mode
+- User/Assistant/System message roles
+- Markdown rendering in messages
+- Code syntax highlighting
+- Copy functionality for code blocks
+- Message retry capabilities
+- Stop/interrupt streaming
+
+5. TOOL EXECUTION SYSTEM
+- Tool Timeline visualization
+- Real-time tool execution tracking
+- Input/output JSON display
+- Duration and exit code tracking
+- Error state visualization
+- Tool retry with edited inputs
+- Concurrent tool execution display
+- Tool result inspection
+
+6. MCP (MODEL CONTEXT PROTOCOL)
+- Server configuration (user/project scope)
+- Tool enable/disable controls
+- Priority ordering with drag reorder
+- Audit log configuration
+- Per-session tool overrides
+- Default configuration templates
+- Server status monitoring
+
+7. FILE BROWSER
+- SSH-based file system access
+- Directory tree navigation
+- File preview capabilities
+- Text file content display
+- Monospace formatting for code
+- Copy file contents
+- Path navigation
+
+8. SYSTEM MONITORING
+- SSH-based remote monitoring
+- CPU usage tracking and visualization
+- Memory usage metrics
+- Network I/O statistics
+- Disk usage monitoring
+- Process list with resource usage
+- Auto-refresh capabilities (5-10s)
+- Snapshot export to CSV/JSON
+
+9. ANALYTICS DASHBOARD
+- Token usage over time (area chart)
+- Cost breakdown by model (bar chart)
+- Tool invocation statistics
+- Session activity metrics
+- Project-level aggregations
+- Time range filtering
+- CSV export capabilities
+
+10. TRACING & DIAGNOSTICS
+- Request/response logging
+- SSE event tracking
+- Tool execution spans
+- Error tracking with stack traces
+- Performance metrics
+- NDJSON export for analysis
+- Log level filtering
+- Real-time log streaming
+
+11. HYPERTHINK PLANNER
+- Multi-step task planning
+- Queue visualization
+- Progress tracking
+- Step execution status
+- Pause/resume capabilities
+- Reset functionality
+- Scratchpad for notes
+
+===========================================
+USER INTERFACE SPECIFICATIONS
+===========================================
+
+NAVIGATION ARCHITECTURE:
+- Bottom tab bar with 4 tabs: Home, Projects, Sessions, Monitor
+- Modal sheets for creation flows
+- Push navigation for detail views
+- No drawer navigation pattern
+
+SCREEN SPECIFICATIONS:
+
+HOME SCREEN:
+- Quick action buttons
+- Recent projects list
+- Active sessions display
+- KPI metrics (tokens, cost, sessions)
+- Settings gear icon access
+
+PROJECTS LIST:
+- Search and filter capabilities
+- Sort by name/date/tokens
+- Token count badges
+- Session count indicators
+- Swipe actions for delete
+
+PROJECT DETAIL:
+- Project metadata display
+- Environment variables (secure)
+- Session list with statistics
+- New session button
+- Debug and metrics actions
+
+NEW SESSION:
+- Model selection picker
+- Title input field
+- System prompt editor
+- MCP configuration toggle
+- Streaming mode toggle
+
+CHAT CONSOLE:
+- Split view: transcript + tool timeline
+- Message bubbles with role indicators
+- Streaming text animation
+- Tool execution cards
+- Status bar with metrics
+- Composer with multiline input
+
+FILE BROWSER:
+- Tree view navigation
+- File/folder indicators
+- Preview pane
+- Syntax highlighting
+- Copy functionality
+
+MONITORING VIEW:
+- Real-time metric gauges
+- Process list table
+- Disk usage bars
+- Network I/O indicators
+- Auto-refresh controls
+
+SETTINGS:
+- Server configuration
+- API key management
+- Default preferences
+- MCP global settings
+- SSH credentials
+
+===========================================
+SECURITY REQUIREMENTS
+===========================================
+
+- API keys stored in iOS Keychain with biometric protection
+- No credentials in UserDefaults or plain storage
+- HTTPS only for remote connections
+- SSH password authentication initially (public key in v2)
+- Secure credential passing to SSH library
+- No logging of sensitive data
+- Redaction of keys in debug output
+- Session isolation for credentials
+
+===========================================
+PERFORMANCE REQUIREMENTS
+===========================================
+
+- App launch to interactive: <2 seconds
+- SSE connection establishment: <3 seconds
+- Message rendering: <50ms per chunk
+- Tool timeline update: <100ms
+- SSH snapshot: <5 seconds
+- Chart rendering: <200ms
+- File browser listing: <2 seconds
+- Search operations: <500ms
+
+===========================================
+QUALITY REQUIREMENTS
+===========================================
+
+- 100% Swift type safety (no force unwrapping)
+- Comprehensive error handling with user feedback
+- Graceful degradation for network issues
+- Automatic SSE reconnection with backoff
+- Memory leak prevention in streaming
+- Background task handling for long operations
+- Proper Combine/async cancellation
+
+===========================================
+DEVELOPMENT ROADMAP
+===========================================
+
+PHASE 1 - FOUNDATION (WEEKS 1-2):
+- Project setup with XcodeGen
+- Core data models implementation
+- Theme system with HSL tokens
+- Basic navigation structure
+- Settings and authentication
+
+PHASE 2 - CORE FEATURES (WEEKS 3-4):
+- Project management CRUD
+- Session creation and management
+- Basic chat interface (non-streaming)
+- API client implementation
+- Error handling framework
+
+PHASE 3 - STREAMING (WEEKS 5-6):
+- SSE client implementation
+- Streaming chat interface
+- Tool timeline visualization
+- Real-time status updates
+- Stop/interrupt functionality
+
+PHASE 4 - ADVANCED FEATURES (WEEKS 7-8):
+- MCP configuration system
+- SSH monitoring implementation
+- File browser functionality
+- Analytics and charts
+- Tracing system
+
+PHASE 5 - POLISH (WEEKS 9-10):
+- Performance optimization
+- UI/UX refinements
+- Comprehensive testing
+- Documentation
+- App Store preparation
+
+===========================================
+TESTING REQUIREMENTS
+===========================================
+
+UNIT TESTING:
+- Model serialization/deserialization
+- API client methods
+- SSH command parsing
+- Theme color calculations
+- MCP configuration logic
+
+INTEGRATION TESTING:
+- API endpoint connectivity
+- SSE streaming stability
+- SSH connection handling
+- Keychain operations
+- File system operations
+
+UI TESTING:
+- Navigation flows
+- Form validation
+- Streaming UI updates
+- Gesture handling
+- State management
+
+PERFORMANCE TESTING:
+- Memory usage during streaming
+- CPU usage monitoring
+- Network efficiency
+- Battery impact
+- Storage growth
+
+===========================================
+DEPLOYMENT SPECIFICATIONS
+===========================================
+
+- App Store distribution
+- TestFlight beta testing
+- Minimum iOS 17.0 support
+- Universal app (iPhone + iPad)
+- No third-party analytics initially
+- No crash reporting initially
+- Manual update notifications
+
+===========================================
+SUCCESS CRITERIA
+===========================================
+
+1. Successful SSE streaming for 10,000+ token responses
+2. Tool execution visualization with <100ms latency
+3. SSH monitoring with 5-second refresh cycles
+4. Zero credential leaks in security audit
+5. 4.5+ star App Store rating target
+6. <1% crash rate in production
+7. 95% user retention after first week
+
+===========================================
+CONSTRAINTS & LIMITATIONS
+===========================================
+
+- No offline mode in v1
+- No multi-account support initially
+- No collaborative features
+- English only interface initially
+- No Apple Watch app
+- No macOS Catalyst initially
+- No widgets or app clips
+- No iCloud sync

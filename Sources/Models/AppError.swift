@@ -61,38 +61,4 @@ public enum AppError: LocalizedError {
     }
 }
 
-/// API-specific errors
-public enum APIError: LocalizedError {
-    case invalidURL
-    case invalidResponse
-    case decodingError(Error)
-    case serverError(statusCode: Int, message: String?)
-    case rateLimited(retryAfter: TimeInterval?)
-    case unauthorized
-    case timeout
-    case cancelled
-    
-    public var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "Invalid URL"
-        case .invalidResponse:
-            return "Invalid server response"
-        case .decodingError(let error):
-            return "Failed to decode response: \(error.localizedDescription)"
-        case .serverError(let code, let message):
-            return "Server error (\(code)): \(message ?? "Unknown error")"
-        case .rateLimited(let retryAfter):
-            if let retryAfter = retryAfter {
-                return "Rate limited. Retry after \(Int(retryAfter)) seconds"
-            }
-            return "Rate limited. Please try again later"
-        case .unauthorized:
-            return "Unauthorized. Check your API key"
-        case .timeout:
-            return "Request timed out"
-        case .cancelled:
-            return "Request was cancelled"
-        }
-    }
-}
+// APIError is now defined in APIModels.swift

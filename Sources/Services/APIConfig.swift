@@ -163,7 +163,7 @@ enum APIConfig {
     
     // MARK: - Error Codes
     
-    enum APIError: LocalizedError {
+    enum ConfigError: LocalizedError {
         case invalidURL
         case noData
         case decodingError(Error)

@@ -6,18 +6,27 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct ChatListView: View {
     @EnvironmentObject private var appState: AppState
+    @StateObject private var viewModel: ChatListViewModel
     @State private var searchText = ""
     @State private var showingNewChat = false
-    @State private var chats: [ChatSession] = ChatSession.mockData
+    
+    init() {
+        let container = DependencyContainer.shared
+        _viewModel = StateObject(wrappedValue: ChatListViewModel(
+            apiClient: container.apiClient,
+            appState: container.appState
+        ))
+    }
     
     var filteredChats: [ChatSession] {
         if searchText.isEmpty {
-            return chats
+            return viewModel.sessions
         }
-        return chats.filter { 
+        return viewModel.sessions.filter { 
             $0.title.localizedCaseInsensitiveContains(searchText) ||
             $0.lastMessage.localizedCaseInsensitiveContains(searchText)
         }
@@ -28,7 +37,7 @@ struct ChatListView: View {
             Theme.background
                 .ignoresSafeArea()
             
-            if chats.isEmpty {
+            if viewModel.sessions.isEmpty && !viewModel.isLoading {
                 EmptyStateView(
                     icon: "message.fill",
                     title: "No Conversations",
@@ -63,7 +72,28 @@ struct ChatListView: View {
         }
         .sheet(isPresented: $showingNewChat) {
             NewChatView { newChat in
-                chats.insert(newChat, at: 0)
+                Task {
+                    try? await viewModel.createSession(newChat)
+                }
+            }
+        }
+        .refreshable {
+            await viewModel.refreshSessions()
+        }
+        .alert("Error", isPresented: $viewModel.showError) {
+            Button("OK") {
+                viewModel.showError = false
+            }
+        } message: {
+            Text(viewModel.error?.localizedDescription ?? "An error occurred")
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(1.5)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.3))
             }
         }
     }
@@ -136,12 +166,41 @@ struct ChatRowView: View {
 // MARK: - Chat Session Model
 
 struct ChatSession: Identifiable {
-    let id = UUID().uuidString
+    var id: String  // Made mutable for backend integration
     let title: String
     let lastMessage: String
     let timestamp: Date
     let icon: String
     let tags: [String]
+    
+    // Default initializer for new sessions
+    init(title: String,
+         lastMessage: String,
+         timestamp: Date,
+         icon: String,
+         tags: [String]) {
+        self.id = UUID().uuidString
+        self.title = title
+        self.lastMessage = lastMessage
+        self.timestamp = timestamp
+        self.icon = icon
+        self.tags = tags
+    }
+    
+    // Initializer with explicit id for backend integration
+    init(id: String,
+         title: String,
+         lastMessage: String,
+         timestamp: Date,
+         icon: String,
+         tags: [String]) {
+        self.id = id
+        self.title = title
+        self.lastMessage = lastMessage
+        self.timestamp = timestamp
+        self.icon = icon
+        self.tags = tags
+    }
     
     var formattedDate: String {
         let formatter = RelativeDateTimeFormatter()

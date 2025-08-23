@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import OSLog
 
 /// ViewModel for managing chat interactions
 @MainActor
@@ -44,7 +45,13 @@ final class ChatViewModel: ObservableObject {
     private let appState: AppState
     private var sseClient: SSEClient?
     private var cancellables = Set<AnyCancellable>()
+    private let logger = Logger(subsystem: "com.claudecode.ios", category: "ChatViewModel")
     private let conversationId: String?
+    
+    // Performance optimizations
+    private let messageDebouncer = Debouncer(delay: 0.5)
+    private let scrollDebouncer = Debouncer(delay: 0.3)
+    private var messageCache = LRUCache<String, Message>(maxSize: 100)
     
     // MARK: - Computed Properties
     
@@ -311,21 +318,62 @@ final class ChatViewModel: ObservableObject {
             stream: true
         )
         
-        // TODO: Implement SSE streaming
-        // For now, simulate with a regular request
-        isStreaming = false
-        
-        do {
-            let response = try await apiClient.createChatCompletion(request: request)
-            if let choice = response.choices.first {
-                updateMessage(id: assistantMessage.id, content: choice.message.content)
+        // Use the streamChatCompletion method from APIClient+Streaming
+        await apiClient.streamChatCompletion(
+            request: request,
+            onChunk: { [weak self] chunk in
+                guard let self = self else { return }
+                
+                // Process streaming chunk
+                if let delta = chunk.choices.first?.delta {
+                    if let content = delta.content {
+                        self.streamingContent += content
+                        
+                        // Update the message with accumulated content
+                        if let messageId = self.streamingMessageId {
+                            self.updateMessage(id: messageId, content: self.streamingContent)
+                        }
+                    }
+                    
+                    // Handle tool calls if present
+                    if let toolCalls = delta.toolCalls, !toolCalls.isEmpty {
+                        // Process tool calls
+                        self.logger.info("Received tool calls in stream")
+                    }
+                }
+                
+                // Update usage if available
+                if let usage = chunk.usage {
+                    // Store usage information
+                    self.logger.info("Token usage - prompt: \(usage.promptTokens), completion: \(usage.completionTokens)")
+                }
+            },
+            onComplete: { [weak self] in
+                guard let self = self else { return }
+                
+                // Finalize the streaming message
+                if let messageId = self.streamingMessageId {
+                    // Mark message as no longer streaming
+                    if let index = self.messages.firstIndex(where: { $0.id == messageId }) {
+                        self.messages[index].isStreaming = false
+                    }
+                }
+                
+                self.streamingMessageId = nil
+                self.streamingContent = ""
+                self.isStreaming = false
+                self.isLoading = false
+            },
+            onError: { [weak self] error in
+                guard let self = self else { return }
+                
+                self.handleError(error)
+                self.streamingMessageId = nil
+                self.streamingContent = ""
+                self.isStreaming = false
+                self.isLoading = false
             }
-        } catch {
-            handleError(error)
-        }
-        
-        streamingMessageId = nil
-        isStreaming = false
+        )
     }
     
     private func prepareMessagesForAPI() -> [ChatMessage] {
@@ -347,6 +395,47 @@ final class ChatViewModel: ObservableObject {
         }
         
         return apiMessages
+    }
+    
+    // MARK: - Performance Optimization Methods
+    
+    /// Preload message content for smooth scrolling
+    func preloadMessageContent(_ message: Message) {
+        // Cache message in LRU cache
+        messageCache[message.id] = message
+        
+        // Preload any images or resources in the message
+        if let imageURLs = extractImageURLs(from: message.content) {
+            Task {
+                for url in imageURLs {
+                    _ = try? await ImageCache.shared.loadThumbnail(from: url)
+                }
+            }
+        }
+    }
+    
+    /// Clean up message resources when out of view
+    func cleanupMessageResources(_ message: Message) {
+        // Keep recent messages in cache, remove very old ones
+        if messages.count > 100 {
+            // Remove from cache if message is old and not visible
+            if let index = messages.firstIndex(where: { $0.id == message.id }),
+               index < messages.count - 50 {
+                messageCache.remove(message.id)
+            }
+        }
+    }
+    
+    private func extractImageURLs(from content: String) -> [URL]? {
+        // Simple regex to find image URLs in markdown
+        let pattern = #"!\[.*?\]\((https?://[^\s)]+)\)"#
+        let regex = try? NSRegularExpression(pattern: pattern)
+        let matches = regex?.matches(in: content, range: NSRange(content.startIndex..., in: content))
+        
+        return matches?.compactMap { match in
+            guard let range = Range(match.range(at: 1), in: content) else { return nil }
+            return URL(string: String(content[range]))
+        }
     }
     
     // MARK: - Error Handling
@@ -423,59 +512,4 @@ enum ConnectionStatus {
 }
 
 // MARK: - API Request/Response Types
-
-struct ChatMessage: Codable {
-    let role: String
-    let content: String
-}
-
-struct ChatCompletionRequest: Codable {
-    let model: String
-    let messages: [ChatMessage]
-    let temperature: Double?
-    let maxTokens: Int?
-    let stream: Bool
-    
-    enum CodingKeys: String, CodingKey {
-        case model
-        case messages
-        case temperature
-        case maxTokens = "max_tokens"
-        case stream
-    }
-}
-
-struct ChatCompletionResponse: Codable {
-    let id: String
-    let object: String
-    let created: Int
-    let model: String
-    let choices: [Choice]
-    let usage: Usage?
-    
-    struct Choice: Codable {
-        let index: Int
-        let message: ChatMessage
-        let finishReason: String?
-        
-        enum CodingKeys: String, CodingKey {
-            case index
-            case message
-            case finishReason = "finish_reason"
-        }
-    }
-    
-    struct Usage: Codable {
-        let promptTokens: Int
-        let completionTokens: Int
-        let totalTokens: Int
-        let cachedTokens: Int?
-        
-        enum CodingKeys: String, CodingKey {
-            case promptTokens = "prompt_tokens"
-            case completionTokens = "completion_tokens"
-            case totalTokens = "total_tokens"
-            case cachedTokens = "cached_tokens"
-        }
-    }
-}
+// Using types from NetworkModels.swift

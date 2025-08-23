@@ -23,6 +23,16 @@ extension Color {
         self.init(red: rgb.r, green: rgb.g, blue: rgb.b, opacity: opacity)
     }
     
+    /// Static helper method for HSL color creation
+    /// - Parameters:
+    ///   - hue: Hue value (0-360 degrees)
+    ///   - saturation: Saturation percentage (0-100)
+    ///   - lightness: Lightness percentage (0-100)
+    ///   - opacity: Opacity value (0-1), default is 1
+    static func hsl(_ hue: Double, _ saturation: Double, _ lightness: Double, opacity: Double = 1.0) -> Color {
+        return Color(hsl: hue, saturation, lightness, opacity: opacity)
+    }
+    
     /// Convert HSL to RGB values
     private static func hslToRgb(h: Double, s: Double, l: Double) -> (r: Double, g: Double, b: Double) {
         let c = (1 - abs(2 * l - 1)) * s

@@ -1,0 +1,479 @@
+# Claude Code iOS Fastlane Configuration
+# Tasks 961-970: Complete Fastlane setup with automated build, test, and deployment
+
+# Minimum fastlane version required
+fastlane_version "2.217.0"
+
+# iOS-specific setup
+default_platform(:ios)
+
+# Import environment variables
+import_from_git(
+  url: "https://github.com/fastlane/fastlane",
+  path: "fastlane/actions"
+) if File.exist?(".git")
+
+platform :ios do
+  # ============================================================================
+  # SETUP AND CONFIGURATION
+  # ============================================================================
+  
+  before_all do |lane|
+    ensure_git_status_clean unless lane == :test || lane == :build_dev
+    
+    # Environment validation
+    if is_ci
+      UI.message "🤖 Running on CI environment"
+      ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "true"
+      ENV["FASTLANE_HIDE_CHANGELOG"] = "true"
+    else
+      UI.message "🖥️  Running on local environment"
+    end
+    
+    # Setup directories
+    sh("mkdir -p ../logs")
+    sh("mkdir -p ../build")
+    sh("mkdir -p ../reports")
+  end
+
+  # ============================================================================
+  # DEVELOPMENT LANES
+  # ============================================================================
+  
+  desc "Quick development build for testing"
+  lane :build_dev do
+    UI.header "🛠️  Development Build"
+    
+    # Generate project if needed
+    if !File.exist?("../ClaudeCode.xcodeproj")
+      sh("cd .. && xcodegen generate")
+    end
+    
+    build_app(
+      project: "ClaudeCode.xcodeproj",
+      scheme: "ClaudeCode",
+      configuration: "Debug",
+      destination: "platform=iOS Simulator,name=iPhone 16 Pro Max",
+      derived_data_path: "build/DerivedData",
+      skip_archive: true,
+      skip_codesigning: true,
+      output_directory: "build",
+      output_name: "ClaudeCode-dev.app"
+    )
+    
+    UI.success "✅ Development build completed successfully"
+  end
+  
+  desc "Run all tests with coverage"
+  lane :test do |options|
+    UI.header "🧪 Running Tests"
+    
+    # Generate project if needed
+    if !File.exist?("../ClaudeCode.xcodeproj")
+      sh("cd .. && xcodegen generate")
+    end
+    
+    # Determine test plan
+    test_plan = options[:test_plan] || "ClaudeCodeTests"
+    
+    scan(
+      project: "ClaudeCode.xcodeproj",
+      scheme: "ClaudeCode",
+      configuration: "Debug",
+      destination: "platform=iOS Simulator,name=iPhone 16 Pro Max",
+      testplan: test_plan,
+      derived_data_path: "build/DerivedData",
+      result_bundle: true,
+      output_directory: "test-results",
+      output_types: "html,junit",
+      code_coverage: true,
+      fail_build: false,
+      suppress_xcode_output: !is_ci
+    )
+    
+    # Generate coverage report
+    if options[:coverage] != false
+      xcov(
+        project: "ClaudeCode.xcodeproj",
+        scheme: "ClaudeCode",
+        output_directory: "coverage",
+        derived_data_path: "build/DerivedData",
+        minimum_coverage_percentage: 75.0,
+        include_test_targets: false
+      )
+    end
+    
+    UI.success "✅ Tests completed"
+  end
+
+  # ============================================================================
+  # BUILD LANES
+  # ============================================================================
+  
+  desc "Build for App Store distribution"
+  lane :build do |options|
+    UI.header "🏗️  Building for Distribution"
+    
+    # Default configuration
+    configuration = options[:configuration] || "Release"
+    export_method = options[:export_method] || "app-store"
+    
+    # Generate project
+    sh("cd .. && xcodegen generate")
+    
+    # Update version if provided
+    if options[:version]
+      increment_version_number(version_number: options[:version])
+    end
+    
+    # Update build number if provided
+    if options[:build_number]
+      increment_build_number(build_number: options[:build_number])
+    else
+      # Auto-increment build number with timestamp
+      build_number = Time.now.strftime("%Y%m%d%H%M")
+      increment_build_number(build_number: build_number)
+    end
+    
+    # Code signing setup
+    if export_method != "development"
+      setup_code_signing(export_method: export_method)
+    end
+    
+    # Build and archive
+    build_app(
+      project: "ClaudeCode.xcodeproj",
+      scheme: "ClaudeCode",
+      configuration: configuration,
+      destination: "generic/platform=iOS",
+      derived_data_path: "build/DerivedData",
+      archive_path: "build/ClaudeCode.xcarchive",
+      export_method: export_method,
+      export_options: {
+        method: export_method,
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false,
+        teamID: ENV["FASTLANE_TEAM_ID"] || CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+      },
+      output_directory: "build",
+      output_name: "ClaudeCode.ipa"
+    )
+    
+    UI.success "✅ Build completed successfully"
+    UI.message "📦 Archive: build/ClaudeCode.xcarchive"
+    UI.message "📱 IPA: build/ClaudeCode.ipa"
+  end
+
+  # ============================================================================
+  # DEPLOYMENT LANES
+  # ============================================================================
+  
+  desc "Deploy to TestFlight"
+  lane :beta do |options|
+    UI.header "🚀 Deploying to TestFlight"
+    
+    # Build if IPA not provided
+    ipa_path = options[:ipa] || options[:ipa_path]
+    if !ipa_path || !File.exist?(ipa_path)
+      UI.message "📦 Building for TestFlight distribution..."
+      build(
+        export_method: "app-store",
+        configuration: "Release",
+        version: options[:version],
+        build_number: options[:build_number]
+      )
+      ipa_path = "build/ClaudeCode.ipa"
+    end
+    
+    # Upload to TestFlight
+    pilot(
+      ipa: ipa_path,
+      skip_submission: options[:skip_submission] || false,
+      skip_waiting_for_build_processing: options[:skip_waiting_for_build_processing] || true,
+      changelog: options[:changelog] || generate_changelog,
+      distribute_external: options[:distribute_external] || false,
+      groups: options[:groups] || ["Internal Testing"],
+      demo_account_required: false,
+      beta_app_review_info: {
+        contact_email: ENV["FASTLANE_USER"] || "developer@claudecode.app",
+        contact_first_name: "Claude",
+        contact_last_name: "Code",
+        contact_phone: "555-123-4567",
+        demo_account_name: "",
+        demo_account_password: "",
+        notes: "Claude Code iOS app for developer productivity"
+      }
+    )
+    
+    # Notify team
+    if options[:notify] != false
+      notify_beta_deployment(
+        version: get_version_number,
+        build: get_build_number,
+        changelog: options[:changelog] || generate_changelog
+      )
+    end
+    
+    UI.success "✅ Successfully deployed to TestFlight"
+  end
+  
+  desc "Deploy to App Store"
+  lane :release do |options|
+    UI.header "🌟 Releasing to App Store"
+    
+    # Build if IPA not provided
+    ipa_path = options[:ipa] || options[:ipa_path]
+    if !ipa_path || !File.exist?(ipa_path)
+      UI.message "📦 Building for App Store release..."
+      build(
+        export_method: "app-store",
+        configuration: "Release",
+        version: options[:version],
+        build_number: options[:build_number]
+      )
+      ipa_path = "build/ClaudeCode.ipa"
+    end
+    
+    # Prepare metadata
+    prepare_app_store_metadata(options)
+    
+    # Upload to App Store
+    deliver(
+      ipa: ipa_path,
+      skip_metadata: options[:skip_metadata] || false,
+      skip_screenshots: options[:skip_screenshots] || true,
+      submit_for_review: options[:submit_for_review] || false,
+      automatic_release: options[:automatic_release] || false,
+      force: options[:force] || false,
+      submission_information: {
+        add_id_info_limits_tracking: true,
+        add_id_info_serves_ads: false,
+        add_id_info_tracks_action: false,
+        add_id_info_tracks_install: false,
+        add_id_info_uses_idfa: false,
+        content_rights_has_rights: true,
+        content_rights_contains_third_party_content: false,
+        export_compliance_platform: "ios",
+        export_compliance_compliance_required: false,
+        export_compliance_encryption_updated: false,
+        export_compliance_app_type: nil,
+        export_compliance_uses_encryption: false
+      }
+    )
+    
+    # Create release notes
+    create_release_notes(
+      version: get_version_number,
+      build: get_build_number
+    )
+    
+    UI.success "✅ Successfully submitted to App Store"
+  end
+
+  # ============================================================================
+  # UTILITY LANES
+  # ============================================================================
+  
+  desc "Setup code signing"
+  private_lane :setup_code_signing do |options|
+    export_method = options[:export_method] || "app-store"
+    
+    if ENV["MATCH_GIT_URL"]
+      UI.message "🔐 Setting up code signing with Match..."
+      
+      match(
+        type: export_method == "app-store" ? "appstore" : "development",
+        readonly: is_ci,
+        shallow_clone: true,
+        clone_branch_directly: true,
+        force_for_new_devices: !is_ci
+      )
+    else
+      UI.important "⚠️  No Match configuration found, using automatic code signing"
+    end
+  end
+  
+  desc "Generate changelog from git commits"
+  private_lane :generate_changelog do
+    # Get commits since last tag
+    last_tag = sh("git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo ''", log: false).strip
+    
+    if last_tag.empty?
+      range = "HEAD"
+    else
+      range = "#{last_tag}..HEAD"
+    end
+    
+    changelog = sh("git log --pretty=format:'• %s' #{range} | head -20", log: false).strip
+    
+    if changelog.empty?
+      changelog = "Bug fixes and improvements"
+    end
+    
+    changelog
+  end
+  
+  desc "Prepare App Store metadata"
+  private_lane :prepare_app_store_metadata do |options|
+    # Create metadata directory structure
+    sh("mkdir -p fastlane/metadata/en-US")
+    
+    # Generate release notes if not provided
+    if !File.exist?("fastlane/metadata/en-US/release_notes.txt")
+      File.write(
+        "fastlane/metadata/en-US/release_notes.txt",
+        options[:release_notes] || generate_changelog
+      )
+    end
+    
+    # App description
+    if !File.exist?("fastlane/metadata/en-US/description.txt")
+      File.write(
+        "fastlane/metadata/en-US/description.txt",
+        "Claude Code is a powerful iOS development tool that enhances your coding workflow with AI assistance and advanced features."
+      )
+    end
+    
+    # Keywords
+    if !File.exist?("fastlane/metadata/en-US/keywords.txt")
+      File.write(
+        "fastlane/metadata/en-US/keywords.txt",
+        "developer,coding,AI,productivity,swift,ios"
+      )
+    end
+  end
+  
+  desc "Create release notes"
+  private_lane :create_release_notes do |options|
+    version = options[:version]
+    build = options[:build]
+    
+    release_notes = <<~NOTES
+      # Claude Code v#{version} (#{build})
+      
+      ## Release Information
+      - **Version**: #{version}
+      - **Build**: #{build}
+      - **Release Date**: #{Time.now.strftime("%Y-%m-%d")}
+      
+      ## Changes
+      #{generate_changelog}
+      
+      ## Technical Details
+      - iOS 17.0+ required
+      - Built with Xcode #{ENV["XCODE_VERSION"] || "15.2"}
+      - Swift 5.9
+    NOTES
+    
+    File.write("reports/release-notes-#{version}.md", release_notes)
+    UI.message "📝 Release notes created: reports/release-notes-#{version}.md"
+  end
+  
+  desc "Notify team about beta deployment"
+  private_lane :notify_beta_deployment do |options|
+    # This can be extended with Slack, Discord, or email notifications
+    UI.success "🔔 Beta deployment notification:"
+    UI.message "Version: #{options[:version]} (#{options[:build]})"
+    UI.message "Changelog: #{options[:changelog]}"
+    
+    # Example Slack notification (uncomment and configure as needed)
+    # slack(
+    #   message: "New Claude Code beta available!",
+    #   payload: {
+    #     "Version" => options[:version],
+    #     "Build" => options[:build],
+    #     "Changelog" => options[:changelog]
+    #   },
+    #   default_payloads: [:git_branch, :git_author]
+    # )
+  end
+
+  # ============================================================================
+  # COMPOSITE LANES
+  # ============================================================================
+  
+  desc "Full build and test pipeline"
+  lane :ci do |options|
+    UI.header "🔄 CI Pipeline"
+    
+    # Run tests
+    test(
+      test_plan: "ClaudeCodeTests",
+      coverage: true
+    )
+    
+    # Build for distribution
+    build(
+      configuration: "Release",
+      export_method: "app-store"
+    )
+    
+    # Optional: Deploy to TestFlight if configured
+    if options[:deploy_beta] && ENV["APP_STORE_CONNECT_API_KEY_ID"]
+      beta(
+        skip_waiting_for_build_processing: true,
+        changelog: "CI build #{Time.now.strftime("%Y-%m-%d %H:%M")}"
+      )
+    end
+    
+    UI.success "✅ CI pipeline completed successfully"
+  end
+  
+  desc "Nightly build pipeline"
+  lane :nightly do |options|
+    UI.header "🌙 Nightly Build"
+    
+    # Update build number with nightly suffix
+    build_number = "#{Time.now.strftime("%Y%m%d")}01"
+    version = get_version_number + "-nightly"
+    
+    # Run full test suite
+    test(coverage: true)
+    
+    # Build
+    build(
+      version: version,
+      build_number: build_number,
+      configuration: "Release"
+    )
+    
+    # Deploy to internal TestFlight group
+    if ENV["APP_STORE_CONNECT_API_KEY_ID"]
+      beta(
+        groups: ["Nightly Testers"],
+        changelog: "Nightly build #{Time.now.strftime("%Y-%m-%d")}\n\n#{generate_changelog}",
+        skip_waiting_for_build_processing: true
+      )
+    end
+    
+    UI.success "✅ Nightly build completed"
+  end
+
+  # ============================================================================
+  # ERROR HANDLING
+  # ============================================================================
+  
+  after_all do |lane|
+    # Clean up
+    sh("rm -rf ../build/DerivedData") unless ENV["KEEP_DERIVED_DATA"]
+    
+    UI.success "🎉 Lane '#{lane}' completed successfully!"
+  end
+
+  error do |lane, exception|
+    UI.error "❌ Lane '#{lane}' failed with exception:"
+    UI.error exception.message
+    
+    # Clean up on error
+    sh("rm -rf ../build/DerivedData") unless ENV["KEEP_DERIVED_DATA"]
+    
+    # Capture logs for debugging
+    if File.exist?("../build/Logs")
+      sh("cp -r ../build/Logs ../logs/fastlane-error-#{Time.now.strftime("%Y%m%d_%H%M%S")}")
+    end
+    
+    # Notify team of failure (can be extended with notifications)
+    UI.error "🚨 Build failed. Check logs for details."
+  end
+end

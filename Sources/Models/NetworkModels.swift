@@ -276,6 +276,9 @@ public struct ChatUsage: Codable {
     }
 }
 
+/// Alternative Usage type for compatibility
+public typealias Usage = ChatUsage
+
 // MARK: - Model Information (Tasks 411-420)
 
 /// Model information
@@ -609,5 +612,149 @@ public struct SSHSessionsResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case sessions
         case activeCount = "active_count"
+    }
+}
+
+// MARK: - Additional Types for Compatibility
+
+/// Tool result event for streaming
+public struct ToolResultEvent: Codable {
+    public let toolCallId: String
+    public let result: AnyCodable
+    public let error: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case toolCallId = "tool_call_id"
+        case result
+        case error
+    }
+}
+
+/// Session statistics
+public struct SessionStats: Codable {
+    public let messageCount: Int
+    public let tokenUsage: Int
+    public let duration: TimeInterval
+    public let model: String
+    
+    enum CodingKeys: String, CodingKey {
+        case messageCount = "message_count"
+        case tokenUsage = "token_usage"
+        case duration
+        case model
+    }
+}
+
+/// Model capabilities
+public struct ModelCapabilities: Codable {
+    public let maxTokens: Int
+    public let supportsStreaming: Bool
+    public let supportsFunctions: Bool
+    public let supportsVision: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case maxTokens = "max_tokens"
+        case supportsStreaming = "supports_streaming"
+        case supportsFunctions = "supports_functions"
+        case supportsVision = "supports_vision"
+    }
+}
+
+/// Connection quality enum
+public enum ConnectionQuality: String, Codable {
+    case excellent
+    case good
+    case fair
+    case poor
+    case unknown
+}
+
+/// Metric type for monitoring
+public enum MetricType: String, CaseIterable, Codable {
+    case cpu
+    case memory
+    case disk
+    case network
+    case latency
+    case performance
+    
+    public var icon: String {
+        switch self {
+        case .cpu: return "cpu"
+        case .memory: return "memorychip"
+        case .disk: return "internaldrive"
+        case .network: return "network"
+        case .latency: return "timer"
+        case .performance: return "speedometer"
+        }
+    }
+}
+
+/// Time range for monitoring data
+public enum TimeRange: String, CaseIterable, Identifiable, Codable {
+    case oneMinute = "1m"
+    case fiveMinutes = "5m"
+    case fifteenMinutes = "15m"
+    case thirtyMinutes = "30m"
+    case oneHour = "1h"
+    case sixHours = "6h"
+    case twelveHours = "12h"
+    case oneDay = "1d"
+    case oneWeek = "1w"
+    
+    public var id: String { rawValue }
+    
+    public var displayName: String {
+        switch self {
+        case .oneMinute: return "1 Min"
+        case .fiveMinutes: return "5 Min"
+        case .fifteenMinutes: return "15 Min"
+        case .thirtyMinutes: return "30 Min"
+        case .oneHour: return "1 Hour"
+        case .sixHours: return "6 Hours"
+        case .twelveHours: return "12 Hours"
+        case .oneDay: return "1 Day"
+        case .oneWeek: return "1 Week"
+        }
+    }
+}
+
+/// Cached response for request caching
+public class CachedResponse: NSObject {
+    public let data: Data
+    public let timestamp: Date
+    public let headers: [String: String]
+    
+    public init(data: Data, headers: [String: String]) {
+        self.data = data
+        self.timestamp = Date()
+        self.headers = headers
+        super.init()
+    }
+}
+
+/// Request metrics
+public struct RequestMetrics: Codable {
+    public let totalRequests: Int
+    public let successfulRequests: Int
+    public let failedRequests: Int
+    public let averageResponseTime: TimeInterval
+    public let totalBytesTransferred: Int64
+}
+
+/// Metrics collector
+public class MetricsCollector: ObservableObject {
+    @Published public var metrics = RequestMetrics(
+        totalRequests: 0,
+        successfulRequests: 0,
+        failedRequests: 0,
+        averageResponseTime: 0,
+        totalBytesTransferred: 0
+    )
+    
+    public init() {}
+    
+    public func recordRequest(success: Bool, responseTime: TimeInterval, bytes: Int64) {
+        // Implementation
     }
 }

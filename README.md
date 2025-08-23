@@ -1,140 +1,201 @@
-# Shannon iOS
+# Claude Code iOS
 
-The future home of Shannon - a modern iOS application built with Swift and SwiftUI, leveraging Claude's capabilities for intelligent code assistance and development.
+[![Swift Version](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
+[![iOS Version](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)](https://developer.apple.com/ios/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/krzemienski/claude-code-ios)
 
-## Overview
+A powerful native iOS client for Claude AI, providing seamless integration with Claude's capabilities through an intuitive mobile interface. Built with Swift and SwiftUI, Claude Code iOS delivers professional-grade AI assistance for developers on the go.
 
-Shannon iOS is an upcoming native iOS client that will provide a seamless mobile experience for interacting with Claude through an intuitive and powerful interface. This repository contains the foundation and development framework for building the application.
+## 🌟 Features
 
-## Current Documentation
+### Core Capabilities
+- **💬 AI Chat Interface** - Full-featured chat with Claude AI models
+- **🔄 Real-time Streaming** - Server-sent events for responsive interactions
+- **📱 Native iOS Experience** - Built with SwiftUI for optimal performance
+- **🔒 Security First** - Biometric authentication, keychain storage, and encrypted communications
+- **🎨 Cyberpunk UI Theme** - Modern, customizable dark theme with neon accents
+- **🖥️ SSH Terminal** - Integrated terminal with SSH support for remote development
+- **📊 Performance Monitoring** - Real-time metrics and system diagnostics
+- **🛠️ MCP Tool Support** - Extensible tool system for enhanced capabilities
 
-The project currently includes comprehensive documentation and development infrastructure:
+### Advanced Features
+- **Project Management** - Organize conversations by project context
+- **Background Processing** - Continue tasks while app is backgrounded
+- **Offline Support** - Queue messages for sending when connection restored
+- **Multi-Model Support** - Switch between Claude Opus, Sonnet, and Haiku models
+- **Code Highlighting** - Syntax highlighting for 100+ languages
+- **Export/Import** - Backup and restore conversations and settings
 
-### Available Documentation
+## 📋 Requirements
 
-- **App Design Document** - Comprehensive design specifications and user experience guidelines
-- **Tech Stack Documentation** - Detailed technical architecture and technology choices
-- **Product Requirements** - Feature specifications and development priorities
-- **Task Management** - Structured development workflow using Task Master with tagged tasks
+- **iOS** 17.0 or later
+- **Xcode** 15.0 or later
+- **Swift** 5.9 or later
+- **Device** iPhone, iPad (Universal app)
+- **Backend** Claude Code API server (included)
 
-### Development Infrastructure
+## 🚀 Quick Start
 
-- **Task Master Integration** - AI-powered task management system for organized development
-- **Claude Code Configuration** - Optimized settings for AI-assisted development
-- **Cursor IDE Rules** - Code standards and development patterns
-- **Custom Commands** - Streamlined workflows for common development tasks
-
-## Project Structure
-
-```
-shannon-ios/
-├── .taskmaster/          # Task management and project planning
-│   ├── docs/            # App design, tech stack, and PRD documents
-│   ├── tasks/           # Tagged task management system
-│   └── config.json      # AI model configuration
-├── .cursor/              # Cursor IDE configuration and rules
-├── .claude/              # Claude Code configuration and commands
-├── claude-code-api/      # Backend API (see attribution below)
-└── src/                  # iOS application source code (coming soon)
-```
-
-## Backend API Attribution
-
-This project includes the [Claude Code API](https://github.com/codingworkflow/claude-code-api) backend implementation, which provides:
-
-- OpenAI-compatible API endpoints for Claude interactions
-- Session management and context handling
-- Streaming responses and error handling
-- Project-based organization
-
-Full credit and thanks to the original [claude-code-api](https://github.com/codingworkflow/claude-code-api) project for the excellent backend foundation.
-
-## Getting Started
-
-### Prerequisites
-
-- Xcode 15.0 or later
-- iOS 17.0+ deployment target
-- Swift 5.9+
-- Task Master for project management
-- Node.js (for backend API if needed)
-
-### Setup
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/krzemienski/shannon-ios.git
-   cd shannon-ios
-   ```
-
-2. Review existing documentation
-   - App Design: `.taskmaster/docs/app-design-document.md`
-   - Tech Stack: `.taskmaster/docs/tech-stack.md`
-   - PRD: `.taskmaster/docs/prd.txt`
-
-3. Set up Task Master for development workflow
-   ```bash
-   task-master list  # View current tasks
-   ```
-
-## Task Management
-
-This project uses Task Master for development workflow management. Key commands:
-
+### 1. Clone the Repository
 ```bash
-# View all tasks
-task-master list
-
-# Get next task to work on
-task-master next
-
-# Mark task as complete
-task-master set-status --id=<id> --status=done
-
-# Work with feature tags
-task-master tags  # List all feature tags
-task-master use-tag <tag-name>  # Switch context
+git clone https://github.com/krzemienski/claude-code-ios.git
+cd claude-code-ios
 ```
 
-## Development Roadmap
+### 2. Install Dependencies
+```bash
+# Install XcodeGen if not already installed
+brew install xcodegen
 
-The iOS application is currently in the planning and foundation phase. The comprehensive documentation and task structure are already in place to guide development:
+# Generate Xcode project
+xcodegen generate
 
-1. **Foundation** (Current Phase)
-   - Project structure and configuration ✓
-   - Development workflow setup ✓
-   - Documentation and planning ✓
+# Install Swift Package dependencies (handled by Xcode)
+```
 
-2. **Core Implementation** (Next)
-   - SwiftUI views and navigation
-   - Claude API integration
-   - Session management
-   - Core UI components
+### 3. Configure the Backend (Optional)
+```bash
+# Navigate to backend directory
+cd claude-code-api
 
-3. **Feature Development**
-   - Chat interface
-   - Project management
-   - Code assistance features
-   - Settings and customization
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-## Development Approach
+# Install dependencies
+pip install -r requirements.txt
 
-The project follows a structured development approach with:
-- Task-driven development using Task Master
-- AI-assisted development with Claude Code
-- Clear separation of concerns
-- Modern Swift and SwiftUI patterns
-- Comprehensive documentation-first approach
+# Run the server
+uvicorn app:app --reload --port 8000
+```
 
-## Contributing
+### 4. Build and Run
+```bash
+# Using the automation script (recommended)
+./Scripts/simulator_automation.sh all
 
-Please refer to the task list and development guidelines in the `.taskmaster` directory. The project uses a tagged task system for managing different features and development contexts.
+# Or open in Xcode
+open ClaudeCode.xcodeproj
+# Then press Cmd+R to build and run
+```
 
-## License
+## 📱 Simulator Configuration
 
-[To be determined]
+The project is configured for iPhone 16 Pro Max simulator:
+- **Simulator UUID**: `A707456B-44DB-472F-9722-C88153CDFFA1`
+- **iOS Version**: 18.6
+- **Use Script**: `./Scripts/simulator_automation.sh` for automated building
 
-## Acknowledgments
+## 🏗️ Architecture
 
-- Backend API implementation from [claude-code-api](https://github.com/codingworkflow/claude-code-api)
-- Built with Claude Code and Task Master for AI-assisted development
+Claude Code iOS follows a modular MVVM-C (Model-View-ViewModel-Coordinator) architecture:
+
+```
+Sources/
+├── App/                    # App entry point and configuration
+├── Architecture/           # Core architectural components
+│   ├── DependencyInjection/
+│   ├── ModuleRegistration/
+│   └── StateManagement/
+├── Core/                   # Core functionality
+│   ├── Coordinators/       # Navigation coordinators
+│   ├── Security/           # Security and encryption
+│   ├── SSH/               # SSH client implementation
+│   ├── State/             # Global state management
+│   └── Telemetry/         # Analytics and monitoring
+├── Features/              # Feature modules
+│   └── Terminal/          # Terminal emulator
+├── Models/                # Data models
+├── Services/              # Network and API services
+├── Theme/                 # Design system and theming
+├── ViewModels/            # View models for MVVM
+└── Views/                 # SwiftUI views
+```
+
+## 🔧 Configuration
+
+### API Configuration
+Configure the API endpoint in `Services/APIConfig.swift`:
+```swift
+struct APIConfig {
+    static let baseURL = "http://localhost:8000"
+    static let apiVersion = "v1"
+}
+```
+
+### Environment Variables
+Set in Xcode scheme or `.env` file:
+```bash
+API_BASE_URL=http://localhost:8000/v1
+LOG_LEVEL=debug
+ENABLE_TESTING_FEATURES=YES
+```
+
+## 🧪 Testing
+
+### Run UI Tests
+```bash
+# Using automation script
+./Scripts/simulator_automation.sh test
+
+# Or using xcodebuild
+xcodebuild test \
+    -scheme ClaudeCode \
+    -destination "platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1"
+```
+
+### Test Coverage
+- UI Tests: Functional testing of all major workflows
+- Integration Tests: API client and service layer
+- Performance Tests: Memory and CPU usage monitoring
+
+## 📚 Documentation
+
+- [Architecture Guide](ARCHITECTURE.md) - System design and patterns
+- [API Documentation](API_DOCUMENTATION.md) - Complete API reference
+- [Deployment Guide](DEPLOYMENT_GUIDE.md) - App Store submission process
+- [User Manual](USER_MANUAL.md) - End-user documentation
+- [Contributing](CONTRIBUTING.md) - Development guidelines
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Claude Code API** - Backend implementation from [claude-code-api](https://github.com/codingworkflow/claude-code-api)
+- **Anthropic** - For Claude AI models and capabilities
+- **Swift Community** - For excellent open-source packages
+- **Contributors** - Everyone who has contributed to this project
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/krzemienski/claude-code-ios/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/krzemienski/claude-code-ios/discussions)
+- **Email**: support@claudecode.app
+
+## 🚦 Project Status
+
+- ✅ Core Architecture
+- ✅ UI/UX Design System
+- ✅ API Integration
+- ✅ Security Implementation
+- ✅ SSH Terminal
+- 🚧 App Store Preparation
+- 🚧 Performance Optimization
+- 📋 Beta Testing
+
+---
+
+Built with ❤️ using Claude Code and Swift

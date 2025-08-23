@@ -1,0 +1,79 @@
+//
+//  MonitorExportView.swift
+//  ClaudeCode
+//
+//  Export monitoring data view
+//
+
+import SwiftUI
+
+struct MonitorExportView: View {
+    @EnvironmentObject var coordinator: MonitorCoordinator
+    @State private var exportFormat = ExportFormat.csv
+    @State private var dateRange = DateRange.lastWeek
+    @State private var includeSSHLogs = true
+    @State private var includePerformanceMetrics = true
+    
+    var body: some View {
+        Form {
+            Section("Export Format") {
+                Picker("Format", selection: $exportFormat) {
+                    ForEach(ExportFormat.allCases, id: \.self) { format in
+                        Text(format.rawValue.uppercased()).tag(format)
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+            }
+            
+            Section("Date Range") {
+                Picker("Range", selection: $dateRange) {
+                    ForEach(DateRange.allCases, id: \.self) { range in
+                        Text(range.title).tag(range)
+                    }
+                }
+            }
+            
+            Section("Include Data") {
+                Toggle("SSH Logs", isOn: $includeSSHLogs)
+                Toggle("Performance Metrics", isOn: $includePerformanceMetrics)
+            }
+            
+            Section {
+                Button("Export Data") {
+                    exportData()
+                }
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .navigationTitle("Export Monitor Data")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func exportData() {
+        // TODO: Implement export
+        print("Exporting data as \(exportFormat.rawValue)")
+    }
+}
+
+enum ExportFormat: String, CaseIterable {
+    case csv = "csv"
+    case json = "json"
+    case xml = "xml"
+}
+
+enum DateRange: CaseIterable {
+    case today
+    case lastWeek
+    case lastMonth
+    case custom
+    
+    var title: String {
+        switch self {
+        case .today: return "Today"
+        case .lastWeek: return "Last 7 Days"
+        case .lastMonth: return "Last 30 Days"
+        case .custom: return "Custom Range"
+        }
+    }
+}

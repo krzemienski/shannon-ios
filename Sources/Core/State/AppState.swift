@@ -26,11 +26,14 @@ class AppState: ObservableObject {
     @Published var isLoading = false
     @Published var error: AppError?
     @Published var apiHealth: APIHealth?
+    @Published var isFirstLaunch = false
+    @Published var isAuthenticated = true // Default to true for now
     
     // MARK: - Settings
     @AppStorage("enableTelemetry") var enableTelemetry = true
     @AppStorage("enableBackgroundRefresh") var enableBackgroundRefresh = true
     @AppStorage("sshMonitoringEnabled") var sshMonitoringEnabled = false
+    @AppStorage("hasCompletedOnboarding") var hasCompletedOnboarding = false
     
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
@@ -40,6 +43,7 @@ class AppState: ObservableObject {
     init() {
         setupObservers()
         loadSavedState()
+        checkFirstLaunch()
     }
     
     // MARK: - Public Methods
@@ -116,6 +120,29 @@ class AppState: ObservableObject {
         }
     }
     
+    /// Complete onboarding process
+    func completeOnboarding() async {
+        hasCompletedOnboarding = true
+        isFirstLaunch = false
+        userDefaults.set(true, forKey: "hasCompletedOnboarding")
+    }
+    
+    /// Refresh authentication status
+    func refreshAuthenticationStatus() async {
+        // Check if API key is valid
+        if !apiKey.isEmpty {
+            isAuthenticated = true
+        } else {
+            // Check keychain for stored credentials
+            if let storedKey = try? await KeychainManager.shared.getAPIKey() {
+                apiKey = storedKey
+                isAuthenticated = true
+            } else {
+                isAuthenticated = false
+            }
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func setupObservers() {
@@ -155,7 +182,15 @@ class AppState: ObservableObject {
         // Load any additional user preferences
         // This is where we'd load theme preferences, shortcuts, etc.
     }
+    
+    private func checkFirstLaunch() {
+        isFirstLaunch = !hasCompletedOnboarding
+    }
 }
+
+// MARK: - APIHealth Type
+// APIHealth is now defined in APIModels.swift
+// ServiceHealth is also defined there
 
 // MARK: - Supporting Types
 

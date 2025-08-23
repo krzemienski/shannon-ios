@@ -374,18 +374,11 @@ struct APIKeyInputSheet: View {
 }
 
 // MARK: - Connection Test Result
-
-extension ConnectionTestResult {
-    var details: String? { nil }
-}
+// ConnectionTestResult already has a details property
 
 // MARK: - Settings Store Extensions
-
-extension SettingsStore {
-    @Published var requestTimeout: Int = 30
-    @Published var maxRetries: Int = 3
-    @Published var maxConcurrentRequests: Int = 3
-}
+// Note: requestTimeout, maxRetries, and maxConcurrentRequests
+// should be added to SettingsStore class if needed
 
 #Preview {
     NavigationStack {

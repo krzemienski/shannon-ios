@@ -726,22 +726,16 @@ enum ConnectionType: String, CaseIterable {
     }
 }
 
-/// Connection quality levels
-enum ConnectionQuality: String, CaseIterable {
-    case excellent = "Excellent"
-    case good = "Good"
-    case fair = "Fair"
-    case poor = "Poor"
-    case unusable = "Unusable"
-    case unknown = "Unknown"
-    
+// ConnectionQuality is now defined in NetworkModels.swift
+// Using the shared definition from NetworkModels
+
+extension ConnectionQuality {
     var color: String {
         switch self {
         case .excellent: return "green"
         case .good: return "blue"
         case .fair: return "yellow"
         case .poor: return "orange"
-        case .unusable: return "red"
         case .unknown: return "gray"
         }
     }

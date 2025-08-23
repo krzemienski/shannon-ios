@@ -6,19 +6,28 @@
 //
 
 import SwiftUI
+import OSLog
 
 struct ProjectsView: View {
     @EnvironmentObject private var appState: AppState
-    @State private var projects: [Project] = Project.mockData
+    @StateObject private var viewModel: ProjectsViewModel
     @State private var searchText = ""
     @State private var showingNewProject = false
     @State private var selectedProject: Project?
     
+    init() {
+        let container = DependencyContainer.shared
+        _viewModel = StateObject(wrappedValue: ProjectsViewModel(
+            apiClient: container.apiClient,
+            appState: container.appState
+        ))
+    }
+    
     var filteredProjects: [Project] {
         if searchText.isEmpty {
-            return projects
+            return viewModel.projects
         }
-        return projects.filter {
+        return viewModel.projects.filter {
             $0.name.localizedCaseInsensitiveContains(searchText) ||
             $0.description.localizedCaseInsensitiveContains(searchText)
         }
@@ -29,7 +38,7 @@ struct ProjectsView: View {
             Theme.background
                 .ignoresSafeArea()
             
-            if projects.isEmpty {
+            if viewModel.projects.isEmpty && !viewModel.isLoading {
                 VStack(spacing: ThemeSpacing.lg) {
                     Image(systemName: "folder.fill")
                         .font(.system(size: 64))
@@ -82,7 +91,28 @@ struct ProjectsView: View {
         }
         .sheet(isPresented: $showingNewProject) {
             NewProjectView { newProject in
-                projects.insert(newProject, at: 0)
+                Task {
+                    try? await viewModel.createProject(newProject)
+                }
+            }
+        }
+        .refreshable {
+            await viewModel.refreshProjects()
+        }
+        .alert("Error", isPresented: $viewModel.showError) {
+            Button("OK") {
+                viewModel.showError = false
+            }
+        } message: {
+            Text(viewModel.error?.localizedDescription ?? "An error occurred")
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(1.5)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.3))
             }
         }
         .sheet(item: $selectedProject) { project in
@@ -157,7 +187,7 @@ struct ProjectCard: View {
 // MARK: - Project Model
 
 struct Project: Identifiable {
-    let id = UUID().uuidString
+    let id: String  // Changed to match backend API
     let name: String
     let description: String
     let icon: String
@@ -166,6 +196,27 @@ struct Project: Identifiable {
     let toolCount: Int
     let lastUpdated: Date
     let sshConfig: SSHConfig?
+    
+    // Constructor with default id for new projects
+    init(id: String = UUID().uuidString,
+         name: String,
+         description: String,
+         icon: String,
+         isActive: Bool,
+         sessionCount: Int,
+         toolCount: Int,
+         lastUpdated: Date,
+         sshConfig: SSHConfig?) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.icon = icon
+        self.isActive = isActive
+        self.sessionCount = sessionCount
+        self.toolCount = toolCount
+        self.lastUpdated = lastUpdated
+        self.sshConfig = sshConfig
+    }
     
     var formattedLastUpdated: String {
         let formatter = RelativeDateTimeFormatter()

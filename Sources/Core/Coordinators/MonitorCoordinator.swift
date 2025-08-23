@@ -142,7 +142,7 @@ final class MonitorCoordinator: BaseCoordinator, ObservableObject {
         navigationPath.append(MonitorRoute.export)
     }
     
-    func exportData(type: MonitorType, format: ExportFormat) async throws -> URL {
+    func exportData(type: MonitorType, format: MonitorExportFormat) async throws -> URL {
         try await dependencyContainer.monitorStore.exportData(
             type: type,
             format: format,
@@ -150,7 +150,7 @@ final class MonitorCoordinator: BaseCoordinator, ObservableObject {
         )
     }
     
-    func exportAllData(format: ExportFormat) async throws -> URL {
+    func exportAllData(format: MonitorExportFormat) async throws -> URL {
         try await dependencyContainer.monitorStore.exportAllData(
             format: format,
             timeRange: timeRange
@@ -296,7 +296,7 @@ enum TimeRange: String, CaseIterable, Identifiable {
     }
 }
 
-enum ExportFormat: String, CaseIterable {
+enum MonitorExportFormat: String, CaseIterable {
     case json = "JSON"
     case csv = "CSV"
     case pdf = "PDF"

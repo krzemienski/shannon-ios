@@ -1,0 +1,37 @@
+# Claude Code iOS - Fastlane App Configuration
+# Tasks 961-970: App configuration for automated deployment
+
+# App identifier and team configuration
+app_identifier("com.claudecode.ios")
+apple_id(ENV["FASTLANE_USER"] || "developer@claudecode.app")
+team_id(ENV["FASTLANE_TEAM_ID"] || "YOUR_TEAM_ID")
+
+# iTunes Connect team (if different from development team)
+itc_team_id(ENV["FASTLANE_ITC_TEAM_ID"] || ENV["FASTLANE_TEAM_ID"])
+
+# For Enterprise accounts, specify the team name
+# team_name("Your Team Name")
+
+# Platform-specific configuration
+for_platform :ios do
+  # App Store Connect configuration
+  app_identifier("com.claudecode.ios")
+  
+  # Development team
+  team_id(ENV["FASTLANE_TEAM_ID"])
+  
+  # iTunes Connect team (for app submissions)
+  itc_team_id(ENV["FASTLANE_ITC_TEAM_ID"] || ENV["FASTLANE_TEAM_ID"])
+end
+
+# Optional: Multiple targets configuration
+# for_lane :beta do
+#   app_identifier("com.claudecode.ios.beta")
+# end
+
+# Optional: Environment-specific configuration
+if ENV["FASTLANE_ENV"] == "staging"
+  app_identifier("com.claudecode.ios.staging")
+elsif ENV["FASTLANE_ENV"] == "development"
+  app_identifier("com.claudecode.ios.dev")
+end

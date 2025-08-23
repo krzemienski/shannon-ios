@@ -1,7 +1,8 @@
 import Foundation
-import Citadel
-import NIO
-import NIOSSH
+// Temporarily disabled for UI testing
+// import Citadel
+// import NIO
+// import NIOSSH
 import OSLog
 #if canImport(UIKit)
 import UIKit
@@ -17,19 +18,19 @@ class SSHManager: ObservableObject {
     @Published var lastError: String?
     @Published var activeConnections: [SSHConnectionState] = []
     @Published var transferProgress: Double = 0  // Task 471: Transfer progress
-    @Published var commandHistory: [SSHCommand] = []  // Task 472: Command history
+    @Published var commandHistory: [CommandHistoryEntry] = []  // Task 472: Command history
     @Published var bandwidth: BandwidthInfo?  // Task 473: Bandwidth monitoring
     
     // MARK: - Private Properties
     
-    private var client: SSHClient?
+    private var client: Citadel.SSHClient?
     private var sftp: SFTPClient?
     private var monitoringTimer: Timer?
     private let keychain = KeychainManager.shared
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "SSHManager")
     
     // Connection pooling (Task 461)
-    private var connectionPool: [String: SSHClient] = [:]
+    private var connectionPool: [String: Citadel.SSHClient] = [:]
     private let maxPoolSize = 5
     
     // Session management (Task 462)
@@ -80,7 +81,7 @@ class SSHManager: ObservableObject {
             try await saveCredentials(host: host, username: username, password: password)
             
             // Create SSH client
-            let client = try await SSHClient.connect(
+            let client = try await Citadel.SSHClient.connect(
                 host: host,
                 port: port,
                 authenticationMethod: .passwordBased(username: username, password: password),
@@ -184,7 +185,7 @@ class SSHManager: ObservableObject {
             }
             
             guard connectedClient != nil else {
-                throw SSHError.connectionFailed("Failed to establish connection")
+                throw SSHClientError.connectionFailed("Failed to establish connection")
             }
             isConnected = true
             connectionStatus = "Connected to \(host) (key auth)"
@@ -225,8 +226,7 @@ class SSHManager: ObservableObject {
         defer { endBackgroundTask() }
         
         // Record command in history (Task 472)
-        let historyEntry = SSHCommand(
-            id: UUID(),
+        let historyEntry = CommandHistoryEntry(
             command: command,
             timestamp: Date(),
             status: .running
@@ -258,11 +258,11 @@ class SSHManager: ObservableObject {
                 
                 group.addTask {
                     try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-                    throw SSHError.timeout
+                    throw SSHClientError.timeout
                 }
                 
                 guard let output = try await group.next() else {
-                    throw SSHError.executionFailed
+                    throw SSHClientError.commandExecutionFailed("Command execution failed")
                 }
                 
                 group.cancelAll()
@@ -334,9 +334,8 @@ class SSHManager: ObservableObject {
             
             // Create remote file
             let handle = try await sftp.openFile(
-                remotePath,
-                flags: [.write, .create, .truncate],
-                permissions: permissions ?? .default
+                filePath: remotePath,
+                flags: .write
             )
             
             // Upload in chunks for progress tracking
@@ -415,9 +414,8 @@ class SSHManager: ObservableObject {
             
             // Open remote file
             let handle = try await sftp.openFile(
-                remotePath,
-                flags: [.read],
-                permissions: nil
+                filePath: remotePath,
+                flags: .read
             )
             
             // Create or append to local file
@@ -769,15 +767,15 @@ class SSHManager: ObservableObject {
         guard let sftp = await createSFTPSession() else { return nil }
         
         do {
-            let items = try await sftp.listDirectory(path)
+            let items = try await sftp.listDirectory(atPath: path)
             return items.map { item in
-                FileInfo(
-                    name: item.filename,
-                    path: "\(path)/\(item.filename)",
-                    size: item.attributes.size ?? 0,
-                    isDirectory: item.attributes.isDirectory,
-                    permissions: item.attributes.permissions,
-                    modifiedDate: item.attributes.modificationDate
+                // Create FileInfo with only relativePath and size as defined in SSHFileTransfer.swift
+                let filename = item.filename?.string ?? ""
+                let relativePath = "\(path)/\(filename)"
+                let size = item.attributes?.size ?? 0
+                return FileInfo(
+                    relativePath: relativePath,
+                    size: Int64(size)
                 )
             }
         } catch {
@@ -791,7 +789,7 @@ class SSHManager: ObservableObject {
         guard let sftp = await createSFTPSession() else { return false }
         
         do {
-            try await sftp.createDirectory(path, permissions: permissions ?? .defaultDirectory)
+            try await sftp.createDirectory(atPath: path)
             return true
         } catch {
             lastError = "Failed to create directory: \(error.localizedDescription)"
@@ -957,35 +955,27 @@ struct SSHCredentials: Codable {
     let passphrase: String?
 }
 
-/// SSH connection options (Task 466-467)
-struct SSHConnectionOptions {
-    let enableCompression: Bool
-    let compressionLevel: Int
-    let keepAliveInterval: TimeInterval
-    let enableAgentForwarding: Bool
-    let strictHostKeyChecking: Bool
-    let autoReconnect: Bool
-    let connectionTimeout: TimeInterval
-    
-    static let `default` = SSHConnectionOptions(
-        enableCompression: true,
-        compressionLevel: 6,
-        keepAliveInterval: 30,
-        enableAgentForwarding: false,
-        strictHostKeyChecking: true,
-        autoReconnect: true,
-        connectionTimeout: 30
-    )
+/// Command history entry for tracking executed commands
+struct CommandHistoryEntry: Identifiable {
+    let id = UUID()
+    let command: String
+    let timestamp: Date
+    var status: CommandExecutionStatus
+    var output: String?
+    var error: String?
+    var executionTime: TimeInterval?
 }
 
-/// SSH session for managing connections (Task 462)
-struct SSHSession {
-    let id: UUID
-    let client: SSHClient
-    let createdAt: Date
-    var lastActivity: Date
-    var isActive: Bool
+enum CommandExecutionStatus {
+    case pending
+    case running
+    case completed
+    case failed
 }
+
+// SSHConnectionOptions removed - using Core/SSH/SSHClient.swift definition
+
+// SSHSession removed - using Core/SSH/SSHSession.swift definition
 
 /// SSH tunnel configuration (Task 463)
 struct SSHTunnel: Identifiable {
@@ -998,27 +988,14 @@ struct SSHTunnel: Identifiable {
     var bytesTransferred: Int = 0
 }
 
-enum TunnelType {
-    case local
-    case remote
-    case dynamic
-}
+// TunnelType removed - using Core/SSH/SSHPortForwarding.swift definition
 
 struct Endpoint {
     let host: String
     let port: Int
 }
 
-/// Port forward configuration (Task 464)
-struct PortForward: Identifiable {
-    let id: UUID
-    let localPort: Int
-    let remoteHost: String
-    let remotePort: Int
-    let bindAddress: String
-    var isActive: Bool
-    var bytesTransferred: Int
-}
+// PortForward removed - using Core/SSH/SSHConfiguration.swift definition
 
 /// Known hosts manager (Task 468)
 class KnownHostsManager {
@@ -1044,12 +1021,7 @@ class KnownHostsManager {
     }
 }
 
-/// SSH host key validator
-enum SSHHostKeyValidator {
-    case acceptAnything
-    case fingerprint(String)
-    case ask((String) -> Bool)
-}
+// SSHHostKeyValidator removed - using Core/SSH/SSHClient.swift definition
 
 /// Session recorder (Task 470)
 class SessionRecorder {
@@ -1074,16 +1046,7 @@ class SessionRecorder {
     }
 }
 
-/// SSH command for history (Task 472)
-struct SSHCommand: Identifiable {
-    let id: UUID
-    let command: String
-    let timestamp: Date
-    var status: CommandStatus
-    var output: String?
-    var error: String?
-    var executionTime: TimeInterval?
-}
+// SSHCommand removed - using Core/SSH/SSHCommand.swift definition
 
 enum CommandStatus {
     case pending
@@ -1115,45 +1078,9 @@ struct SSHCommandOutput {
     let exitCode: Int
 }
 
-/// SSH errors
-enum SSHError: LocalizedError {
-    case notConnected
-    case connectionFailed(String)
-    case authenticationFailed
-    case timeout
-    case executionFailed
-    case transferFailed(String)
-    case tunnelFailed(String)
-    
-    var errorDescription: String? {
-        switch self {
-        case .notConnected:
-            return "Not connected to SSH server"
-        case .connectionFailed(let reason):
-            return "Connection failed: \(reason)"
-        case .authenticationFailed:
-            return "Authentication failed"
-        case .timeout:
-            return "Operation timed out"
-        case .executionFailed:
-            return "Command execution failed"
-        case .transferFailed(let reason):
-            return "File transfer failed: \(reason)"
-        case .tunnelFailed(let reason):
-            return "Tunnel creation failed: \(reason)"
-        }
-    }
-}
+// SSHError removed - using Core/SSH/SSHErrors.swift definition
 
-/// File information for SFTP
-struct FileInfo {
-    let name: String
-    let path: String
-    let size: UInt64
-    let isDirectory: Bool
-    let permissions: FilePermissions?
-    let modifiedDate: Date?
-}
+// FileInfo removed - using Core/SSH/SSHFileTransfer.swift definition
 
 /// File attributes
 struct FileAttributes {
@@ -1210,7 +1137,7 @@ extension SSHClient {
 }
 
 extension SFTPClient {
-    func openFile(_ path: String, flags: Set<FileOpenFlag>, permissions: FilePermissions?) async throws -> SFTPFileHandle {
+    func openFile(filePath path: String, flags: SFTPOpenFileFlags) async throws -> SFTPFileHandle {
         // Placeholder
         return SFTPFileHandle()
     }
@@ -1220,12 +1147,12 @@ extension SFTPClient {
         return SFTPFileAttributes()
     }
     
-    func listDirectory(_ path: String) async throws -> [SFTPFileItem] {
+    func listDirectory(atPath path: String) async throws -> [SFTPMessage.Name] {
         // Placeholder
         return []
     }
     
-    func createDirectory(_ path: String, permissions: FilePermissions) async throws {
+    func createDirectory(atPath path: String) async throws {
         // Placeholder
     }
     
@@ -1282,7 +1209,5 @@ struct SFTPFileAttributes {
     let isSymbolicLink: Bool = false
 }
 
-struct SFTPFileItem {
-    let filename: String = ""
-    let attributes: SFTPFileAttributes = SFTPFileAttributes()
-}
+// SFTPFileItem is actually SFTPMessage.Name in Citadel
+// Using SFTPMessage.Name directly from Citadel library

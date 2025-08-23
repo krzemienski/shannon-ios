@@ -14,7 +14,7 @@ class APIClient: ObservableObject {
     
     // Published properties
     @Published var isLoading = false
-    @Published var lastError: APIConfig.APIError?
+    @Published var lastError: APIError?
     @Published var networkActivityCount = 0  // Task 324: Network activity indicator
     @Published var currentProgress: Double = 0  // Task 325: Progress tracking
     @Published var connectionQuality: ConnectionQuality = .unknown  // Task 345: Connection quality
@@ -730,14 +730,7 @@ enum CachePolicy {
     case reloadRevalidatingCache
 }
 
-// Connection Quality (Task 345)
-enum ConnectionQuality {
-    case excellent
-    case good
-    case fair
-    case poor
-    case unknown
-}
+// Connection Quality (Task 345) - Using type from NetworkModels.swift
 
 // Network Type (Task 346)
 enum NetworkType {
@@ -749,12 +742,7 @@ enum NetworkType {
     case unknown
 }
 
-struct CachedResponse {
-    let data: Data
-    let timestamp: Date
-    let etag: String?
-    let maxAge: TimeInterval?
-}
+// CachedResponse - Using type from NetworkModels.swift
 
 struct RequestMetric {
     let endpoint: String
@@ -766,14 +754,7 @@ struct RequestMetric {
     let errorType: String?
 }
 
-struct RequestMetrics {
-    let requestCount: Int
-    let averageLatency: TimeInterval
-    let successRate: Double
-    let totalBandwidthUsed: Int
-    let p95Latency: TimeInterval
-    let p99Latency: TimeInterval
-}
+// RequestMetrics - Using type from NetworkModels.swift
 
 struct BatchRequest {
     let id: UUID
@@ -896,41 +877,7 @@ class LatencyMonitor {
 }
 
 // Metrics Collector (Task 349)
-class MetricsCollector {
-    private var metrics: [RequestMetric] = []
-    private var cacheHits = 0
-    private var cacheMisses = 0
-    private let queue = DispatchQueue(label: "metrics.collector")
-    
-    func recordRequest(
-        endpoint: String,
-        method: String,
-        statusCode: Int,
-        responseTime: TimeInterval,
-        dataSize: Int
-    ) {
-        queue.sync {
-            let metric = RequestMetric(
-                endpoint: endpoint,
-                latency: responseTime,
-                success: statusCode >= 200 && statusCode < 300,
-                bytesTransferred: dataSize,
-                timestamp: Date(),
-                statusCode: statusCode,
-                errorType: nil
-            )
-            metrics.append(metric)
-        }
-    }
-    
-    func recordCacheHit() {
-        queue.sync { cacheHits += 1 }
-    }
-    
-    func recordCacheMiss() {
-        queue.sync { cacheMisses += 1 }
-    }
-}
+// MetricsCollector moved to NetworkModels.swift
 
 // Batch Processor (Task 344)
 class BatchProcessor {
@@ -1099,9 +1046,9 @@ enum HTTPMethod: String {
 
 // MARK: - Response Types
 
-struct ModelsResponse: Codable {
-    let object: String
-    let data: [APIModel]
+public struct ModelsResponse: Codable {
+    public let object: String
+    public let data: [APIModel]
 }
 
 struct ErrorResponse: Codable {

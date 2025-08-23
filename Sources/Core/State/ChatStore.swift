@@ -27,8 +27,13 @@ final class ChatStore: ObservableObject {
             return conversations
         }
         return conversations.filter { conversation in
-            conversation.title.localizedCaseInsensitiveContains(searchText) ||
-            conversation.messages.contains { message in
+            // Optimize search by only checking title first, then messages if needed
+            if conversation.title.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            // Limit message search to recent messages for performance
+            let recentMessages = conversation.messages.suffix(20)
+            return recentMessages.contains { message in
                 message.content.localizedCaseInsensitiveContains(searchText)
             }
         }

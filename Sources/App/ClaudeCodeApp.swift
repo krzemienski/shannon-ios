@@ -17,21 +17,38 @@ struct ClaudeCodeApp: App {
     @Environment(\.scenePhase) private var scenePhase
     
     init() {
-        // Register all modules
-        AppModuleRegistration.registerAllModules()
-        
-        // Initialize coordinator
+        // Initialize coordinator first (lightweight)
         let coordinator = AppCoordinator(dependencyContainer: DependencyContainer.shared)
         _appCoordinator = StateObject(wrappedValue: coordinator)
         
-        // Configure app-wide settings
-        configureAppearance()
-        registerBackgroundTasks()
+        // Defer heavy initialization
+        Task {
+            await performDeferredInitialization()
+        }
+    }
+    
+    private func performDeferredInitialization() async {
+        // Register modules asynchronously
+        await Task.detached(priority: .high) {
+            AppModuleRegistration.registerAllModules()
+        }.value
+        
+        // Configure appearance on main thread
+        await MainActor.run {
+            configureAppearance()
+        }
+        
+        // Register background tasks with lower priority
+        Task.detached(priority: .background) {
+            await MainActor.run {
+                registerBackgroundTasks()
+            }
+        }
     }
     
     var body: some Scene {
         WindowGroup {
-            CoordinatorView(coordinator: appCoordinator)
+            ContentView()
                 .withDependencyContainer(dependencyContainer)
                 .environmentObject(appState)
                 .environmentObject(sshManager)
@@ -39,7 +56,7 @@ struct ClaudeCodeApp: App {
                 .environmentObject(dependencyContainer.chatStore)
                 .environmentObject(dependencyContainer.projectStore)
                 .environmentObject(appCoordinator)
-                .preferredColorScheme(.dark) // Force dark mode for consistent theming
+                .withThemeManager()
                 .tint(Theme.primary)
                 .task {
                     // Initialize app on launch
@@ -88,7 +105,7 @@ struct ClaudeCodeApp: App {
     private func registerBackgroundTasks() {
         // Register background task for SSH monitoring
         BGTaskScheduler.shared.register(
-            forTaskWithIdentifier: "com.shannon.ClaudeCode.ssh-monitor",
+            forTaskWithIdentifier: "com.claudecode.ios.ssh-monitor",
             using: nil
         ) { task in
             handleSSHMonitoringTask(task as! BGProcessingTask)
@@ -96,7 +113,7 @@ struct ClaudeCodeApp: App {
         
         // Register background task for telemetry sync
         BGTaskScheduler.shared.register(
-            forTaskWithIdentifier: "com.shannon.ClaudeCode.telemetry-sync",
+            forTaskWithIdentifier: "com.claudecode.ios.telemetry-sync",
             using: nil
         ) { task in
             handleTelemetrySyncTask(task as! BGAppRefreshTask)
@@ -126,7 +143,7 @@ struct ClaudeCodeApp: App {
     private func scheduleBackgroundTasks() {
         // Schedule SSH monitoring task
         let sshRequest = BGProcessingTaskRequest(
-            identifier: "com.shannon.ClaudeCode.ssh-monitor"
+            identifier: "com.claudecode.ios.ssh-monitor"
         )
         sshRequest.requiresNetworkConnectivity = true
         sshRequest.requiresExternalPower = false
@@ -140,7 +157,7 @@ struct ClaudeCodeApp: App {
         
         // Schedule telemetry sync task
         let telemetryRequest = BGAppRefreshTaskRequest(
-            identifier: "com.shannon.ClaudeCode.telemetry-sync"
+            identifier: "com.claudecode.ios.telemetry-sync"
         )
         telemetryRequest.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // 15 minutes
         

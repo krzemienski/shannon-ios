@@ -359,21 +359,7 @@ struct MetricAlert: Identifiable {
     let timestamp = Date()
 }
 
-enum MetricType {
-    case cpu
-    case memory
-    case disk
-    case network
-    
-    var icon: String {
-        switch self {
-        case .cpu: return "cpu"
-        case .memory: return "memorychip"
-        case .disk: return "internaldrive"
-        case .network: return "network"
-        }
-    }
-}
+// MetricType is now defined in NetworkModels.swift
 
 enum AlertSeverity {
     case info

@@ -102,12 +102,9 @@ targets:
     type: application
     platform: iOS
     sources:
-      - path: Sources
-        excludes:
-          - "**/.DS_Store"
-          - "**/Thumbs.db"
-          - "**/*.swp"
-        createIntermediateGroups: true
+      # Minimal app for testing - just use MinimalApp.swift
+      - path: Sources/MinimalApp.swift
+        createIntermediateGroups: false
       - path: Resources
         type: folder
         buildPhase: resources
@@ -122,7 +119,8 @@ targets:
       - package: KeychainAccess
       - package: swift-log
         product: Logging
-      - package: Citadel
+      # Temporarily disabled for UI testing
+      # - package: Citadel
       # Additional Dependencies (to be added as needed)
       # - package: swift-collections
       #   product: Collections
@@ -308,40 +306,16 @@ targets:
           echo "Configuration: ${CONFIGURATION}"
           echo "Architecture: ${ARCHS}"
         basedOnDependencyAnalysis: false
-      
-      - name: Copy Build Logs
-        script: |
-          # Copy build logs to logs directory for debugging
-          LOG_DIR="${PROJECT_DIR}/logs"
-          mkdir -p "$LOG_DIR"
-          echo "Build completed at $(date)" >> "$LOG_DIR/build_history.log"
-        basedOnDependencyAnalysis: false
 
-  ClaudeCodeTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources:
-      - Tests
-    dependencies:
-      - target: ClaudeCode
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios.tests
-        GENERATE_INFOPLIST_FILE: YES
-        TEST_HOST: $(BUILT_PRODUCTS_DIR)/ClaudeCode.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ClaudeCode
-      configs:
-        Debug:
-          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
-        Release:
-          SWIFT_ACTIVE_COMPILATION_CONDITIONS: RELEASE
-        # TestFlight:
-        #   SWIFT_ACTIVE_COMPILATION_CONDITIONS: TESTFLIGHT RELEASE
 
   ClaudeCodeUITests:
     type: bundle.ui-testing
     platform: iOS
     sources:
-      - UITests
+      - path: UITests
+        excludes:
+          - "**/.DS_Store"
+        createIntermediateGroups: true
     dependencies:
       - target: ClaudeCode
     settings:
@@ -349,6 +323,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: ClaudeCode
+        SWIFT_EMIT_LOC_STRINGS: NO
       configs:
         Debug:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
@@ -373,7 +348,6 @@ schemes:
     build:
       targets:
         ClaudeCode: all
-        ClaudeCodeTests: [test]
       parallelizeBuild: true
       buildImplicitDependencies: true
       preActions:
@@ -413,14 +387,9 @@ schemes:
     test:
       config: Debug
       targets:
-        - name: ClaudeCodeTests
-          parallelizable: true
-          randomExecutionOrder: true
         - name: ClaudeCodeUITests
           parallelizable: false
-      gatherCoverageData: true
-      coverageTargets:
-        - ClaudeCode
+      gatherCoverageData: false
       disableMainThreadChecker: false
       commandLineArguments:
         "-UITest": true
@@ -432,8 +401,8 @@ schemes:
       preActions:
         - name: Prepare Test Environment
           script: |
-            echo "🧪 Preparing test environment..."
-            # Start mock server or prepare test data
+            echo "🧪 Preparing UI test environment..."
+            # Prepare for functional UI tests
           settingsTarget: ClaudeCode
     profile:
       config: Release

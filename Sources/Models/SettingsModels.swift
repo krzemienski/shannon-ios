@@ -23,7 +23,7 @@ public struct AppSettings: Codable {
     public var advancedSettings: AdvancedSettings
     
     // Notification Settings
-    public var notificationSettings: NotificationSettings
+    public var notificationSettings: AppNotificationSettings
     
     public init(
         apiConfiguration: APIConfiguration? = nil,
@@ -33,7 +33,7 @@ public struct AppSettings: Codable {
         chatSettings: ChatSettings = ChatSettings(),
         sshSettings: SSHSettings = SSHSettings(),
         advancedSettings: AdvancedSettings = AdvancedSettings(),
-        notificationSettings: NotificationSettings = NotificationSettings()
+        notificationSettings: AppNotificationSettings = AppNotificationSettings()
     ) {
         self.apiConfiguration = apiConfiguration
         self.defaultModel = defaultModel
@@ -400,7 +400,7 @@ public struct AdvancedSettings: Codable {
 
 // MARK: - Notification Settings
 
-public struct NotificationSettings: Codable {
+public struct AppNotificationSettings: Codable {
     public var enableNotifications: Bool
     public var messageNotifications: Bool
     public var errorNotifications: Bool

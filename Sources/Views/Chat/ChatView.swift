@@ -21,13 +21,21 @@ struct ChatView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Messages list
+                // Messages list with optimized scrolling
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(spacing: ThemeSpacing.md) {
                             ForEach(viewModel.messages) { message in
                                 MessageView(message: message)
                                     .id(message.id)
+                                    .onAppear {
+                                        // Preload images when message appears
+                                        viewModel.preloadMessageContent(message)
+                                    }
+                                    .onDisappear {
+                                        // Clean up resources when message disappears
+                                        viewModel.cleanupMessageResources(message)
+                                    }
                             }
                             
                             if viewModel.isLoading {
@@ -36,11 +44,18 @@ struct ChatView: View {
                         }
                         .padding()
                     }
-                    .onChange(of: viewModel.messages.count) { _ in
-                        withAnimation {
-                            proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                    .onChange(of: viewModel.messages.count) { oldCount, newCount in
+                        // Only scroll to bottom for new messages, not for deletions
+                        if newCount > oldCount {
+                            // Debounce scrolling to prevent excessive animations
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                                }
+                            }
                         }
                     }
+                    .scrollDismissesKeyboard(.interactively)
                 }
                 
                 // Input area
@@ -159,7 +174,7 @@ struct ChatView: View {
 // MARK: - Message View
 
 struct MessageView: View {
-    let message: ChatMessage
+    let message: ChatMessageUI
     
     var body: some View {
         HStack(alignment: .top, spacing: ThemeSpacing.md) {
@@ -267,7 +282,7 @@ struct ThinkingIndicator: View {
 // MARK: - Chat View Model
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessage] = ChatMessage.mockData
+    @Published var messages: [ChatMessageUI] = ChatMessageUI.mockData
     @Published var isLoading = false
     @Published var tokenUsage = 0
     @Published var toolUsages: [ToolUsage] = []
@@ -281,7 +296,7 @@ class ChatViewModel: ObservableObject {
     }
     
     func sendMessage(_ text: String) {
-        let userMessage = ChatMessage(
+        let userMessage = ChatMessageUI(
             role: .user,
             content: text,
             timestamp: Date()
@@ -292,7 +307,7 @@ class ChatViewModel: ObservableObject {
         
         // Simulate response
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-            let aiMessage = ChatMessage(
+            let aiMessage = ChatMessageUI(
                 role: .assistant,
                 content: "I understand you want help with: \(text). Let me assist you with that.",
                 timestamp: Date()
@@ -306,9 +321,9 @@ class ChatViewModel: ObservableObject {
 
 // MARK: - Chat Message Model
 
-struct ChatMessage: Identifiable {
+struct ChatMessageUI: Identifiable {
     let id = UUID().uuidString
-    let role: MessageRole
+    let role: MessageRoleUI
     let content: String
     let timestamp: Date
     
@@ -318,24 +333,24 @@ struct ChatMessage: Identifiable {
         return formatter.string(from: timestamp)
     }
     
-    enum MessageRole {
+    enum MessageRoleUI {
         case user
         case assistant
         case system
     }
     
-    static let mockData: [ChatMessage] = [
-        ChatMessage(
+    static let mockData: [ChatMessageUI] = [
+        ChatMessageUI(
             role: .assistant,
             content: "Hello! I'm Claude Code. How can I help you with your iOS development today?",
             timestamp: Date().addingTimeInterval(-300)
         ),
-        ChatMessage(
+        ChatMessageUI(
             role: .user,
             content: "Can you help me create a custom SwiftUI button with a gradient background?",
             timestamp: Date().addingTimeInterval(-240)
         ),
-        ChatMessage(
+        ChatMessageUI(
             role: .assistant,
             content: "I'll help you create a custom SwiftUI button with a gradient background. Here's a complete implementation with customizable parameters and smooth animations.",
             timestamp: Date().addingTimeInterval(-180)

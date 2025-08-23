@@ -9,8 +9,8 @@ import SwiftUI
 import Charts
 
 struct MonitorView: View {
-    @State private var selectedMetric: MetricType = .tokenUsage
-    @State private var selectedTimeRange: TimeRange = .today
+    @State private var selectedMetric: MonitorMetricType = .tokenUsage
+    @State private var selectedTimeRange: MonitorTimeRange = .today
     @State private var isSSHConnected = false
     @State private var sshLogs: [SSHLogEntry] = []
     
@@ -26,7 +26,7 @@ struct MonitorView: View {
                     
                     // Time Range Selector
                     Picker("Time Range", selection: $selectedTimeRange) {
-                        ForEach(TimeRange.allCases, id: \.self) { range in
+                        ForEach(MonitorTimeRange.allCases, id: \.self) { range in
                             Text(range.rawValue).tag(range)
                         }
                     }
@@ -42,7 +42,7 @@ struct MonitorView: View {
                     // Metric Selector
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: ThemeSpacing.sm) {
-                            ForEach(MetricType.allCases, id: \.self) { metric in
+                            ForEach(MonitorMetricType.allCases, id: \.self) { metric in
                                 MetricChip(
                                     metric: metric,
                                     isSelected: selectedMetric == metric
@@ -409,7 +409,7 @@ struct ActivityRow: View {
 // MARK: - Helper Views
 
 struct MetricChip: View {
-    let metric: MetricType
+    let metric: MonitorMetricType
     let isSelected: Bool
     let onTap: () -> Void
     
@@ -432,7 +432,7 @@ struct MetricChip: View {
 
 // MARK: - Models
 
-enum MetricType: String, CaseIterable {
+enum MonitorMetricType: String, CaseIterable {
     case tokenUsage = "Tokens"
     case apiCalls = "API Calls"
     case responseTime = "Response Time"
@@ -450,7 +450,7 @@ enum MetricType: String, CaseIterable {
     }
 }
 
-enum TimeRange: String, CaseIterable {
+enum MonitorTimeRange: String, CaseIterable {
     case today = "Today"
     case week = "7 Days"
     case month = "30 Days"

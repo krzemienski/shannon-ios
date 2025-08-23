@@ -261,7 +261,9 @@ enum MCPToolCategory: String, CaseIterable {
 }
 
 // MARK: - MCP Tool Model
+// Using MCPTool from MCPModels.swift instead
 
+/*
 struct MCPTool: Identifiable {
     let id = UUID().uuidString
     let name: String
@@ -284,19 +286,25 @@ struct MCPTool: Identifiable {
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: lastUsed, relativeTo: Date())
     }
+*/
     
+extension MCPTool {
     static let mockData: [MCPTool] = [
         MCPTool(
+            id: "read-file",
+            serverId: "filesystem",
             name: "Read File",
             description: "Read contents of a file from the file system",
-            category: .fileSystem,
-            usageCount: 245,
-            lastUsed: Date().addingTimeInterval(-1800),
-            requiresConfig: false,
-            parameters: [
-                Parameter(name: "path", type: "string", required: true),
-                Parameter(name: "encoding", type: "string", required: false)
-            ]
+            version: "1.0.0",
+            category: nil,
+            inputSchema: JSONSchema(type: .object, properties: [:]),
+            outputSchema: nil,
+            examples: nil,
+            permissions: nil,
+            rateLimit: nil,
+            metadata: nil,
+            isDeprecated: false,
+            replacedBy: nil
         ),
         MCPTool(
             name: "Write File",

@@ -314,14 +314,51 @@ main() {
             build_app
             install_and_launch
             
+            # Parse additional arguments for specific tests
+            local test_args=""
+            local test_type="${2:-standard}"
+            
+            case "$test_type" in
+                functional)
+                    log_info "Running functional UI tests with real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/ProjectFlowTests -only-testing:ClaudeCodeUITests/SessionFlowTests -only-testing:ClaudeCodeUITests/MessagingFlowTests -only-testing:ClaudeCodeUITests/MonitoringFlowTests -only-testing:ClaudeCodeUITests/MCPConfigurationTests"
+                    
+                    # Set environment variables for functional testing
+                    export BACKEND_URL="${BACKEND_URL:-http://localhost:8000}"
+                    export NETWORK_TIMEOUT="${NETWORK_TIMEOUT:-30}"
+                    export UI_WAIT_TIMEOUT="${UI_WAIT_TIMEOUT:-15}"
+                    export VERBOSE_LOGGING="${VERBOSE_LOGGING:-true}"
+                    export CLEANUP_AFTER_TESTS="${CLEANUP_AFTER_TESTS:-true}"
+                    
+                    log_info "Backend URL: $BACKEND_URL"
+                    log_info "Network timeout: ${NETWORK_TIMEOUT}s"
+                    log_info "UI wait timeout: ${UI_WAIT_TIMEOUT}s"
+                    ;;
+                standard)
+                    log_info "Running standard UI tests..."
+                    test_args="-only-testing:ClaudeCodeUITests"
+                    ;;
+                *)
+                    # Specific test class
+                    log_info "Running specific test class: $test_type"
+                    test_args="-only-testing:ClaudeCodeUITests/$test_type"
+                    ;;
+            esac
+            
             # Run UI tests
-            log_info "Running UI tests..."
-            PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodebuild test \
+            log_info "Executing tests with args: $test_args"
+            PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+            BACKEND_URL="$BACKEND_URL" \
+            NETWORK_TIMEOUT="$NETWORK_TIMEOUT" \
+            UI_WAIT_TIMEOUT="$UI_WAIT_TIMEOUT" \
+            VERBOSE_LOGGING="$VERBOSE_LOGGING" \
+            CLEANUP_AFTER_TESTS="$CLEANUP_AFTER_TESTS" \
+            xcodebuild test \
                 -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
                 -scheme "$SCHEME_NAME" \
                 -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
                 -derivedDataPath "$BUILD_DIR" \
-                -only-testing:ClaudeCodeUITests \
+                $test_args \
                 2>&1 | tee "${LOGS_DIR}/uitest_$(date +%Y%m%d_%H%M%S).log" | xcbeautify || {
                     log_error "UI tests failed"
                     exit 1
@@ -338,7 +375,10 @@ main() {
             echo "  build   - Build app with logging"
             echo "  launch  - Install and launch app"
             echo "  test    - Run all unit tests with coverage"
-            echo "  uitest  - Run UI tests"
+            echo "  uitest [type|class] - Run UI tests"
+            echo "    uitest functional - Run functional tests with real backend"
+            echo "    uitest standard   - Run standard UI tests (default)"
+            echo "    uitest ProjectFlowTests - Run specific test class"
             echo "  clean   - Clean build artifacts"
             echo "  status  - Check simulator status"
             echo "  help    - Show this help message"

@@ -1,0 +1,192 @@
+// Claude Code iOS - Production Configuration
+// Environment-specific settings for App Store distribution
+
+#include "Release.xcconfig"
+
+// ============================================================================
+// ENVIRONMENT CONFIGURATION
+// ============================================================================
+
+// Environment identifier
+ENVIRONMENT = production
+ENVIRONMENT_NAME = Production
+ENVIRONMENT_SHORT_NAME = Prod
+
+// ============================================================================
+// API CONFIGURATION
+// ============================================================================
+
+// Backend API endpoints
+API_BASE_URL = https:/$()/api.claudecode.app
+API_VERSION = v1
+API_TIMEOUT = 30
+
+// WebSocket endpoints
+WEBSOCKET_URL = wss:/$()/ws.claudecode.app
+WEBSOCKET_RECONNECT_INTERVAL = 5
+
+// Authentication
+AUTH_BASE_URL = https:/$()/auth.claudecode.app
+AUTH_REFRESH_INTERVAL = 3600
+
+// ============================================================================
+// FEATURE FLAGS
+// ============================================================================
+
+// Analytics and monitoring
+ENABLE_ANALYTICS = YES
+ENABLE_CRASH_REPORTING = YES
+ENABLE_PERFORMANCE_MONITORING = YES
+ENABLE_USER_BEHAVIOR_TRACKING = YES
+
+// Security features
+ENABLE_CERTIFICATE_PINNING = YES
+ENABLE_JAILBREAK_DETECTION = YES
+ENABLE_APP_INTEGRITY_CHECK = YES
+ENABLE_SECURE_STORAGE = YES
+
+// Debug features (disabled in production)
+ENABLE_DEBUG_MENU = NO
+ENABLE_NETWORK_LOGGING = NO
+ENABLE_VERBOSE_LOGGING = NO
+ENABLE_MOCK_DATA = NO
+
+// Beta features
+ENABLE_BETA_FEATURES = NO
+ENABLE_EXPERIMENTAL_UI = NO
+ENABLE_A_B_TESTING = YES
+
+// ============================================================================
+// THIRD-PARTY SERVICES
+// ============================================================================
+
+// Analytics
+ANALYTICS_API_KEY = $(ANALYTICS_API_KEY_PRODUCTION)
+ANALYTICS_ENDPOINT = https:/$()/analytics.claudecode.app
+
+// Crash reporting
+CRASHLYTICS_API_KEY = $(CRASHLYTICS_API_KEY_PRODUCTION)
+SENTRY_DSN = $(SENTRY_DSN_PRODUCTION)
+
+// Push notifications
+PUSH_NOTIFICATION_SERVER = https:/$()/push.claudecode.app
+PUSH_ENVIRONMENT = production
+
+// Cloud storage
+CLOUD_STORAGE_BUCKET = claudecode-production
+CLOUD_STORAGE_REGION = us-east-1
+
+// ============================================================================
+// BUILD SETTINGS
+// ============================================================================
+
+// Code signing
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = iPhone Distribution
+PROVISIONING_PROFILE_SPECIFIER = ClaudeCode_Production
+DEVELOPMENT_TEAM = $(DEVELOPMENT_TEAM_ID)
+
+// Bundle identifier
+PRODUCT_BUNDLE_IDENTIFIER = com.claudecode.ios
+
+// App name
+PRODUCT_NAME = Claude Code
+DISPLAY_NAME = Claude Code
+
+// Optimization
+SWIFT_OPTIMIZATION_LEVEL = -O
+GCC_OPTIMIZATION_LEVEL = s
+SWIFT_COMPILATION_MODE = wholemodule
+ENABLE_BITCODE = NO
+
+// Strip symbols
+STRIP_INSTALLED_PRODUCT = YES
+STRIP_SWIFT_SYMBOLS = YES
+DEPLOYMENT_POSTPROCESSING = YES
+SEPARATE_STRIP = YES
+STRIP_STYLE = all
+
+// ============================================================================
+// SECURITY SETTINGS
+// ============================================================================
+
+// App Transport Security
+APP_TRANSPORT_SECURITY_ALLOWS_ARBITRARY_LOADS = NO
+APP_TRANSPORT_SECURITY_ALLOWS_LOCAL_NETWORKING = NO
+
+// Data protection
+DATA_PROTECTION_CLASS = NSFileProtectionComplete
+ENABLE_DATA_PROTECTION = YES
+
+// Keychain
+KEYCHAIN_ACCESS_GROUP = $(AppIdentifierPrefix)com.claudecode.ios.keychain
+KEYCHAIN_SHARING_ENABLED = YES
+
+// ============================================================================
+// LOGGING AND MONITORING
+// ============================================================================
+
+// Log levels
+LOG_LEVEL = error
+LOG_TO_FILE = YES
+LOG_FILE_MAX_SIZE = 10485760
+LOG_FILE_MAX_COUNT = 5
+
+// Performance monitoring
+PERFORMANCE_MONITORING_SAMPLE_RATE = 0.1
+PERFORMANCE_MONITORING_ENABLED = YES
+
+// Error reporting
+ERROR_REPORTING_ENABLED = YES
+ERROR_REPORTING_SAMPLE_RATE = 1.0
+
+// ============================================================================
+// DEPLOYMENT CONFIGURATION
+// ============================================================================
+
+// App Store Connect
+APP_STORE_ID = 1234567890
+APP_STORE_TEAM_ID = $(TEAM_ID)
+
+// Update configuration
+CHECK_FOR_UPDATES = YES
+UPDATE_CHECK_INTERVAL = 86400
+FORCE_UPDATE_VERSION = 1.0.0
+
+// Cache configuration
+CACHE_EXPIRY_TIME = 3600
+CACHE_MAX_SIZE = 104857600
+CACHE_CLEANUP_INTERVAL = 86400
+
+// ============================================================================
+// CUSTOM BUILD SETTINGS
+// ============================================================================
+
+// Custom preprocessor macros
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) PRODUCTION=1 ENVIRONMENT_PRODUCTION=1
+
+// Swift Active Compilation Conditions
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) PRODUCTION RELEASE
+
+// Other Swift Flags
+OTHER_SWIFT_FLAGS = $(inherited) -D PRODUCTION
+
+// ============================================================================
+// INFO.PLIST VALUES
+// ============================================================================
+
+// Version
+MARKETING_VERSION = $(MARKETING_VERSION)
+CURRENT_PROJECT_VERSION = $(CURRENT_PROJECT_VERSION)
+
+// App permissions strings
+INFOPLIST_KEY_NSCameraUsageDescription = Claude Code needs camera access to scan QR codes and capture screenshots
+INFOPLIST_KEY_NSPhotoLibraryUsageDescription = Claude Code needs photo library access to save and share screenshots
+INFOPLIST_KEY_NSFaceIDUsageDescription = Claude Code uses Face ID to secure your data
+INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = Claude Code uses your location for contextual features
+
+// URL schemes
+URL_SCHEMES = claudecode
+
+// Universal links
+ASSOCIATED_DOMAINS = applinks:claudecode.app webcredentials:claudecode.app

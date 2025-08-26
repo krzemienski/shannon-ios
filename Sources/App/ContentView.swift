@@ -10,7 +10,13 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var navigationCoordinator = NavigationCoordinator()
+    @StateObject private var featureFlags = FeatureFlagService.shared
+    @StateObject private var onboardingService = OnboardingService.shared
+    @StateObject private var tooltipService = TooltipService.shared
+    @EnvironmentObject private var appState: AppState
     @State private var selectedTab = Tab.chat
+    @State private var showOnboarding = false
+    @State private var showHelpCenter = false
     @Environment(\.colorScheme) private var colorScheme
     
     enum Tab: Int, CaseIterable {
@@ -39,12 +45,41 @@ struct ContentView: View {
     }
     
     var body: some View {
+        ZStack {
+            if showOnboarding {
+                EnhancedOnboardingView {
+                    withAnimation {
+                        showOnboarding = false
+                        appState.hasCompletedOnboarding = true
+                    }
+                }
+                .transition(.opacity)
+            } else {
+                mainTabView
+            }
+        }
+        .onAppear {
+            checkOnboardingStatus()
+            initializeServices()
+        }
+        .sheet(isPresented: $showHelpCenter) {
+            HelpCenterView()
+        }
+    }
+    
+    private var mainTabView: some View {
         TabView(selection: $selectedTab) {
             // Chat Tab
             NavigationStack(path: $navigationCoordinator.chatPath) {
                 ChatListView()
                     .navigationTitle("Chat")
                     .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            helpButton
+                        }
+                    }
+                    .tooltip("chat_input", show: appState.isFirstLaunch)
             }
             .tabItem {
                 Label(Tab.chat.title, systemImage: Tab.chat.icon)
@@ -56,28 +91,37 @@ struct ContentView: View {
                 ProjectsView()
                     .navigationTitle("Projects")
                     .navigationBarTitleDisplayMode(.large)
+                    .tooltip("project_create", show: appState.isFirstLaunch)
             }
             .tabItem {
                 Label(Tab.projects.title, systemImage: Tab.projects.icon)
             }
             .tag(Tab.projects)
             
-            // Terminal Tab
-            NavigationStack(path: $navigationCoordinator.terminalPath) {
-                TerminalView()
-                    .navigationTitle("Terminal")
-                    .navigationBarTitleDisplayMode(.large)
+            // Terminal Tab - with feature flag
+            if featureFlags.isEnabled("advanced_terminal") {
+                NavigationStack(path: $navigationCoordinator.terminalPath) {
+                    TerminalView()
+                        .navigationTitle("Terminal")
+                        .navigationBarTitleDisplayMode(.large)
+                        .tooltip("terminal_access")
+                }
+                .tabItem {
+                    Label(Tab.terminal.title, systemImage: Tab.terminal.icon)
+                }
+                .tag(Tab.terminal)
             }
-            .tabItem {
-                Label(Tab.terminal.title, systemImage: Tab.terminal.icon)
-            }
-            .tag(Tab.terminal)
             
             // Settings Tab
             NavigationStack(path: $navigationCoordinator.settingsPath) {
                 SettingsView()
                     .navigationTitle("Settings")
                     .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            helpButton
+                        }
+                    }
             }
             .tabItem {
                 Label(Tab.settings.title, systemImage: Tab.settings.icon)
@@ -88,6 +132,8 @@ struct ContentView: View {
         .preferredColorScheme(themeManager.currentTheme.colorScheme)
         .environmentObject(themeManager)
         .environmentObject(navigationCoordinator)
+        .environmentObject(featureFlags)
+        .environmentObject(tooltipService)
         .onAppear {
             setupTabBarAppearance()
         }
@@ -115,9 +161,36 @@ struct ContentView: View {
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
+    
+    private func checkOnboardingStatus() {
+        showOnboarding = !appState.hasCompletedOnboarding
+    }
+    
+    private func initializeServices() {
+        Task {
+            // Initialize feature flags
+            await featureFlags.initialize()
+            
+            // Track app open
+            AnalyticsService.shared.track(event: "app_opened", properties: [
+                "has_completed_onboarding": appState.hasCompletedOnboarding,
+                "is_first_launch": appState.isFirstLaunch
+            ])
+        }
+    }
+    
+    private var helpButton: some View {
+        Button {
+            showHelpCenter = true
+        } label: {
+            Image(systemName: "questionmark.circle")
+                .foregroundColor(Theme.primary)
+        }
+    }
 }
 
 #Preview {
     ContentView()
         .preferredColorScheme(.dark)
+        .environmentObject(AppState())
 }

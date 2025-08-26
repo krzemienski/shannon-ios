@@ -1,0 +1,54 @@
+Claude Code revolutionizes iOS development with AI-powered assistance and advanced features designed for professional developers.
+
+KEY FEATURES:
+• AI-Powered Code Assistant - Get intelligent code suggestions, explanations, and debugging help powered by Claude AI
+• Advanced Project Management - Organize and manage multiple iOS projects with ease
+• Secure SSH Connections - Connect to remote servers and development environments securely
+• Real-Time Monitoring - Track performance metrics, system resources, and app health
+• Beautiful Cyberpunk UI - Enjoy a stunning, customizable interface designed for long coding sessions
+• Tool Integration - Access and execute development tools directly from the app
+• Smart Chat Interface - Natural conversation with AI for coding questions and solutions
+• Code Snippet Management - Save, organize, and quickly access your code snippets
+• Terminal Emulator - Full-featured terminal with SSH support and customization
+• Environment Management - Easily switch between development, staging, and production environments
+
+DEVELOPER PRODUCTIVITY:
+Boost your iOS development workflow with intelligent automation, context-aware suggestions, and seamless integration with your existing tools. Claude Code understands your code and provides relevant help exactly when you need it.
+
+AI ASSISTANCE:
+• Get instant explanations for complex code
+• Debug issues with AI-powered analysis
+• Generate boilerplate code automatically
+• Receive optimization suggestions
+• Learn best practices as you code
+
+SECURITY FIRST:
+• Biometric authentication (Face ID/Touch ID)
+• End-to-end encrypted data storage
+• Secure SSH key management
+• Certificate pinning for API connections
+• Jailbreak detection and app integrity checks
+
+PERFECT FOR:
+• Professional iOS developers
+• Swift and SwiftUI enthusiasts
+• Remote development teams
+• Students learning iOS development
+• Anyone building iOS applications
+
+REQUIREMENTS:
+• iOS 17.0 or later
+• Compatible with iPhone and iPad
+• Internet connection required for AI features
+• Approximately 50MB storage space
+
+Join thousands of developers who are already coding smarter with Claude Code. Whether you're building your first app or managing enterprise projects, Claude Code adapts to your workflow and helps you write better code faster.
+
+SUBSCRIPTION INFORMATION:
+Claude Code offers optional premium subscriptions for advanced features. All subscriptions include a free trial period. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.
+
+SUPPORT:
+We're here to help! Visit support.claudecode.app for documentation, tutorials, and assistance. Join our Discord community to connect with other developers and share your experiences.
+
+Privacy Policy: https://claudecode.app/privacy
+Terms of Service: https://claudecode.app/terms

@@ -1,0 +1,159 @@
+{
+  "app_information": {
+    "name": "Claude Code",
+    "subtitle": "AI-Powered Mobile Development",
+    "bundle_id": "com.claudecode.ios",
+    "sku": "CLAUDECODE001",
+    "primary_category": "Developer Tools",
+    "secondary_category": "Productivity",
+    "content_rating": "4+",
+    "copyright": "© 2024 Claude Code Team",
+    "version": "1.0.0",
+    "build_number": "1"
+  },
+  
+  "pricing": {
+    "price_tier": "Free",
+    "availability": {
+      "countries": "All Territories",
+      "release_date": "Immediate",
+      "pre_order": false
+    }
+  },
+  
+  "app_description": {
+    "en": "Transform your iPhone and iPad into a powerful development environment with Claude Code – the revolutionary mobile app that brings professional coding tools and AI assistance to iOS.\n\n🚀 CODE ANYWHERE, ANYTIME\nWrite, edit, and debug code directly on your mobile device with our full-featured editor. Whether you're on the go, in a meeting, or away from your desk, never let inspiration wait.\n\n🤖 AI-POWERED DEVELOPMENT\nIntegrated Claude AI provides intelligent code completion, error detection, and optimization suggestions. Get instant help with debugging, code reviews, and learning new technologies.\n\n🔒 SECURE REMOTE ACCESS\nConnect to your servers and development environments through encrypted SSH connections. Access your files, run commands, and manage deployments from anywhere.\n\n⚡ PROFESSIONAL FEATURES\n• Syntax highlighting for 50+ programming languages\n• Git integration with full version control\n• Terminal emulator with SSH support\n• Project file management and organization\n• Code completion and IntelliSense\n• Split-view multitasking on iPad\n• External keyboard support\n• Dark mode and accessibility features\n\n💼 PERFECT FOR:\n• Mobile developers and programmers\n• DevOps engineers managing servers\n• Students learning to code\n• Professionals who need coding access on-the-go\n• Anyone wanting to maximize productivity\n\n🌟 WHY DEVELOPERS LOVE CLAUDE CODE:\n\"Finally, a mobile IDE that doesn't compromise on features\" - TechReview\n\"The AI integration is a game-changer for mobile development\" - Developer Weekly\n\"SSH access from my phone has transformed my workflow\" - SysAdmin Pro\n\n📱 UNIVERSAL COMPATIBILITY\nOptimized for iPhone and iPad with iOS 17.0+. Take advantage of the latest iOS features including Stage Manager, Shortcuts integration, and Focus modes.\n\nStart coding smarter, faster, and anywhere with Claude Code. Download now and revolutionize your mobile development experience!",
+    
+    "es": "Transforma tu iPhone y iPad en un potente entorno de desarrollo con Claude Code: la aplicación revolucionaria que trae herramientas de programación profesional y asistencia de IA a iOS.\n\n🚀 PROGRAMA EN CUALQUIER LUGAR\nEscribe, edita y depura código directamente en tu dispositivo móvil con nuestro editor completo. Ya sea que estés de viaje, en una reunión o lejos de tu escritorio, nunca dejes que la inspiración espere.\n\n🤖 DESARROLLO POTENCIADO POR IA\nClaude AI integrado proporciona autocompletado inteligente de código, detección de errores y sugerencias de optimización. Obtén ayuda instantánea con depuración, revisiones de código y aprendizaje de nuevas tecnologías.\n\n🔒 ACCESO REMOTO SEGURO\nConéctate a tus servidores y entornos de desarrollo a través de conexiones SSH cifradas. Accede a tus archivos, ejecuta comandos y administra despliegues desde cualquier lugar.\n\n⚡ CARACTERÍSTICAS PROFESIONALES\n• Resaltado de sintaxis para más de 50 lenguajes\n• Integración completa con Git\n• Terminal con soporte SSH\n• Gestión de archivos de proyecto\n• Autocompletado de código e IntelliSense\n• Multitarea en vista dividida en iPad\n• Soporte para teclado externo\n• Modo oscuro y características de accesibilidad\n\nComienza a programar de manera más inteligente, rápida y desde cualquier lugar con Claude Code.",
+    
+    "fr": "Transformez votre iPhone et iPad en un environnement de développement puissant avec Claude Code – l'application révolutionnaire qui apporte des outils de programmation professionnels et l'assistance IA sur iOS.\n\n🚀 CODEZ N'IMPORTE OÙ\nÉcrivez, modifiez et déboguez du code directement sur votre appareil mobile avec notre éditeur complet. Que vous soyez en déplacement, en réunion ou loin de votre bureau, ne laissez jamais l'inspiration attendre.\n\n🤖 DÉVELOPPEMENT ALIMENTÉ PAR L'IA\nClaude AI intégré fournit une complétion de code intelligente, une détection d'erreurs et des suggestions d'optimisation. Obtenez une aide instantanée pour le débogage, les revues de code et l'apprentissage de nouvelles technologies.\n\n🔒 ACCÈS DISTANT SÉCURISÉ\nConnectez-vous à vos serveurs et environnements de développement via des connexions SSH chiffrées. Accédez à vos fichiers, exécutez des commandes et gérez les déploiements de n'importe où.\n\nCommencez à coder plus intelligemment, plus rapidement et de n'importe où avec Claude Code."
+  },
+  
+  "keywords": {
+    "en": "code editor,ssh client,mobile development,terminal,git,programming,ios development,ai coding,developer tools,remote access",
+    "es": "editor código,cliente ssh,desarrollo móvil,terminal,git,programación,desarrollo ios,codificación ia,herramientas desarrollador",
+    "fr": "éditeur code,client ssh,développement mobile,terminal,git,programmation,développement ios,codage ia,outils développeur"
+  },
+  
+  "what_is_new": {
+    "v1.0.0": {
+      "en": "🎉 Welcome to Claude Code!\n\nThe revolutionary mobile development environment is here:\n\n• AI-powered coding with Claude integration\n• Secure SSH terminal access\n• Professional code editor with 50+ languages\n• Git version control system\n• Mobile-optimized touch interface\n• iPad Pro multitasking support\n\nStart coding anywhere, anytime. Your development environment is now in your pocket!",
+      "es": "🎉 ¡Bienvenido a Claude Code!\n\nEl entorno de desarrollo móvil revolucionario está aquí:\n\n• Codificación potenciada por IA con integración Claude\n• Acceso seguro al terminal SSH\n• Editor de código profesional con más de 50 lenguajes\n• Sistema de control de versiones Git\n• Interfaz táctil optimizada para móviles\n• Soporte multitarea para iPad Pro\n\n¡Comienza a programar en cualquier lugar y momento!",
+      "fr": "🎉 Bienvenue à Claude Code!\n\nL'environnement de développement mobile révolutionnaire est là:\n\n• Codage alimenté par l'IA avec intégration Claude\n• Accès sécurisé au terminal SSH\n• Éditeur de code professionnel avec plus de 50 langages\n• Système de contrôle de version Git\n• Interface tactile optimisée pour mobile\n• Support multitâche iPad Pro\n\nCommencez à coder n'importe où, n'importe quand!"
+    }
+  },
+  
+  "promotional_text": {
+    "en": "Revolutionary mobile IDE with AI assistance. Code anywhere with Claude Code!",
+    "es": "IDE móvil revolucionario con asistencia de IA. ¡Programa en cualquier lugar con Claude Code!",
+    "fr": "IDE mobile révolutionnaire avec assistance IA. Codez partout avec Claude Code!"
+  },
+  
+  "support_information": {
+    "support_url": "https://claudecode.app/support",
+    "marketing_url": "https://claudecode.app",
+    "privacy_policy_url": "https://claudecode.app/privacy",
+    "terms_of_service_url": "https://claudecode.app/terms",
+    "copyright_url": "https://claudecode.app/copyright"
+  },
+  
+  "review_information": {
+    "contact_information": {
+      "first_name": "Claude",
+      "last_name": "Code",
+      "phone": "+1-555-CLAUDE",
+      "email": "appstore@claudecode.app"
+    },
+    "demo_account": {
+      "username": "demo@claudecode.app",
+      "password": "ClaudeCode2024!",
+      "notes": "Demo account with sample projects and configurations pre-loaded."
+    },
+    "notes": "Claude Code is a mobile development environment that provides secure SSH access, AI-powered code assistance, and professional development tools. All AI features are clearly labeled and users maintain full control over their code and data."
+  },
+  
+  "app_store_connect": {
+    "available_territories": "All",
+    "pricing_schedule": "Free",
+    "educational_discount": false,
+    "custom_b2b_app": false,
+    "content_rights": "You confirm you have all necessary rights to the content in your app"
+  },
+  
+  "technical_requirements": {
+    "ios_version": "17.0",
+    "device_requirements": [
+      "iPhone (iOS 17.0+)",
+      "iPad (iOS 17.0+)"
+    ],
+    "languages": [
+      "English",
+      "Spanish", 
+      "French",
+      "German",
+      "Japanese",
+      "Chinese (Simplified)",
+      "Chinese (Traditional)",
+      "Korean",
+      "Portuguese (Brazil)",
+      "Russian",
+      "Italian",
+      "Arabic"
+    ],
+    "accessibility_features": [
+      "VoiceOver",
+      "Dynamic Type",
+      "High Contrast",
+      "Reduce Motion",
+      "Switch Control",
+      "AssistiveTouch"
+    ]
+  },
+  
+  "age_rating": {
+    "rating": "4+",
+    "content_descriptions": {
+      "cartoon_fantasy_violence": "None",
+      "realistic_violence": "None", 
+      "sexual_content_nudity": "None",
+      "profanity_crude_humor": "None",
+      "alcohol_tobacco_drugs": "None",
+      "mature_suggestive": "None",
+      "horror_fear": "None",
+      "medical_treatment": "None",
+      "gambling": "None",
+      "unrestricted_web_access": "None",
+      "user_generated_content": "None"
+    }
+  },
+  
+  "privacy": {
+    "collects_data": true,
+    "data_types": {
+      "identifiers": {
+        "user_id": "Used for app functionality",
+        "device_id": "Used for analytics"
+      },
+      "usage_data": {
+        "product_interaction": "Used for analytics and app improvement",
+        "crash_data": "Used for app stability"
+      }
+    },
+    "data_usage": {
+      "third_party_advertising": false,
+      "developers_advertising": false,
+      "analytics": true,
+      "product_personalization": true,
+      "app_functionality": true
+    },
+    "data_retention": "Data is retained as long as account is active, or as required by law"
+  },
+  
+  "export_compliance": {
+    "uses_encryption": true,
+    "encryption_type": "Standard encryption for SSH connections and secure data storage",
+    "ccats_number": null,
+    "export_compliance_code": "Standard",
+    "notes": "Uses standard iOS encryption APIs and SSH encryption protocols"
+  }
+}

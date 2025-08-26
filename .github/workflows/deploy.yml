@@ -1,0 +1,524 @@
+name: Deploy to App Store
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      deployment_target:
+        description: 'Deployment target'
+        required: true
+        default: 'testflight'
+        type: choice
+        options:
+          - testflight
+          - appstore
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      skip_tests:
+        description: 'Skip tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  XCODE_VERSION: '15.2'
+  IOS_DESTINATION: 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.0'
+  DERIVED_DATA_PATH: 'build/DerivedData'
+  FASTLANE_SKIP_UPDATE_CHECK: true
+  FASTLANE_HIDE_CHANGELOG: true
+
+jobs:
+  # ============================================================================
+  # TEST JOB
+  # ============================================================================
+  test:
+    name: Run Tests
+    runs-on: macos-14
+    if: github.event.inputs.skip_tests != 'true'
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      
+      - name: 🔧 Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 📦 Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ~/Library/Developer/Xcode/DerivedData
+            ~/.swiftpm
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+      
+      - name: 🛠️ Install Dependencies
+        run: |
+          brew install xcodegen swiftlint xcpretty
+          
+          # Install Fastlane
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+      
+      - name: 🏗️ Generate Project
+        run: xcodegen generate
+      
+      - name: 🧪 Run Unit Tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project ClaudeCode.xcodeproj \
+            -scheme ClaudeCode \
+            -destination "${{ env.IOS_DESTINATION }}" \
+            -derivedDataPath "${{ env.DERIVED_DATA_PATH }}" \
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
+            | xcpretty --color --report junit --output test-results/junit.xml
+      
+      - name: 📊 Generate Coverage Report
+        if: success() || failure()
+        run: |
+          xcrun xccov view --report --json TestResults.xcresult > coverage.json
+          
+          # Extract coverage percentage
+          coverage=$(cat coverage.json | jq -r '.targets[0].coveredLines / .targets[0].executableLines * 100')
+          echo "Code Coverage: ${coverage}%"
+          
+          # Fail if coverage is below threshold
+          if (( $(echo "$coverage < 70" | bc -l) )); then
+            echo "❌ Code coverage is below 70%"
+            exit 1
+          fi
+      
+      - name: 📈 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            test-results/
+            TestResults.xcresult
+            coverage.json
+      
+      - name: 📝 Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: iOS Test Results
+          path: 'test-results/*.xml'
+          reporter: java-junit
+          fail-on-error: true
+
+  # ============================================================================
+  # BUILD JOB
+  # ============================================================================
+  build:
+    name: Build & Archive
+    runs-on: macos-14
+    needs: [test]
+    if: always() && (needs.test.result == 'success' || github.event.inputs.skip_tests == 'true')
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      build_number: ${{ steps.version.outputs.build_number }}
+      artifact_name: ${{ steps.archive.outputs.artifact_name }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔧 Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+      
+      - name: 🔐 Setup Certificates
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          
+          # Import certificate
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+          
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" \
+            -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          
+          # Apply provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+      
+      - name: 📝 Update Version
+        id: version
+        run: |
+          # Determine version bump type
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            BUMP_TYPE="${{ github.event.inputs.version_bump }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            BUMP_TYPE="none"
+          else
+            BUMP_TYPE="patch"
+          fi
+          
+          # Get current version
+          CURRENT_VERSION=$(cat .version 2>/dev/null || echo "1.0.0")
+          
+          # Calculate new version
+          if [[ "$BUMP_TYPE" != "none" ]]; then
+            IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+            case "$BUMP_TYPE" in
+              major)
+                major=$((major + 1))
+                minor=0
+                patch=0
+                ;;
+              minor)
+                minor=$((minor + 1))
+                patch=0
+                ;;
+              patch)
+                patch=$((patch + 1))
+                ;;
+            esac
+            VERSION="${major}.${minor}.${patch}"
+          fi
+          
+          # Generate build number
+          BUILD_NUMBER=$(date +%Y%m%d%H%M)
+          
+          # Update project
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" Info.plist
+          
+          # Save version
+          echo "$VERSION" > .version
+          
+          # Set outputs
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          
+          echo "📱 Version: $VERSION ($BUILD_NUMBER)"
+      
+      - name: 🏗️ Generate Project
+        run: xcodegen generate
+      
+      - name: 📦 Build Archive
+        id: archive
+        run: |
+          set -o pipefail
+          
+          xcodebuild archive \
+            -project ClaudeCode.xcodeproj \
+            -scheme ClaudeCode \
+            -configuration Release \
+            -archivePath build/ClaudeCode.xcarchive \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
+            CODE_SIGNING_ALLOWED=YES \
+            | xcpretty --color
+          
+          # Set artifact name
+          ARTIFACT_NAME="ClaudeCode_${{ steps.version.outputs.version }}_${{ steps.version.outputs.build_number }}"
+          echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+      
+      - name: 📱 Export IPA
+        run: |
+          # Create export options
+          cat > ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>${{ secrets.TEAM_ID }}</string>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>compileBitcode</key>
+              <false/>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>thinning</key>
+              <string>&lt;thin-for-all-variants&gt;</string>
+          </dict>
+          </plist>
+          EOF
+          
+          xcodebuild -exportArchive \
+            -archivePath build/ClaudeCode.xcarchive \
+            -exportPath build \
+            -exportOptionsPlist ExportOptions.plist \
+            -allowProvisioningUpdates
+          
+          # Rename IPA
+          mv build/ClaudeCode.ipa "build/${{ steps.archive.outputs.artifact_name }}.ipa"
+      
+      - name: 📤 Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.archive.outputs.artifact_name }}
+          path: |
+            build/*.ipa
+            build/*.xcarchive
+            build/*.dSYM.zip
+      
+      - name: 🧹 Cleanup Keychain
+        if: always()
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
+          rm -f ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
+  # ============================================================================
+  # DEPLOY TO TESTFLIGHT
+  # ============================================================================
+  deploy-testflight:
+    name: Deploy to TestFlight
+    runs-on: macos-14
+    needs: [build]
+    if: |
+      github.event_name == 'push' && 
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deployment_target == 'testflight')
+    
+    environment:
+      name: testflight
+      url: https://testflight.apple.com/join/${{ secrets.TESTFLIGHT_PUBLIC_LINK }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: build
+      
+      - name: 🚀 Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+        run: |
+          # Create API key file
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+          
+          # Find IPA file
+          IPA_PATH=$(find build -name "*.ipa" | head -1)
+          
+          # Upload to TestFlight
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_PATH" \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER_ID"
+      
+      - name: 📝 Generate Release Notes
+        run: |
+          cat > release_notes.txt <<EOF
+          Claude Code iOS v${{ needs.build.outputs.version }}
+          Build: ${{ needs.build.outputs.build_number }}
+          
+          What's New:
+          $(git log --pretty=format:"• %s" -10)
+          
+          TestFlight Link: https://testflight.apple.com/join/${{ secrets.TESTFLIGHT_PUBLIC_LINK }}
+          EOF
+      
+      - name: 🔔 Send Notifications
+        if: success()
+        run: |
+          # Slack notification
+          if [[ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]]; then
+            curl -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H 'Content-Type: application/json' \
+              -d "{
+                \"text\": \"🚀 Claude Code iOS v${{ needs.build.outputs.version }} deployed to TestFlight!\",
+                \"attachments\": [{
+                  \"color\": \"good\",
+                  \"fields\": [
+                    {\"title\": \"Version\", \"value\": \"${{ needs.build.outputs.version }}\", \"short\": true},
+                    {\"title\": \"Build\", \"value\": \"${{ needs.build.outputs.build_number }}\", \"short\": true},
+                    {\"title\": \"Branch\", \"value\": \"${GITHUB_REF#refs/heads/}\", \"short\": true},
+                    {\"title\": \"Commit\", \"value\": \"${GITHUB_SHA::8}\", \"short\": true}
+                  ]
+                }]
+              }"
+          fi
+
+  # ============================================================================
+  # DEPLOY TO APP STORE
+  # ============================================================================
+  deploy-appstore:
+    name: Deploy to App Store
+    runs-on: macos-14
+    needs: [build]
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.deployment_target == 'appstore')
+    
+    environment:
+      name: production
+      url: https://apps.apple.com/app/claude-code/id${{ secrets.APP_STORE_ID }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 📦 Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: build
+      
+      - name: 🛠️ Install Fastlane
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+      
+      - name: 📝 Prepare App Store Metadata
+        run: |
+          mkdir -p fastlane/metadata/en-US
+          
+          # App description
+          cat > fastlane/metadata/en-US/description.txt <<EOF
+          Claude Code revolutionizes iOS development with AI-powered assistance.
+          
+          KEY FEATURES:
+          • Intelligent code completion
+          • Real-time collaboration
+          • Advanced debugging
+          • Performance monitoring
+          • Secure SSH connections
+          • Beautiful UI
+          EOF
+          
+          # Keywords
+          echo "developer,coding,AI,productivity,swift,ios" > fastlane/metadata/en-US/keywords.txt
+          
+          # Release notes
+          cat > fastlane/metadata/en-US/release_notes.txt <<EOF
+          Version ${{ needs.build.outputs.version }}
+          
+          $(git log --pretty=format:"• %s" -10)
+          EOF
+      
+      - name: 🌟 Submit to App Store
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+        run: |
+          # Find IPA file
+          IPA_PATH=$(find build -name "*.ipa" | head -1)
+          
+          # Submit to App Store
+          bundle exec fastlane deliver \
+            --ipa "$IPA_PATH" \
+            --submit_for_review \
+            --automatic_release \
+            --force \
+            --skip_screenshots \
+            --precheck_include_in_app_purchases false
+      
+      - name: 🎉 Create GitHub Release
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.build.outputs.version }}
+          name: Claude Code iOS v${{ needs.build.outputs.version }}
+          body: |
+            # Claude Code iOS v${{ needs.build.outputs.version }}
+            
+            ## 🎉 What's New
+            $(git log --pretty=format:"• %s" -10)
+            
+            ## 📱 Download
+            - [App Store](https://apps.apple.com/app/claude-code/id${{ secrets.APP_STORE_ID }})
+            - [TestFlight](https://testflight.apple.com/join/${{ secrets.TESTFLIGHT_PUBLIC_LINK }})
+            
+            ## 📊 Build Information
+            - Version: ${{ needs.build.outputs.version }}
+            - Build: ${{ needs.build.outputs.build_number }}
+            - Commit: ${{ github.sha }}
+          files: |
+            build/*.ipa
+            build/*.dSYM.zip
+          draft: false
+          prerelease: false
+
+  # ============================================================================
+  # CLEANUP JOB
+  # ============================================================================
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    needs: [deploy-testflight, deploy-appstore]
+    if: always()
+    
+    steps:
+      - name: 🧹 Delete Old Artifacts
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            for (const artifact of artifacts.data.artifacts) {
+              const createdAt = new Date(artifact.created_at);
+              if (createdAt < oneWeekAgo) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id
+                });
+                console.log(`Deleted artifact: ${artifact.name}`);
+              }
+            }

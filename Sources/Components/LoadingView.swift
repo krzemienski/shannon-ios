@@ -58,7 +58,7 @@ struct LoadingView: View {
 
 // MARK: - Loading Overlay Modifier
 
-struct LoadingOverlay: ViewModifier {
+struct LoadingOverlayModifier: ViewModifier {
     let isLoading: Bool
     let message: String?
     
@@ -81,7 +81,7 @@ struct LoadingOverlay: ViewModifier {
 
 extension View {
     func loadingOverlay(isLoading: Bool, message: String? = nil) -> some View {
-        self.modifier(LoadingOverlay(isLoading: isLoading, message: message))
+        self.modifier(LoadingOverlayModifier(isLoading: isLoading, message: message))
     }
 }
 

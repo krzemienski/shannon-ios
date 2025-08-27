@@ -283,7 +283,7 @@ struct SSHConfig: Codable, Equatable {
     var host: String
     var port: Int
     var username: String
-    var authMethod: SSHAuthMethod
+    var authMethod: ProjectStore.SSHAuthMethod
     var privateKeyPath: String?
     var passphrase: String?
     var knownHostsPath: String?
@@ -291,7 +291,7 @@ struct SSHConfig: Codable, Equatable {
     init(host: String,
          port: Int = 22,
          username: String,
-         authMethod: SSHAuthMethod = .publicKey,
+         authMethod: ProjectStore.SSHAuthMethod = .publicKey,
          privateKeyPath: String? = nil,
          passphrase: String? = nil,
          knownHostsPath: String? = nil) {

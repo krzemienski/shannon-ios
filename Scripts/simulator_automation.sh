@@ -132,7 +132,6 @@ build_app() {
             -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
             -scheme "$SCHEME_NAME" \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
-            -derivedDataPath "$BUILD_DIR" \
             clean build \
             | xcbeautify || {
                 log_error "Build failed"
@@ -143,7 +142,6 @@ build_app() {
             -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
             -scheme "$SCHEME_NAME" \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
-            -derivedDataPath "$BUILD_DIR" \
             clean build || {
                 log_error "Build failed"
                 exit 1
@@ -157,11 +155,11 @@ build_app() {
 install_and_launch() {
     log_info "Installing app on simulator..."
     
-    # Find the app bundle
-    local app_path=$(find "$BUILD_DIR" -name "*.app" -type d | head -n 1)
+    # Find the app bundle in DerivedData
+    local app_path=$(find ~/Library/Developer/Xcode/DerivedData/ClaudeCode-*/Build/Products/Debug-iphonesimulator -name "ClaudeCode.app" -type d 2>/dev/null | head -n 1)
     
     if [ -z "$app_path" ]; then
-        log_error "App bundle not found in build directory"
+        log_error "App bundle not found in DerivedData"
         exit 1
     fi
     
@@ -319,6 +317,64 @@ main() {
             local test_type="${2:-standard}"
             
             case "$test_type" in
+                backend)
+                    log_info "Running ALL tests against REAL BACKEND at http://localhost:8000/v1/"
+                    log_warning "⚠️  IMPORTANT: Ensure backend is running at http://localhost:8000"
+                    
+                    # Check backend is accessible
+                    if ! curl -f -s -o /dev/null "http://localhost:8000/v1/health" 2>/dev/null; then
+                        log_error "Backend is not accessible at http://localhost:8000/v1/"
+                        log_error "Please start the backend server first!"
+                        exit 1
+                    fi
+                    log_success "Backend is accessible"
+                    
+                    test_args="-only-testing:ClaudeCodeUITests"
+                    
+                    # Set environment variables for real backend testing
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    export TEST_MODE="YES"
+                    export TEST_API_KEY="${TEST_API_KEY:-sk-test-key-12345}"
+                    export TEST_USERNAME="${TEST_USERNAME:-test@claudecode.com}"
+                    export TEST_PASSWORD="${TEST_PASSWORD:-TestPassword123!}"
+                    export TEST_SSH_HOST="${TEST_SSH_HOST:-localhost}"
+                    export TEST_SSH_PORT="${TEST_SSH_PORT:-2222}"
+                    export TEST_SSH_USER="${TEST_SSH_USER:-testuser}"
+                    export TEST_SSH_PASSWORD="${TEST_SSH_PASSWORD:-testpass123}"
+                    
+                    log_info "API Base URL: $API_BASE_URL"
+                    log_info "Test API Key: ${TEST_API_KEY:0:10}..."
+                    ;;
+                auth)
+                    log_info "Running Authentication tests against real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/AuthenticationTests"
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    ;;
+                chat)
+                    log_info "Running Chat & Streaming tests against real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/ChatStreamingTests"
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    ;;
+                projects)
+                    log_info "Running Project Management tests against real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/ProjectManagementTests"
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    ;;
+                files)
+                    log_info "Running File Operations tests against real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/FileOperationsTests"
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    ;;
+                ssh)
+                    log_info "Running SSH Terminal tests against real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/SSHTerminalTests"
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    ;;
+                comprehensive)
+                    log_info "Running COMPREHENSIVE test suite against real backend..."
+                    test_args="-only-testing:ClaudeCodeUITests/ComprehensiveTestSuite"
+                    export API_BASE_URL="http://localhost:8000/v1/"
+                    ;;
                 functional)
                     log_info "Running functional UI tests with real backend..."
                     test_args="-only-testing:ClaudeCodeUITests/ProjectFlowTests -only-testing:ClaudeCodeUITests/SessionFlowTests -only-testing:ClaudeCodeUITests/MessagingFlowTests -only-testing:ClaudeCodeUITests/MonitoringFlowTests -only-testing:ClaudeCodeUITests/MCPConfigurationTests"
@@ -348,6 +404,15 @@ main() {
             # Run UI tests
             log_info "Executing tests with args: $test_args"
             PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+            API_BASE_URL="${API_BASE_URL:-http://localhost:8000/v1/}" \
+            TEST_MODE="${TEST_MODE:-YES}" \
+            TEST_API_KEY="$TEST_API_KEY" \
+            TEST_USERNAME="$TEST_USERNAME" \
+            TEST_PASSWORD="$TEST_PASSWORD" \
+            TEST_SSH_HOST="$TEST_SSH_HOST" \
+            TEST_SSH_PORT="$TEST_SSH_PORT" \
+            TEST_SSH_USER="$TEST_SSH_USER" \
+            TEST_SSH_PASSWORD="$TEST_SSH_PASSWORD" \
             BACKEND_URL="$BACKEND_URL" \
             NETWORK_TIMEOUT="$NETWORK_TIMEOUT" \
             UI_WAIT_TIMEOUT="$UI_WAIT_TIMEOUT" \
@@ -375,17 +440,44 @@ main() {
             echo "  build   - Build app with logging"
             echo "  launch  - Install and launch app"
             echo "  test    - Run all unit tests with coverage"
-            echo "  uitest [type|class] - Run UI tests"
-            echo "    uitest functional - Run functional tests with real backend"
-            echo "    uitest standard   - Run standard UI tests (default)"
-            echo "    uitest ProjectFlowTests - Run specific test class"
+            echo "  uitest [type|class] - Run UI tests against REAL BACKEND"
+            echo "    uitest backend      - Run ALL tests against real backend (comprehensive)"
+            echo "    uitest auth         - Run authentication tests only"
+            echo "    uitest chat         - Run chat & streaming tests only"
+            echo "    uitest projects     - Run project management tests only"
+            echo "    uitest files        - Run file operations tests only"
+            echo "    uitest ssh          - Run SSH terminal tests only"
+            echo "    uitest comprehensive - Run comprehensive test suite"
+            echo "    uitest functional   - Run functional tests with real backend"
+            echo "    uitest standard     - Run standard UI tests (default)"
+            echo "    uitest [ClassName]  - Run specific test class"
             echo "  clean   - Clean build artifacts"
             echo "  status  - Check simulator status"
             echo "  help    - Show this help message"
             echo
+            echo "Environment Variables for Testing:"
+            echo "  TEST_API_KEY      - API key for authentication tests"
+            echo "  TEST_USERNAME     - Username for test account"
+            echo "  TEST_PASSWORD     - Password for test account"
+            echo "  TEST_SSH_HOST     - SSH host for terminal tests"
+            echo "  TEST_SSH_PORT     - SSH port for terminal tests"
+            echo "  TEST_SSH_USER     - SSH username"
+            echo "  TEST_SSH_PASSWORD - SSH password"
+            echo
+            echo "Example Usage:"
+            echo "  # Run all tests against real backend"
+            echo "  ./Scripts/simulator_automation.sh uitest backend"
+            echo
+            echo "  # Run specific test category"
+            echo "  ./Scripts/simulator_automation.sh uitest auth"
+            echo
+            echo "  # Run with custom test credentials"
+            echo "  TEST_API_KEY='sk-real-key' ./Scripts/simulator_automation.sh uitest backend"
+            echo
             echo "Environment:"
             echo "  Simulator UUID: $SIMULATOR_UUID"
             echo "  Bundle ID: $APP_BUNDLE_ID"
+            echo "  Backend URL: http://localhost:8000/v1/"
             echo "  Logs: ${LOGS_DIR}/"
             ;;
         *)

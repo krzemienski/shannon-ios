@@ -6,204 +6,37 @@
 //
 
 import SwiftUI
-import BackgroundTasks
 
 @main
 struct ClaudeCodeApp: App {
-    @StateObject private var dependencyContainer = DependencyContainer.shared
-    @StateObject private var appCoordinator: AppCoordinator
-    @StateObject private var appState = DependencyContainer.shared.appState
-    @StateObject private var sshManager = DependencyContainer.shared.sshManager
-    @Environment(\.scenePhase) private var scenePhase
+    @StateObject private var appState = AppState()
     
     init() {
-        // Initialize coordinator first (lightweight)
-        let coordinator = AppCoordinator(dependencyContainer: DependencyContainer.shared)
-        _appCoordinator = StateObject(wrappedValue: coordinator)
-        
-        // Defer heavy initialization
-        Task {
-            await performDeferredInitialization()
-        }
-    }
-    
-    private func performDeferredInitialization() async {
-        // Register modules asynchronously
-        await Task.detached(priority: .high) {
-            AppModuleRegistration.registerAllModules()
-        }.value
-        
-        // Configure appearance on main thread
-        await MainActor.run {
-            configureAppearance()
-        }
-        
-        // Register background tasks with lower priority
-        Task.detached(priority: .background) {
-            await MainActor.run {
-                registerBackgroundTasks()
-            }
-        }
+        // Configure appearance on launch
+        configureAppearance()
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .withDependencyContainer(dependencyContainer)
                 .environmentObject(appState)
-                .environmentObject(sshManager)
-                .environmentObject(dependencyContainer.settingsStore)
-                .environmentObject(dependencyContainer.chatStore)
-                .environmentObject(dependencyContainer.projectStore)
-                .environmentObject(appCoordinator)
-                .withThemeManager()
-                .tint(Theme.primary)
-                .task {
-                    // Initialize app on launch
-                    await appState.initialize()
-                    appCoordinator.start()
-                }
-                .onChange(of: scenePhase) { _, newPhase in
-                    handleScenePhaseChange(newPhase)
-                }
-                .onOpenURL { url in
-                    // Handle deep links
-                    appCoordinator.handleDeepLink(url)
-                }
         }
     }
     
     private func configureAppearance() {
         // Configure navigation bar appearance
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(Theme.card)
-        appearance.titleTextAttributes = [.foregroundColor: UIColor(Theme.foreground)]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor(Theme.foreground)]
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithOpaqueBackground()
         
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().standardAppearance = navAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
+        UINavigationBar.appearance().compactAppearance = navAppearance
         
         // Configure tab bar appearance
-        let tabBarAppearance = UITabBarAppearance()
-        tabBarAppearance.configureWithOpaqueBackground()
-        tabBarAppearance.backgroundColor = UIColor(Theme.card)
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithOpaqueBackground()
         
-        UITabBar.appearance().standardAppearance = tabBarAppearance
-        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
-        
-        // Configure table view appearance
-        UITableView.appearance().backgroundColor = UIColor(Theme.background)
-        UITableViewCell.appearance().backgroundColor = UIColor(Theme.card)
-        
-        // Configure text view appearance
-        UITextView.appearance().backgroundColor = .clear
-        UITextView.appearance().textColor = UIColor(Theme.foreground)
-    }
-    
-    private func registerBackgroundTasks() {
-        // Register background task for SSH monitoring
-        BGTaskScheduler.shared.register(
-            forTaskWithIdentifier: "com.claudecode.ios.ssh-monitor",
-            using: nil
-        ) { task in
-            handleSSHMonitoringTask(task as! BGProcessingTask)
-        }
-        
-        // Register background task for telemetry sync
-        BGTaskScheduler.shared.register(
-            forTaskWithIdentifier: "com.claudecode.ios.telemetry-sync",
-            using: nil
-        ) { task in
-            handleTelemetrySyncTask(task as! BGAppRefreshTask)
-        }
-    }
-    
-    private func handleScenePhaseChange(_ phase: ScenePhase) {
-        switch phase {
-        case .active:
-            print("App became active")
-            // Resume any paused operations
-            
-        case .inactive:
-            print("App became inactive")
-            
-        case .background:
-            print("App entered background")
-            // Schedule background tasks
-            scheduleBackgroundTasks()
-            // Save app state
-            
-        @unknown default:
-            break
-        }
-    }
-    
-    private func scheduleBackgroundTasks() {
-        // Schedule SSH monitoring task
-        let sshRequest = BGProcessingTaskRequest(
-            identifier: "com.claudecode.ios.ssh-monitor"
-        )
-        sshRequest.requiresNetworkConnectivity = true
-        sshRequest.requiresExternalPower = false
-        sshRequest.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60) // 5 minutes
-        
-        do {
-            try BGTaskScheduler.shared.submit(sshRequest)
-        } catch {
-            print("Failed to schedule SSH monitoring task: \(error)")
-        }
-        
-        // Schedule telemetry sync task
-        let telemetryRequest = BGAppRefreshTaskRequest(
-            identifier: "com.claudecode.ios.telemetry-sync"
-        )
-        telemetryRequest.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60) // 15 minutes
-        
-        do {
-            try BGTaskScheduler.shared.submit(telemetryRequest)
-        } catch {
-            print("Failed to schedule telemetry sync task: \(error)")
-        }
-    }
-    
-    private func handleSSHMonitoringTask(_ task: BGProcessingTask) {
-        // Set expiration handler
-        task.expirationHandler = {
-            // Clean up any ongoing operations
-            task.setTaskCompleted(success: false)
-        }
-        
-        // Perform SSH monitoring
-        Task {
-            do {
-                // Check SSH connections and perform monitoring
-                await sshManager.performBackgroundMonitoring()
-                task.setTaskCompleted(success: true)
-            } catch {
-                print("SSH monitoring failed: \(error)")
-                task.setTaskCompleted(success: false)
-            }
-            
-            // Schedule next monitoring task
-            scheduleBackgroundTasks()
-        }
-    }
-    
-    private func handleTelemetrySyncTask(_ task: BGAppRefreshTask) {
-        // Set expiration handler
-        task.expirationHandler = {
-            task.setTaskCompleted(success: false)
-        }
-        
-        // Sync telemetry data
-        Task {
-            // TODO: Implement telemetry sync
-            task.setTaskCompleted(success: true)
-            
-            // Schedule next sync
-            scheduleBackgroundTasks()
-        }
+        UITabBar.appearance().standardAppearance = tabAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
     }
 }

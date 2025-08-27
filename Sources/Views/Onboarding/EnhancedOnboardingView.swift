@@ -6,7 +6,8 @@
 //
 
 import SwiftUI
-import Lottie
+// TODO: Add Lottie package when needed for animations
+// import Lottie
 
 struct EnhancedOnboardingView: View {
     @StateObject private var onboardingService = OnboardingService.shared

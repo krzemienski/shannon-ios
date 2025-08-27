@@ -23,6 +23,7 @@ STRIP_INSTALLED_PRODUCT = NO
 // Code Signing
 CODE_SIGN_IDENTITY = iPhone Developer
 CODE_SIGN_STYLE = Automatic
+PRODUCT_BUNDLE_IDENTIFIER = com.claudecode.ios
 
 // Swift Compiler
 SWIFT_COMPILATION_MODE = singlefile
@@ -33,3 +34,7 @@ API_ENVIRONMENT = development
 API_BASE_URL = http://localhost:8000/v1
 ENABLE_LOGGING = YES
 LOG_LEVEL = verbose
+
+// Info.plist Processing
+INFOPLIST_OUTPUT_FORMAT = xml
+INFOPLIST_PREPROCESS = NO

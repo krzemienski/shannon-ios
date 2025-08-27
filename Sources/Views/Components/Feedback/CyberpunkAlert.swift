@@ -336,7 +336,7 @@ struct CyberpunkModalAlert: View {
                     .frame(maxWidth: .infinity)
                 }
             }
-            .padding(24)
+            .themePadding(24)
             .frame(maxWidth: 320)
             .background(
                 RoundedRectangle(cornerRadius: 16)

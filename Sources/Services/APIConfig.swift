@@ -1,15 +1,15 @@
 import Foundation
 
 /// API configuration for Claude Code backend
-enum APIConfig {
+public enum APIConfig {
     // MARK: - Base Configuration
     
     /// Base URL for the Claude Code API Gateway
     /// Should be running at localhost:8000 in development
-    static let baseURL = URL(string: "http://localhost:8000/v1")!
+    public static let baseURL = URL(string: "http://localhost:8000/v1")!
     
     /// Default base URL string for settings
-    static let defaultBaseURL = "http://localhost:8000/v1"
+    public static let defaultBaseURL = "http://localhost:8000/v1"
     
     /// Alternative base URLs for different environments
     static let productionURL = URL(string: "https://api.claudecode.com/v1")!

@@ -29,6 +29,10 @@ class AppState: ObservableObject {
     @Published var isFirstLaunch = false
     @Published var isAuthenticated = true // Default to true for now
     
+    // WebSocket Connection Status
+    @Published var webSocketConnected = false
+    @Published var webSocketReconnecting = false
+    
     // MARK: - Settings
     @AppStorage("enableTelemetry") var enableTelemetry = true
     @AppStorage("enableBackgroundRefresh") var enableBackgroundRefresh = true
@@ -38,12 +42,14 @@ class AppState: ObservableObject {
     // MARK: - Private Properties
     private var cancellables = Set<AnyCancellable>()
     private let userDefaults = UserDefaults.standard
+    private let webSocketService = WebSocketService.shared
     
     // MARK: - Initialization
     init() {
         setupObservers()
         loadSavedState()
         checkFirstLaunch()
+        setupWebSocketObservers()
     }
     
     // MARK: - Public Methods
@@ -59,6 +65,9 @@ class AppState: ObservableObject {
             
             // Load user preferences
             loadUserPreferences()
+            
+            // Initialize WebSocket connection
+            await initializeWebSocket()
             
             isInitialized = true
             print("AppState initialized successfully")
@@ -76,6 +85,11 @@ class AppState: ObservableObject {
         
         // Resume any paused SSE connections
         NotificationCenter.default.post(name: .resumeSSEConnections, object: nil)
+        
+        // Reconnect WebSocket if needed
+        if !webSocketConnected {
+            await initializeWebSocket()
+        }
     }
     
     /// Save current app state
@@ -185,6 +199,117 @@ class AppState: ObservableObject {
     
     private func checkFirstLaunch() {
         isFirstLaunch = !hasCompletedOnboarding
+    }
+    
+    // MARK: - WebSocket Methods
+    
+    private func setupWebSocketObservers() {
+        // Observe WebSocket connection state
+        webSocketService.$connectionState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                switch state {
+                case .connected:
+                    self?.webSocketConnected = true
+                    self?.webSocketReconnecting = false
+                    
+                case .disconnected:
+                    self?.webSocketConnected = false
+                    self?.webSocketReconnecting = false
+                    
+                case .connecting:
+                    self?.webSocketReconnecting = true
+                    
+                default:
+                    break
+                }
+            }
+            .store(in: &cancellables)
+        
+        // Subscribe to WebSocket events
+        subscribeToWebSocketEvents()
+    }
+    
+    private func initializeWebSocket() async {
+        // Configure WebSocket with base URL and auth token
+        let wsURL = baseURL.replacingOccurrences(of: "/v1", with: "/ws")
+        webSocketService.configure(baseURL: wsURL, authToken: apiKey)
+        
+        do {
+            try await webSocketService.connect()
+            print("WebSocket connected successfully")
+            
+            // Subscribe to relevant channels
+            if let projectId = selectedProjectId {
+                try? await webSocketService.subscribeToProject(projectId)
+            }
+            
+            if let chatId = selectedChatId {
+                try? await webSocketService.subscribeToChat(chatId)
+            }
+            
+        } catch {
+            print("Failed to connect WebSocket: \(error)")
+        }
+    }
+    
+    private func subscribeToWebSocketEvents() {
+        // Project updates
+        webSocketService.projectUpdates
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                self?.handleProjectUpdate(event)
+            }
+            .store(in: &cancellables)
+        
+        // Chat updates
+        webSocketService.chatUpdates
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                self?.handleChatUpdate(event)
+            }
+            .store(in: &cancellables)
+        
+        // System notifications
+        webSocketService.systemNotifications
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                self?.handleSystemNotification(event)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func handleProjectUpdate(_ event: ProjectUpdateEvent) {
+        print("Received project update: \(event.action) for \(event.projectId)")
+        // Update project state as needed
+    }
+    
+    private func handleChatUpdate(_ event: ChatUpdateEvent) {
+        print("Received chat update: \(event.action) for \(event.chatId)")
+        // Update chat state as needed
+    }
+    
+    private func handleSystemNotification(_ event: SystemNotificationEvent) {
+        print("System notification: \(event.title) - \(event.message)")
+        // Show notification to user
+    }
+    
+    /// Subscribe to project updates
+    func subscribeToProject(_ projectId: String) async {
+        selectedProjectId = projectId
+        
+        if webSocketConnected {
+            try? await webSocketService.subscribeToProject(projectId)
+        }
+    }
+    
+    /// Subscribe to chat updates
+    func subscribeToChat(_ chatId: String) async {
+        selectedChatId = chatId
+        
+        if webSocketConnected {
+            try? await webSocketService.subscribeToChat(chatId)
+        }
     }
 }
 

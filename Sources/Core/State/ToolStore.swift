@@ -23,7 +23,7 @@ final class ToolStore: ObservableObject {
     
     // MARK: - Computed Properties
     
-    var categorizedTools: [ToolCategory: [Tool]] {
+    var categorizedTools: [ToolStoreCategory: [Tool]] {
         Dictionary(grouping: availableTools, by: { $0.category })
     }
     
@@ -107,6 +107,23 @@ final class ToolStore: ObservableObject {
     func clearRecentTools() {
         recentTools.removeAll()
         userDefaults.removeObject(forKey: "recentToolIds")
+    }
+    
+    /// Get tools by category (compatibility method for ToolsCoordinator)
+    func getToolsByCategory(_ category: Any) -> [Tool] {
+        // For now, return all tools - proper category mapping would be needed
+        return availableTools
+    }
+    
+    /// Search tools by query
+    func searchTools(query: String) -> [Tool] {
+        guard !query.isEmpty else { return availableTools }
+        
+        let lowercasedQuery = query.lowercased()
+        return availableTools.filter { tool in
+            tool.name.lowercased().contains(lowercasedQuery) ||
+            tool.description.lowercased().contains(lowercasedQuery)
+        }
     }
     
     // MARK: - Private Methods
@@ -250,7 +267,7 @@ struct Tool: Identifiable, Equatable {
     let id: String
     let name: String
     let description: String
-    let category: ToolCategory
+    let category: ToolStoreCategory
     let icon: String
     let parameters: [ToolParameter]
 }
@@ -283,7 +300,7 @@ enum ParameterType: String, Equatable {
     case object
 }
 
-enum ToolCategory: String, CaseIterable {
+enum ToolStoreCategory: String, CaseIterable {
     case fileSystem = "File System"
     case shell = "Shell"
     case git = "Git"

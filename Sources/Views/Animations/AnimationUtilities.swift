@@ -339,12 +339,12 @@ class PageTransitionManager: ObservableObject {
         }
         
         // Text animations
-        Text("Cyberpunk UI")
+        SwiftUI.Text("Cyberpunk UI")
             .font(Theme.Typography.title)
             .foregroundColor(Theme.primary)
             .pulse()
         
-        Text("Loading...")
+        SwiftUI.Text("Loading...")
             .font(Theme.Typography.body)
             .foregroundColor(Theme.foreground)
             .shimmer()

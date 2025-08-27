@@ -163,10 +163,13 @@ struct PullToRefreshModifier: ViewModifier {
                     
                     // Content
                     content
-                        .anchorPreference(
-                            key: ScrollOffsetPreferenceKey.self,
-                            value: .top
-                        ) { $0 }
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .preference(key: ScrollOffsetPreferenceKey.self, 
+                                              value: geometry.frame(in: .global).minY)
+                            }
+                        )
                 }
             }
             .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
@@ -227,7 +230,7 @@ struct PullToRefreshIndicator: View {
                     .trim(from: 0, to: progress * 0.8)
                     .stroke(Theme.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                     .frame(width: 30, height: 30)
-                    .rotationEffect(.degrees(-90 + progress * 360))
+                    .rotationEffect(.degrees(-90 + (progress * 360)))
                     .opacity(progress)
             }
         }
@@ -238,16 +241,16 @@ struct PullToRefreshIndicator: View {
 // MARK: - Scroll Offset Preference Key
 
 struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
+    nonisolated(unsafe) static var defaultValue: CGFloat = 0
     
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
 }
 
-// MARK: - Interactive Card
+// MARK: - Gesture Interactive Card
 
-struct InteractiveCard: View {
+struct GestureInteractiveCard: View {
     let content: AnyView
     let onTap: () -> Void
     let onLongPress: (() -> Void)?
@@ -374,7 +377,7 @@ extension View {
 #Preview {
     VStack(spacing: 20) {
         // Interactive card example
-        InteractiveCard(
+        GestureInteractiveCard(
             content: {
                 VStack {
                     Text("Interactive Card")

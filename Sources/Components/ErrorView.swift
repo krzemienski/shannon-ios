@@ -75,7 +75,7 @@ struct ErrorView: View {
 
 // MARK: - Empty State View
 
-struct EmptyStateView: View {
+struct StandardEmptyStateView: View {
     let icon: String
     let title: String
     let message: String?

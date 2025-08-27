@@ -8,71 +8,94 @@
 import SwiftUI
 
 struct TerminalView: View {
-    let projectId: String
+    let projectId: String?
     @EnvironmentObject var coordinator: ProjectsCoordinator
-    @State private var terminalOutput = "$ "
-    @State private var currentCommand = ""
-    @FocusState private var isInputFocused: Bool
+    @StateObject private var sshSessionManager = SSHSessionManager.shared
+    @State private var showConnectionSheet = false
+    @State private var showEnhancedTerminal = false
+    
+    init(projectId: String? = nil) {
+        self.projectId = projectId
+    }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Terminal output
-            ScrollViewReader { proxy in
-                ScrollView {
-                    Text(terminalOutput)
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(Theme.foreground)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .id("bottom")
-                }
-                .background(Color.black.opacity(0.9))
-                .onChange(of: terminalOutput) { _ in
-                    withAnimation {
-                        proxy.scrollTo("bottom", anchor: .bottom)
-                    }
-                }
+        Group {
+            if sshSessionManager.sessions.isEmpty {
+                emptyStateView
+            } else {
+                EnhancedTerminalView(projectId: projectId)
             }
-            
-            // Command input
-            HStack {
-                Text("$")
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(Theme.primary)
-                
-                TextField("Enter command", text: $currentCommand)
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(Theme.foreground)
-                    .textFieldStyle(PlainTextFieldStyle())
-                    .focused($isInputFocused)
-                    .onSubmit {
-                        executeCommand()
-                    }
-            }
-            .padding()
-            .background(Theme.card)
         }
         .navigationTitle("Terminal")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            isInputFocused = true
-            connectToProject()
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showConnectionSheet = true
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .foregroundColor(Theme.primary)
+                }
+            }
+        }
+        .sheet(isPresented: $showConnectionSheet) {
+            SSHConnectionSheet { config in
+                Task {
+                    do {
+                        let sessionId = try await sshSessionManager.createSession(
+                            name: config.name,
+                            config: config
+                        )
+                        try await sshSessionManager.connect(sessionId: sessionId)
+                        showEnhancedTerminal = true
+                    } catch {
+                        print("Failed to create SSH session: \(error)")
+                    }
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showEnhancedTerminal) {
+            NavigationStack {
+                EnhancedTerminalView(projectId: projectId)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Done") {
+                                showEnhancedTerminal = false
+                            }
+                        }
+                    }
+            }
         }
     }
     
-    private func executeCommand() {
-        guard !currentCommand.isEmpty else { return }
-        
-        terminalOutput += "\n$ \(currentCommand)\n"
-        
-        // TODO: Send command to SSH connection
-        terminalOutput += "Command execution not yet implemented\n"
-        
-        currentCommand = ""
-    }
-    
-    private func connectToProject() {
-        terminalOutput = "Connecting to project \(projectId)...\n"
-        terminalOutput += "SSH connection not yet implemented\n$ "
+    private var emptyStateView: some View {
+        VStack(spacing: 24) {
+            Image(systemName: "terminal.fill")
+                .font(.system(size: 60))
+                .foregroundColor(Theme.primary.opacity(0.5))
+            
+            Text("No SSH Sessions")
+                .font(.title2)
+                .fontWeight(.semibold)
+            
+            Text("Connect to a server to start using the terminal")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            Button {
+                showConnectionSheet = true
+            } label: {
+                Label("New Connection", systemImage: "plus.circle")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(Theme.primary)
+                    .clipShape(Capsule())
+            }
+        }
+        .padding()
     }
 }

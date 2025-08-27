@@ -27,6 +27,7 @@ public class TerminalViewModel: ObservableObject {
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "TerminalViewModel")
     private var cancellables = Set<AnyCancellable>()
     private let maxSessions = 10
+    private let webSocketService = WebSocketService.shared
     
     // Session management
     private var sessionConnections: [String: SSHClient] = [:]
@@ -238,6 +239,13 @@ public class TerminalViewModel: ObservableObject {
         settings.$autoConnect
             .sink { [weak self] _ in
                 self?.settings.save()
+            }
+            .store(in: &cancellables)
+        
+        // Subscribe to WebSocket terminal output events
+        webSocketService.terminalOutput
+            .sink { [weak self] event in
+                self?.handleWebSocketTerminalOutput(event)
             }
             .store(in: &cancellables)
     }
@@ -454,5 +462,46 @@ extension TerminalViewModel {
         vm.sessions.append(session2)
         
         return vm
+    }
+    
+    // MARK: - WebSocket Integration
+    
+    private func handleWebSocketTerminalOutput(_ event: TerminalOutputEvent) {
+        guard let session = session(with: event.sessionId) else {
+            logger.warning("Received terminal output for unknown session: \(event.sessionId)")
+            return
+        }
+        
+        // Process output through the terminal
+        let content: String
+        switch event.outputType {
+        case .stdout:
+            content = event.content
+            
+        case .stderr:
+            // Could apply different formatting for stderr
+            content = "\u{001b}[31m\(event.content)\u{001b}[0m" // Red color for errors
+            
+        case .command:
+            // Handle command echo or history
+            content = "> \(event.content)\n"
+        }
+        
+        // Convert to data and process through terminal
+        if let data = content.data(using: .utf8) {
+            session.terminal.processOutput(data)
+        }
+    }
+    
+    /// Subscribe to WebSocket terminal output for a session
+    public func subscribeToTerminalOutput(sessionId: String) async {
+        guard session(with: sessionId) != nil else { return }
+        
+        do {
+            try await webSocketService.subscribeToTerminal(sessionId)
+            logger.info("Subscribed to terminal output for session: \(sessionId)")
+        } catch {
+            logger.error("Failed to subscribe to terminal output: \(error)")
+        }
     }
 }

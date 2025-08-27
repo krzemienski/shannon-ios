@@ -103,62 +103,6 @@ struct CustomTextField: View {
     }
 }
 
-// MARK: - Custom Text Editor
-
-struct CustomTextEditor: View {
-    let title: String
-    @Binding var text: String
-    var placeholder: String = ""
-    var minHeight: CGFloat = 100
-    var maxHeight: CGFloat = 300
-    
-    @FocusState private var isFocused: Bool
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
-            // Title label
-            if !title.isEmpty {
-                Text(title)
-                    .font(Theme.Typography.caption)
-                    .foregroundColor(Theme.mutedForeground)
-            }
-            
-            // Text editor
-            ZStack(alignment: .topLeading) {
-                // Placeholder
-                if text.isEmpty {
-                    Text(placeholder)
-                        .font(Theme.Typography.body)
-                        .foregroundColor(Theme.muted)
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 8)
-                        .allowsHitTesting(false)
-                }
-                
-                // Text editor
-                TextEditor(text: $text)
-                    .font(Theme.Typography.body)
-                    .foregroundColor(Theme.foreground)
-                    .tint(Theme.primary)
-                    .scrollContentBackground(.hidden)
-                    .focused($isFocused)
-                    .frame(minHeight: minHeight, maxHeight: maxHeight)
-            }
-            .padding(ThemeSpacing.sm)
-            .background(Theme.input)
-            .cornerRadius(Theme.CornerRadius.sm)
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.CornerRadius.sm)
-                    .stroke(
-                        isFocused ? Theme.primary : Theme.inputBorder,
-                        lineWidth: isFocused ? 2 : 1
-                    )
-            )
-            .animation(Theme.Animation.easeInOut, value: isFocused)
-        }
-    }
-}
-
 #Preview {
     ZStack {
         Theme.background

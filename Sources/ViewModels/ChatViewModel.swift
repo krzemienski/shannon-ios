@@ -44,9 +44,11 @@ final class ChatViewModel: ObservableObject {
     private let apiClient: APIClient
     private let appState: AppState
     private var sseClient: SSEClient?
+    private var streamingService: StreamingChatService?
     private var cancellables = Set<AnyCancellable>()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "ChatViewModel")
     private let conversationId: String?
+    private let webSocketService = WebSocketService.shared
     
     // Performance optimizations
     private let messageDebouncer = Debouncer(delay: 0.5)
@@ -92,6 +94,13 @@ final class ChatViewModel: ObservableObject {
         appState.$isConnected
             .sink { [weak self] isConnected in
                 self?.connectionStatus = isConnected ? .connected : .disconnected
+            }
+            .store(in: &cancellables)
+        
+        // Observe WebSocket chat updates
+        webSocketService.chatUpdates
+            .sink { [weak self] event in
+                self?.handleWebSocketChatUpdate(event)
             }
             .store(in: &cancellables)
         
@@ -168,13 +177,24 @@ final class ChatViewModel: ObservableObject {
     
     /// Stop streaming response
     func stopStreaming() {
+        // Stop SSE client if using direct SSE
         sseClient?.disconnect()
+        
+        // Stop streaming service if using it
+        streamingService?.stopStreaming()
+        
         isStreaming = false
         
         // Finalize the streaming message
         if let messageId = streamingMessageId,
            !streamingContent.isEmpty {
             updateMessage(id: messageId, content: streamingContent)
+            
+            // Mark message as no longer streaming
+            if let index = messages.firstIndex(where: { $0.id == messageId }) {
+                messages[index].isStreaming = false
+            }
+            
             streamingMessageId = nil
             streamingContent = ""
         }
@@ -308,7 +328,16 @@ final class ChatViewModel: ObservableObject {
         addMessage(assistantMessage)
         streamingMessageId = assistantMessage.id
         
-        // Start SSE streaming
+        // Initialize streaming service if needed
+        if streamingService == nil {
+            let settingsStore = DependencyContainer.shared.settingsStore
+            streamingService = StreamingChatService(
+                baseURL: settingsStore.apiBaseURL ?? APIConfig.defaultBaseURL,
+                apiKey: settingsStore.apiKey
+            )
+        }
+        
+        // Prepare request
         let settingsStore = DependencyContainer.shared.settingsStore
         let request = ChatCompletionRequest(
             model: currentModel,
@@ -318,62 +347,73 @@ final class ChatViewModel: ObservableObject {
             stream: true
         )
         
-        // Use the streamChatCompletion method from APIClient+Streaming
-        await apiClient.streamChatCompletion(
+        // Start streaming with the new service
+        await streamingService?.startStreaming(
             request: request,
-            onChunk: { [weak self] chunk in
+            onToken: { [weak self] token in
                 guard let self = self else { return }
                 
-                // Process streaming chunk
-                if let delta = chunk.choices.first?.delta {
-                    if let content = delta.content {
-                        self.streamingContent += content
+                Task { @MainActor in
+                    // Accumulate content token by token
+                    self.streamingContent += token
+                    
+                    // Update the message with accumulated content
+                    if let messageId = self.streamingMessageId {
+                        self.updateMessage(id: messageId, content: self.streamingContent)
                         
-                        // Update the message with accumulated content
-                        if let messageId = self.streamingMessageId {
-                            self.updateMessage(id: messageId, content: self.streamingContent)
+                        // Trigger scroll to bottom for new content
+                        self.shouldScrollToBottom = true
+                    }
+                }
+            },
+            onComplete: { [weak self] metrics in
+                guard let self = self else { return }
+                
+                Task { @MainActor in
+                    // Finalize the streaming message
+                    if let messageId = self.streamingMessageId {
+                        // Mark message as no longer streaming
+                        if let index = self.messages.firstIndex(where: { $0.id == messageId }) {
+                            self.messages[index].isStreaming = false
+                            
+                            // Add usage metadata if available
+                            self.messages[index].metadata = MessageMetadata(
+                                model: self.currentModel,
+                                usage: TokenUsage(
+                                    promptTokens: 0,  // Will be updated from backend
+                                    completionTokens: metrics.tokensReceived,
+                                    totalTokens: metrics.tokensReceived,
+                                    cachedTokens: nil
+                                )
+                            )
                         }
                     }
                     
-                    // Handle tool calls if present
-                    if let toolCalls = delta.toolCalls, !toolCalls.isEmpty {
-                        // Process tool calls
-                        self.logger.info("Received tool calls in stream")
-                    }
+                    // Log streaming metrics
+                    self.logger.info("""
+                        Streaming completed:
+                        - Duration: \(metrics.totalDuration)s
+                        - Tokens: \(metrics.tokensReceived)
+                        - Time to first token: \(metrics.timeToFirstToken)s
+                        - Success: \(metrics.success)
+                    """)
+                    
+                    self.streamingMessageId = nil
+                    self.streamingContent = ""
+                    self.isStreaming = false
+                    self.isLoading = false
                 }
-                
-                // Update usage if available
-                if let usage = chunk.usage {
-                    // Store usage information
-                    self.logger.info("Token usage - prompt: \(usage.promptTokens), completion: \(usage.completionTokens)")
-                }
-            },
-            onComplete: { [weak self] in
-                guard let self = self else { return }
-                
-                // Finalize the streaming message
-                if let messageId = self.streamingMessageId {
-                    // Mark message as no longer streaming
-                    if let index = self.messages.firstIndex(where: { $0.id == messageId }) {
-                        self.messages[index].isStreaming = false
-                    }
-                }
-                
-                self.streamingMessageId = nil
-                self.streamingContent = ""
-                self.isStreaming = false
-                self.isLoading = false
-            },
-            onError: { [weak self] error in
-                guard let self = self else { return }
-                
-                self.handleError(error)
-                self.streamingMessageId = nil
-                self.streamingContent = ""
-                self.isStreaming = false
-                self.isLoading = false
             }
         )
+        
+        // Handle errors from streaming service
+        if let streamingError = streamingService?.error {
+            handleError(streamingError)
+            streamingMessageId = nil
+            streamingContent = ""
+            isStreaming = false
+            isLoading = false
+        }
     }
     
     private func prepareMessagesForAPI() -> [ChatMessage] {
@@ -484,6 +524,106 @@ final class ChatViewModel: ObservableObject {
         
         self.error = error
         showError = true
+    }
+    
+    // MARK: - WebSocket Handling
+    
+    private func handleWebSocketChatUpdate(_ event: ChatUpdateEvent) {
+        guard let conversationId = conversationId,
+              event.chatId == conversationId else { return }
+        
+        switch event.action {
+        case .messageAdded:
+            if let messageData = event.data,
+               let messageId = event.messageId {
+                handleIncomingMessage(
+                    id: messageId,
+                    content: messageData.content ?? "",
+                    role: messageData.role ?? "assistant"
+                )
+            }
+            
+        case .messageUpdated:
+            if let messageId = event.messageId,
+               let messageData = event.data {
+                updateExistingMessage(
+                    id: messageId,
+                    content: messageData.content ?? ""
+                )
+            }
+            
+        case .streamStarted:
+            if let messageId = event.messageId {
+                streamingMessageId = messageId
+                isStreaming = true
+                streamingContent = ""
+            }
+            
+        case .streamEnded:
+            if let messageId = event.messageId,
+               messageId == streamingMessageId {
+                finalizeStreamingMessage()
+            }
+        }
+    }
+    
+    private func handleIncomingMessage(id: String, content: String, role: String) {
+        let messageRole: MessageRole
+        switch role {
+        case "assistant":
+            messageRole = .assistant
+        case "user":
+            messageRole = .user
+        case "system":
+            messageRole = .system
+        default:
+            messageRole = .assistant
+        }
+        
+        let message = Message(
+            id: id,
+            role: messageRole,
+            content: content,
+            timestamp: Date(),
+            isStreaming: false
+        )
+        
+        // Check if message already exists
+        if !messages.contains(where: { $0.id == id }) {
+            addMessage(message)
+        }
+    }
+    
+    private func updateExistingMessage(id: String, content: String) {
+        if let index = messages.firstIndex(where: { $0.id == id }) {
+            messages[index].content = content
+            
+            // If this is the streaming message, update streaming content
+            if id == streamingMessageId {
+                streamingContent = content
+            }
+        }
+    }
+    
+    private func finalizeStreamingMessage() {
+        guard let messageId = streamingMessageId else { return }
+        
+        if let index = messages.firstIndex(where: { $0.id == messageId }) {
+            messages[index].isStreaming = false
+        }
+        
+        streamingMessageId = nil
+        isStreaming = false
+        streamingContent = ""
+    }
+    
+    /// Subscribe to WebSocket updates for this chat
+    func subscribeToWebSocketUpdates() {
+        guard let conversationId = conversationId else { return }
+        
+        Task {
+            await appState.subscribeToChat(conversationId)
+        }
     }
 }
 

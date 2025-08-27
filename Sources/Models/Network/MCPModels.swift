@@ -218,6 +218,61 @@ public struct MCPTool: Codable, Identifiable, Equatable {
     }
 }
 
+/// Tool example for documentation
+public struct ToolExample: Codable, Equatable {
+    public let name: String?
+    public let description: String?
+    public let input: [String: Any]?
+    public let output: [String: Any]?
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case description
+        case input
+        case output
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
+        
+        if let inputDict = try container.decodeIfPresent([String: AnyCodable].self, forKey: .input) {
+            input = inputDict.mapValues { $0.value }
+        } else {
+            input = nil
+        }
+        
+        if let outputDict = try container.decodeIfPresent([String: AnyCodable].self, forKey: .output) {
+            output = outputDict.mapValues { $0.value }
+        } else {
+            output = nil
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(name, forKey: .name)
+        try container.encodeIfPresent(description, forKey: .description)
+        
+        if let input = input {
+            let inputDict = input.mapValues { AnyCodable($0) }
+            try container.encode(inputDict, forKey: .input)
+        }
+        
+        if let output = output {
+            let outputDict = output.mapValues { AnyCodable($0) }
+            try container.encode(outputDict, forKey: .output)
+        }
+    }
+    
+    public static func == (lhs: ToolExample, rhs: ToolExample) -> Bool {
+        lhs.name == rhs.name &&
+        lhs.description == rhs.description
+        // Note: Skipping input/output comparison since they're type Any
+    }
+}
+
 /// Tool category
 public enum ToolCategory: String, Codable {
     case filesystem
@@ -236,7 +291,7 @@ public enum ToolCategory: String, Codable {
 }
 
 /// JSON Schema for tool input/output
-public struct JSONSchema: Codable, Equatable {
+public struct JSONSchema: Codable {
     public let type: String
     public let properties: [String: PropertyDefinition]?
     public let required: [String]?
@@ -283,8 +338,23 @@ public struct JSONSchema: Codable, Equatable {
     }
 }
 
+extension JSONSchema: Equatable {
+    public static func == (lhs: JSONSchema, rhs: JSONSchema) -> Bool {
+        lhs.type == rhs.type &&
+        lhs.properties == rhs.properties &&
+        lhs.required == rhs.required &&
+        lhs.additionalProperties == rhs.additionalProperties &&
+        lhs.description == rhs.description
+        // Note: Skipping examples comparison since it's type Any
+    }
+}
+
 /// Property definition in JSON schema
-public struct PropertyDefinition: Codable, Equatable {
+public indirect enum PropertyDefinitionItems: Codable, Equatable {
+    case definition(PropertyDefinition)
+}
+
+public struct PropertyDefinition: Codable {
     public let type: String
     public let description: String?
     public let defaultValue: Any?
@@ -293,7 +363,7 @@ public struct PropertyDefinition: Codable, Equatable {
     public let maximum: Double?
     public let pattern: String?
     public let format: String?
-    public let items: PropertyDefinition?
+    public let items: PropertyDefinitionItems?
     
     enum CodingKeys: String, CodingKey {
         case type
@@ -316,7 +386,11 @@ public struct PropertyDefinition: Codable, Equatable {
         maximum = try container.decodeIfPresent(Double.self, forKey: .maximum)
         pattern = try container.decodeIfPresent(String.self, forKey: .pattern)
         format = try container.decodeIfPresent(String.self, forKey: .format)
-        items = try container.decodeIfPresent(PropertyDefinition.self, forKey: .items)
+        if let itemsDef = try container.decodeIfPresent(PropertyDefinition.self, forKey: .items) {
+            items = .definition(itemsDef)
+        } else {
+            items = nil
+        }
         
         if let defaultCodable = try container.decodeIfPresent(AnyCodable.self, forKey: .defaultValue) {
             defaultValue = defaultCodable.value
@@ -334,11 +408,27 @@ public struct PropertyDefinition: Codable, Equatable {
         try container.encodeIfPresent(maximum, forKey: .maximum)
         try container.encodeIfPresent(pattern, forKey: .pattern)
         try container.encodeIfPresent(format, forKey: .format)
-        try container.encodeIfPresent(items, forKey: .items)
+        if case let .definition(itemsDef)? = items {
+            try container.encode(itemsDef, forKey: .items)
+        }
         
         if let defaultValue = defaultValue {
             try container.encode(AnyCodable(defaultValue), forKey: .defaultValue)
         }
+    }
+}
+
+extension PropertyDefinition: Equatable {
+    public static func == (lhs: PropertyDefinition, rhs: PropertyDefinition) -> Bool {
+        lhs.type == rhs.type &&
+        lhs.description == rhs.description &&
+        lhs.enumValues == rhs.enumValues &&
+        lhs.minimum == rhs.minimum &&
+        lhs.maximum == rhs.maximum &&
+        lhs.pattern == rhs.pattern &&
+        lhs.format == rhs.format &&
+        lhs.items == rhs.items
+        // Note: Skipping defaultValue comparison since it's type Any
     }
 }
 

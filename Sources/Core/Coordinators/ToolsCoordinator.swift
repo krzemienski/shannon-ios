@@ -19,7 +19,7 @@ final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     @Published var isShowingToolDetail = false
     @Published var isShowingToolExecution = false
     @Published var searchQuery = ""
-    @Published var selectedCategory: ToolCategory = .all
+    @Published var selectedCategory: ToolsCoordinatorCategory = .all
     
     // MARK: - Dependencies
     
@@ -80,7 +80,7 @@ final class ToolsCoordinator: BaseCoordinator, ObservableObject {
         selectedToolId = nil
     }
     
-    func selectCategory(_ category: ToolCategory) {
+    func selectCategory(_ category: ToolsCoordinatorCategory) {
         selectedCategory = category
         navigationPath.append(ToolRoute.category(category))
     }
@@ -131,7 +131,7 @@ final class ToolsCoordinator: BaseCoordinator, ObservableObject {
         dependencyContainer.toolStore.searchTools(query: query)
     }
     
-    func getToolsByCategory(_ category: ToolCategory) -> [Tool] {
+    func getToolsByCategory(_ category: ToolsCoordinatorCategory) -> [Tool] {
         dependencyContainer.toolStore.getToolsByCategory(category)
     }
     
@@ -232,7 +232,7 @@ final class ToolsCoordinator: BaseCoordinator, ObservableObject {
 // MARK: - Navigation Routes
 
 enum ToolRoute: Hashable {
-    case category(ToolCategory)
+    case category(ToolsCoordinatorCategory)
     case detail(String)
     case execution(String, [String: Any])
     
@@ -266,7 +266,7 @@ enum ToolRoute: Hashable {
 
 // MARK: - Supporting Types
 
-enum ToolCategory: String, CaseIterable, Identifiable {
+enum ToolsCoordinatorCategory: String, CaseIterable, Identifiable {
     case all = "All"
     case file = "File"
     case system = "System"

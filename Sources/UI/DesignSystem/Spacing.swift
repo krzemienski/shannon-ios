@@ -132,12 +132,12 @@ public extension EdgeInsets {
 // MARK: - View Extensions
 public extension View {
     /// Apply uniform padding
-    func padding(_ spacing: CGFloat) -> some View {
+    func uniformPadding(_ spacing: CGFloat) -> some View {
         self.padding(EdgeInsets.all(spacing))
     }
     
     /// Apply symmetric padding
-    func padding(horizontal: CGFloat = 0, vertical: CGFloat = 0) -> some View {
+    func themePadding(horizontal: CGFloat = 0, vertical: CGFloat = 0) -> some View {
         self.padding(EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical))
     }
     
@@ -190,7 +190,7 @@ public struct SpacedDivider: View {
     
     public init(
         spacing: CGFloat = Spacing.md,
-        color: Color = Color(hsl: 240, 10, 20)
+        color: Color = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.2)
     ) {
         self.spacing = spacing
         self.color = color

@@ -191,13 +191,34 @@ final class SettingsViewModel: ObservableObject {
                 passphrase: settingsStore.sshPassphrase
             )
             
-            // Test connection
-            let success = await sshManager.testConnection(config: config)
+            // Test connection by attempting to connect
+            var success = false
+            var errorMessage = ""
+            
+            if config.authMethod == .publicKey {
+                await sshManager.connectWithKey(
+                    host: config.host,
+                    port: config.port,
+                    username: config.username,
+                    privateKeyPath: config.privateKeyPath ?? "",
+                    passphrase: config.passphrase
+                )
+            } else {
+                // Password auth - would need password from somewhere
+                errorMessage = "Password authentication not configured"
+            }
+            
+            // Check if connected
+            success = sshManager.connectionState == .connected
+            if success {
+                // Disconnect after test
+                await sshManager.disconnect()
+            }
             
             connectionTestResult = ConnectionTestResult(
                 success: success,
                 message: success ? "SSH connection successful" : "SSH connection failed",
-                details: success ? "Connected to \(config.host)" : "Failed to connect"
+                details: success ? "Connected to \(config.host)" : (errorMessage.isEmpty ? "Failed to connect" : errorMessage)
             )
         } catch {
             connectionTestResult = ConnectionTestResult(
@@ -366,7 +387,7 @@ final class SettingsViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-enum SettingsSection: String, CaseIterable {
+enum SettingsViewSection: String, CaseIterable {
     case api = "API Configuration"
     case ssh = "SSH Settings"
     case appearance = "Appearance"

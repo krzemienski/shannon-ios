@@ -10,6 +10,7 @@ import UIKit
 import OSLog
 
 /// Comprehensive input sanitization and validation
+@MainActor
 public final class InputSanitizer {
     // MARK: - Properties
     
@@ -248,7 +249,7 @@ public final class InputSanitizer {
     
     private func sanitizeEmail(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         // Convert to lowercase and trim
         let email = input.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
@@ -328,7 +329,7 @@ public final class InputSanitizer {
     
     private func sanitizeAPIKey(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         // Remove whitespace
         let key = input.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -359,7 +360,7 @@ public final class InputSanitizer {
     
     private func sanitizeSSHKey(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         let key = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -385,7 +386,7 @@ public final class InputSanitizer {
     
     private func sanitizeFilename(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         // Remove path components
         let filename = (input as NSString).lastPathComponent
@@ -421,7 +422,7 @@ public final class InputSanitizer {
     
     private func sanitizePath(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         let path = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -456,7 +457,7 @@ public final class InputSanitizer {
     
     private func sanitizeCommand(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         let command = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -491,7 +492,7 @@ public final class InputSanitizer {
     
     private func sanitizeGeneralText(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         var sanitized = input
         
@@ -519,7 +520,7 @@ public final class InputSanitizer {
     
     private func sanitizeSearchQuery(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         var query = input.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -545,7 +546,7 @@ public final class InputSanitizer {
     
     private func sanitizeSQLQuery(_ input: String) -> SanitizationResult {
         var errors: [String] = []
-        let warnings: [String] = []
+        var warnings: [String] = []
         
         let query = input.trimmingCharacters(in: .whitespacesAndNewlines)
         

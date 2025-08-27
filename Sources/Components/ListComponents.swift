@@ -238,7 +238,7 @@ struct ConversationListItem: View {
 
 // MARK: - Section Header
 
-struct SectionHeader: View {
+struct ListSectionHeader: View {
     let title: String
     let action: (() -> Void)?
     let actionLabel: String?
@@ -433,7 +433,7 @@ struct ListComponents_Previews: PreviewProvider {
                 VStack(spacing: ThemeSpacing.lg) {
                     // Section with tools
                     VStack(spacing: 0) {
-                        SectionHeader(
+                        ListSectionHeader(
                             title: "Available Tools",
                             action: {},
                             actionLabel: "View All"

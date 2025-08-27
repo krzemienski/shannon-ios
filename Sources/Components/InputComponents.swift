@@ -423,8 +423,13 @@ struct CustomSlider: View {
             }
             
             // Slider
-            Slider(value: $value, in: range, step: step)
-                .tint(Theme.primary)
+            if let step = step {
+                Slider(value: $value, in: range, step: step)
+                    .tint(Theme.primary)
+            } else {
+                Slider(value: $value, in: range)
+                    .tint(Theme.primary)
+            }
         }
         .padding(ThemeSpacing.md)
         .background(Theme.card)

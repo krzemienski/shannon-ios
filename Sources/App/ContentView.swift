@@ -102,8 +102,6 @@ struct ContentView: View {
             if featureFlags.isEnabled("advanced_terminal") {
                 NavigationStack(path: $navigationCoordinator.terminalPath) {
                     TerminalView()
-                        .navigationTitle("Terminal")
-                        .navigationBarTitleDisplayMode(.large)
                         .tooltip("terminal_access")
                 }
                 .tabItem {
@@ -129,7 +127,7 @@ struct ContentView: View {
             .tag(Tab.settings)
         }
         .tint(Theme.primary)
-        .preferredColorScheme(themeManager.currentTheme.colorScheme)
+        .preferredColorScheme(themeManager.effectiveColorScheme)
         .environmentObject(themeManager)
         .environmentObject(navigationCoordinator)
         .environmentObject(featureFlags)

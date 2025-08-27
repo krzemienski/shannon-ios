@@ -156,7 +156,7 @@ struct CyberpunkLoadingAnimation: View {
 
 // MARK: - Error View
 
-public struct ErrorView: View {
+public struct CommonErrorView: View {
     let error: Error
     let retryAction: (() -> Void)?
     
@@ -203,7 +203,7 @@ public struct ErrorView: View {
 
 // MARK: - Empty State View
 
-public struct EmptyStateView: View {
+public struct CommonEmptyStateView: View {
     let icon: String
     let title: String
     let message: String?
@@ -261,7 +261,7 @@ public struct EmptyStateView: View {
 
 // MARK: - Custom Button Styles
 
-public struct PrimaryButtonStyle: ButtonStyle {
+public struct CommonPrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     
     public func makeBody(configuration: Configuration) -> some View {
@@ -279,7 +279,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
     }
 }
 
-public struct SecondaryButtonStyle: ButtonStyle {
+public struct CommonSecondaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     
     public func makeBody(configuration: Configuration) -> some View {
@@ -297,7 +297,7 @@ public struct SecondaryButtonStyle: ButtonStyle {
     }
 }
 
-public struct GhostButtonStyle: ButtonStyle {
+public struct CommonGhostButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(Theme.Typography.headline)
@@ -315,7 +315,7 @@ public struct GhostButtonStyle: ButtonStyle {
 // MARK: - Badge View
 
 public struct BadgeView: View {
-    enum Style {
+    public enum Style {
         case primary, secondary, success, warning, danger, info
         
         var backgroundColor: Color {

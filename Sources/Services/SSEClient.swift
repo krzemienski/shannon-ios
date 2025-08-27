@@ -8,6 +8,7 @@ class SSEClient: NSObject {
     private var urlSession: URLSession?
     private var dataTask: URLSessionDataTask?
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "SSEClient")
+    private let configuration: SSEConfiguration
     
     // Event handlers
     private var onMessage: ((SSEMessage) -> Void)?
@@ -52,7 +53,8 @@ class SSEClient: NSObject {
     
     // MARK: - Initialization
     
-    override init() {
+    init(configuration: SSEConfiguration = .default) {
+        self.configuration = configuration
         super.init()
         setupSession()
     }
@@ -137,7 +139,7 @@ class SSEClient: NSObject {
         startHeartbeatMonitoring()
     }
     
-    /// Connect for chat streaming
+    /// Connect for chat streaming with POST body support
     func streamChat(
         request: ChatCompletionRequest,
         apiKey: String? = nil,
@@ -155,8 +157,11 @@ class SSEClient: NSObject {
         urlRequest.httpMethod = "POST"
         urlRequest.allHTTPHeaderFields = APIConfig.sseHeaders(apiKey: apiKey)
         
+        // Encode request body
         do {
-            urlRequest.httpBody = try JSONEncoder().encode(streamRequest)
+            let encoder = JSONEncoder()
+            encoder.keyEncodingStrategy = .convertToSnakeCase
+            urlRequest.httpBody = try encoder.encode(streamRequest)
         } catch {
             onError(error)
             return
@@ -170,18 +175,35 @@ class SSEClient: NSObject {
                 return
             }
             
+            // Remove "data: " prefix if present
+            let cleanedData = message.data.hasPrefix("data: ") 
+                ? String(message.data.dropFirst(6)) 
+                : message.data
+            
+            guard let data = cleanedData.data(using: .utf8) else {
+                self.logger.warning("Invalid UTF-8 in SSE message")
+                return
+            }
+            
             do {
-                let chunk = try JSONDecoder().decode(ChatStreamChunk.self, from: Data(message.data.utf8))
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let chunk = try decoder.decode(ChatStreamChunk.self, from: data)
                 onMessage(chunk)
             } catch {
                 self.logger.error("Failed to decode chat chunk: \(error)")
+                // Don't stop on decode errors, continue processing stream
             }
         }
         self.onError = onError
         self.onComplete = onComplete
         
+        // Mark as connected
+        isConnected = true
+        reconnectAttempts = 0
+        
         // Start streaming
-        logger.debug("Starting chat stream")
+        logger.debug("Starting chat stream to \(url)")
         dataTask = urlSession?.dataTask(with: urlRequest)
         dataTask?.resume()
     }

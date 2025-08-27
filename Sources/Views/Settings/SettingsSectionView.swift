@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsSectionView: View {
-    let section: SettingsSection
+    let section: SettingsSectionType
     @EnvironmentObject var coordinator: SettingsCoordinator
     
     var body: some View {
@@ -103,7 +103,7 @@ struct SettingsSectionView: View {
     }
 }
 
-enum SettingsSection: String, CaseIterable {
+enum SettingsSectionType: String, CaseIterable {
     case general
     case appearance
     case api

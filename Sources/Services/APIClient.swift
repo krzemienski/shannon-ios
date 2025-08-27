@@ -715,7 +715,7 @@ class APIClient: ObservableObject {
 // MARK: - Supporting Types
 
 // Request Priority (Task 331)
-enum RequestPriority: Int {
+enum APIRequestPriority: Int {
     case low = 0
     case normal = 1
     case high = 2

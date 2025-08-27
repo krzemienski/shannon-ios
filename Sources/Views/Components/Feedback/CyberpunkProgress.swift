@@ -377,15 +377,15 @@ struct CyberpunkSpinner: View {
                 CyberpunkProgressBar(
                     value: 0.3,
                     label: "Low Battery",
-                    variant: .warning,
-                    height: 12
+                    height: 12,
+                    variant: .warning
                 )
                 
                 CyberpunkProgressBar(
                     value: 0.15,
                     label: "Critical",
-                    variant: .error,
-                    showPercentage: false
+                    showPercentage: false,
+                    variant: .error
                 )
             }
             

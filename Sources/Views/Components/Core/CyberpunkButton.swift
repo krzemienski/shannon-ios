@@ -222,6 +222,6 @@ struct CyberpunkButton: View {
             print("Disabled")
         }
     }
-    .padding()
+    .padding(.all)
     .background(Color.hsl(240, 10, 5))
 }

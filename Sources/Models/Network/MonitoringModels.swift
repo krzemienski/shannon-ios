@@ -560,7 +560,7 @@ public enum NotificationCategory: String, Codable {
 }
 
 /// Notification priority
-public enum NotificationPriority: String, Codable {
+public enum MonitoringNotificationPriority: String, Codable {
     case low
     case normal
     case high

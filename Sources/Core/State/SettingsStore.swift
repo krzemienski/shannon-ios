@@ -27,6 +27,11 @@ final class SettingsStore: ObservableObject {
         }
     }
     
+    /// Computed property for API base URL compatibility
+    var apiBaseURL: String? {
+        return baseURL
+    }
+    
     @Published var selectedModel: String = "claude-3-5-haiku-20241022" {
         didSet {
             UserDefaults.standard.set(selectedModel, forKey: Keys.selectedModel)
@@ -340,20 +345,6 @@ final class SettingsStore: ObservableObject {
 }
 
 // MARK: - Supporting Types
-
-enum AppTheme: String, CaseIterable {
-    case light = "light"
-    case dark = "dark"
-    case system = "system"
-    
-    var displayName: String {
-        switch self {
-        case .light: return "Light"
-        case .dark: return "Dark"
-        case .system: return "System"
-        }
-    }
-}
 
 enum FontSize: String, CaseIterable {
     case small = "small"

@@ -105,7 +105,7 @@ struct LoadingContentView<Content: View, LoadedContent: View>: View {
                 .transition(.opacity)
                 
             case .empty:
-                EmptyStateView()
+                SimpleEmptyStateView()
                     .transition(.opacity)
             }
         }
@@ -318,7 +318,7 @@ struct LinearProgressView: View {
 
 // MARK: - Empty State View
 
-struct EmptyStateView: View {
+struct SimpleEmptyStateView: View {
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "tray")

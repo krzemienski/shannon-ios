@@ -22,6 +22,7 @@ struct ChatInputView: View {
     @State private var showAttachmentMenu = false
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isRecording = false
+    @State private var showVoiceInput = false
     @FocusState private var isFocused: Bool
     
     private let maxTextHeight: CGFloat = 200
@@ -65,6 +66,16 @@ struct ChatInputView: View {
             .background(Theme.card)
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: shouldShowCharacterCount)
+        .sheet(isPresented: $showVoiceInput) {
+            VoiceInputView(
+                outputText: $text,
+                isPresented: $showVoiceInput,
+                onComplete: { transcribedText in
+                    // Text is already set via binding
+                    isFocused = true
+                }
+            )
+        }
     }
     
     // MARK: - Subviews
@@ -205,23 +216,8 @@ struct ChatInputView: View {
     }
     
     private func handleVoiceInput() {
-        isRecording.toggle()
-        if isRecording {
-            startRecording()
-        } else {
-            stopRecording()
-        }
+        showVoiceInput = true
         onVoiceInput()
-    }
-    
-    private func startRecording() {
-        // TODO: Implement voice recording
-        print("Start recording")
-    }
-    
-    private func stopRecording() {
-        // TODO: Implement voice recording stop
-        print("Stop recording")
     }
 }
 

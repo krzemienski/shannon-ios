@@ -4,6 +4,9 @@
 
 import Foundation
 import OSLog
+#if os(iOS)
+import UIKit
+#endif
 
 /// Crash reporting system for capturing and reporting application crashes
 public final class CrashReporter: @unchecked Sendable {
@@ -160,7 +163,11 @@ public final class CrashReporter: @unchecked Sendable {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillTerminate),
+            #if os(iOS)
             name: UIApplication.willTerminateNotification,
+            #else
+            name: NSNotification.Name("NSApplicationWillTerminateNotification"),
+            #endif
             object: nil
         )
     }
@@ -179,9 +186,9 @@ public final class CrashReporter: @unchecked Sendable {
     private func installSignalHandlers() {
         let signals: [Int32] = [SIGABRT, SIGILL, SIGSEGV, SIGFPE, SIGBUS, SIGPIPE, SIGTRAP]
         
-        for signal in signals {
-            let oldHandler = signal(signal, CrashReporter.signalHandler)
-            signalHandlers[signal] = oldHandler
+        for sig in signals {
+            let oldHandler = signal(sig, CrashReporter.signalHandler)
+            signalHandlers[sig] = oldHandler
         }
     }
     
@@ -347,16 +354,34 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     private func captureSystemInfo() -> SystemInfo {
-        let processInfo = ProcessInfo.processInfo
+        let processInfo = Foundation.ProcessInfo.processInfo
         
         return SystemInfo(
             osVersion: processInfo.operatingSystemVersionString,
-            deviceModel: UIDevice.current.model,
-            deviceName: UIDevice.current.name,
+            deviceModel: {
+                #if os(iOS)
+                return UIDevice.current.model
+                #else
+                return "Mac"
+                #endif
+            }(),
+            deviceName: {
+                #if os(iOS)
+                return UIDevice.current.name
+                #else
+                return ProcessInfo.processInfo.hostName
+                #endif
+            }(),
             systemUptime: processInfo.systemUptime,
             memoryUsage: getMemoryUsage(),
             diskSpace: getDiskSpace(),
-            batteryLevel: UIDevice.current.batteryLevel,
+            batteryLevel: {
+                #if os(iOS)
+                return UIDevice.current.batteryLevel
+                #else
+                return -1.0
+                #endif
+            }(),
             isLowPowerMode: processInfo.isLowPowerModeEnabled
         )
     }

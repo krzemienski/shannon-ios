@@ -8,9 +8,11 @@
 import Foundation
 import UIKit
 import MachO
-import OSLog
+import os.log
+import Darwin
 
 /// Manager for detecting jailbroken devices and app integrity
+@MainActor
 public final class JailbreakDetector {
     // MARK: - Properties
     
@@ -315,13 +317,13 @@ public final class JailbreakDetector {
     private func isBeingDebugged() -> Bool {
         // Method 1: Check P_TRACED flag
         var info = kinfo_proc()
-        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+        var mib: [Int32] = [Int32(CTL_KERN), Int32(KERN_PROC), Int32(KERN_PROC_PID), getpid()]
         var size = MemoryLayout<kinfo_proc>.size
         
         let result = sysctl(&mib, UInt32(mib.count), &info, &size, nil, 0)
         
         if result == 0 {
-            if (info.kp_proc.p_flag & P_TRACED) != 0 {
+            if (info.kp_proc.p_flag & Int32(P_TRACED)) != 0 {
                 logger.warning("Debugger detected via P_TRACED")
                 return true
             }
@@ -491,7 +493,7 @@ public final class JailbreakDetector {
         #endif
         
         // Check for unusual environment variables
-        let environmentVars = ProcessInfo.processInfo.environment
+        let environmentVars = Foundation.ProcessInfo.processInfo.environment
         let suspiciousKeys = ["CYCRIPT", "FRIDA", "SUBSTRATE"]
         
         for key in environmentVars.keys {

@@ -26,7 +26,7 @@ struct ChatView: View {
                     ScrollView {
                         LazyVStack(spacing: ThemeSpacing.md) {
                             ForEach(viewModel.messages) { message in
-                                MessageView(message: message)
+                                ChatMessageView(message: message)
                                     .id(message.id)
                                     .onAppear {
                                         // Preload images when message appears
@@ -173,7 +173,7 @@ struct ChatView: View {
 
 // MARK: - Message View
 
-struct MessageView: View {
+struct ChatMessageView: View {
     let message: ChatMessageUI
     
     var body: some View {

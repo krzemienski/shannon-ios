@@ -40,13 +40,19 @@ A powerful native iOS client for Claude AI, providing seamless integration with 
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/krzemienski/claude-code-ios.git
-cd claude-code-ios
+cd claude-code-ios-swift2
 ```
 
 ### 2. Install Dependencies
 ```bash
 # Install XcodeGen if not already installed
 brew install xcodegen
+
+# Install libssh2 for SSH support (required for Citadel)
+brew install libssh2
+
+# Install SwiftLint for code quality
+brew install swiftlint
 
 # Generate Xcode project
 xcodegen generate
@@ -72,11 +78,20 @@ uvicorn app:app --reload --port 8000
 
 ### 4. Build and Run
 ```bash
-# Using the automation script (recommended)
+# Using the automation script (STRONGLY RECOMMENDED)
 ./Scripts/simulator_automation.sh all
 
+# Available automation commands:
+./Scripts/simulator_automation.sh build    # Build only
+./Scripts/simulator_automation.sh launch   # Install and launch
+./Scripts/simulator_automation.sh logs     # Capture logs
+./Scripts/simulator_automation.sh status   # Check simulator status
+./Scripts/simulator_automation.sh clean    # Clean build artifacts
+./Scripts/simulator_automation.sh test     # Run UI tests
+./Scripts/simulator_automation.sh help     # Show all options
+
 # Or open in Xcode
-open ClaudeCode.xcodeproj
+open ClaudeCodeSwift.xcodeproj
 # Then press Cmd+R to build and run
 ```
 
@@ -85,7 +100,16 @@ open ClaudeCode.xcodeproj
 The project is configured for iPhone 16 Pro Max simulator:
 - **Simulator UUID**: `A707456B-44DB-472F-9722-C88153CDFFA1`
 - **iOS Version**: 18.6
+- **Bundle ID**: `com.claudecode.ios`
 - **Use Script**: `./Scripts/simulator_automation.sh` for automated building
+
+**IMPORTANT**: Always use the automation script instead of manual xcodebuild commands. The script handles:
+- Automatic simulator boot if needed
+- Log capture with filtering for ClaudeCode
+- Proper PKG_CONFIG_PATH for libssh2 dependencies
+- XcodeGen project generation if missing
+- Clean build and installation
+- Color-coded output for debugging
 
 ## 🏗️ Architecture
 
@@ -94,23 +118,36 @@ Claude Code iOS follows a modular MVVM-C (Model-View-ViewModel-Coordinator) arch
 ```
 Sources/
 ├── App/                    # App entry point and configuration
-├── Architecture/           # Core architectural components
-│   ├── DependencyInjection/
-│   ├── ModuleRegistration/
-│   └── StateManagement/
+│   ├── ClaudeCodeApp.swift
+│   ├── ContentView.swift
+│   └── AppDelegate.swift
 ├── Core/                   # Core functionality
 │   ├── Coordinators/       # Navigation coordinators
-│   ├── Security/           # Security and encryption
-│   ├── SSH/               # SSH client implementation
+│   ├── Data/              # Core Data stack
+│   ├── DependencyContainer.swift
+│   ├── Networking/        # API and WebSocket clients
+│   ├── Security/          # Security and encryption
 │   ├── State/             # Global state management
 │   └── Telemetry/         # Analytics and monitoring
 ├── Features/              # Feature modules
-│   └── Terminal/          # Terminal emulator
+│   ├── Chat/             # Chat functionality
+│   ├── Projects/         # Project management
+│   ├── Terminal/         # Terminal emulator
+│   └── Tools/            # Developer tools
 ├── Models/                # Data models
-├── Services/              # Network and API services
-├── Theme/                 # Design system and theming
-├── ViewModels/            # View models for MVVM
-└── Views/                 # SwiftUI views
+├── Services/              # Business logic services
+│   ├── SSH/              # SSH implementation
+│   ├── Notifications/    # Push notifications
+│   └── Voice/            # Voice features
+├── UI/                    # Shared UI components
+│   ├── Components/       # Reusable components
+│   └── DesignSystem/     # Design tokens and themes
+├── ViewModels/           # View models for MVVM
+└── Views/                # SwiftUI views
+    ├── Chat/            # Chat interface views
+    ├── Projects/        # Project views
+    ├── Settings/        # Settings views
+    └── Tools/           # Tool views
 ```
 
 ## 🔧 Configuration
@@ -136,27 +173,59 @@ ENABLE_TESTING_FEATURES=YES
 
 ### Run UI Tests
 ```bash
-# Using automation script
+# Using automation script (recommended)
 ./Scripts/simulator_automation.sh test
 
-# Or using xcodebuild
+# Run all UI tests
 xcodebuild test \
     -scheme ClaudeCode \
-    -destination "platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1"
+    -destination "platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1" \
+    -only-testing:ClaudeCodeUITests
+
+# Run specific test suite
+xcodebuild test \
+    -scheme ClaudeCode \
+    -destination "platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1" \
+    -only-testing:ClaudeCodeUITests/ChatStreamingTests
+
+# Run with coverage
+xcodebuild test \
+    -scheme ClaudeCode \
+    -destination "platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1" \
+    -enableCodeCoverage YES \
+    -resultBundlePath TestResults
 ```
 
-### Test Coverage
-- UI Tests: Functional testing of all major workflows
-- Integration Tests: API client and service layer
-- Performance Tests: Memory and CPU usage monitoring
+### Test Coverage Areas
+- **Authentication Tests**: Login, biometric auth, session management
+- **Chat Tests**: Message streaming, error handling, offline queue
+- **File Operations**: File CRUD, search, syntax highlighting
+- **Project Management**: Project lifecycle, terminal operations, SSH
+- **Monitoring Tests**: Metric collection, alerts, data export
+- **Settings Tests**: Configuration, theme switching, data management
+- **Navigation Tests**: Tab navigation, deep linking, modal flows
+
+### Test Scripts
+```bash
+# Run functional UI tests
+./Scripts/test_functional_ui.swift
+
+# Test networking layer
+./Scripts/test_networking.swift
+
+# Run notification tests
+./Scripts/test_notifications.swift
+```
 
 ## 📚 Documentation
 
-- [Architecture Guide](ARCHITECTURE.md) - System design and patterns
-- [API Documentation](API_DOCUMENTATION.md) - Complete API reference
-- [Deployment Guide](DEPLOYMENT_GUIDE.md) - App Store submission process
-- [User Manual](USER_MANUAL.md) - End-user documentation
+- [Architecture Guide](docs/ARCHITECTURE.md) - System design and patterns
+- [API Documentation](docs/API_DOCUMENTATION.md) - Complete API reference
+- [Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - App Store submission process
+- [User Manual](docs/USER_MANUAL.md) - End-user documentation
 - [Contributing](CONTRIBUTING.md) - Development guidelines
+- [Testing Guide](docs/TESTING_GUIDE.md) - Comprehensive testing documentation
+- [Security Overview](docs/SECURITY.md) - Security features and implementation
 
 ## 🤝 Contributing
 
@@ -167,6 +236,38 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## 🐛 Common Issues & Solutions
+
+### Build Failures
+```bash
+# Regenerate project file
+xcodegen generate
+
+# Clean build artifacts
+./Scripts/simulator_automation.sh clean
+
+# Check for missing dependencies
+brew list libssh2
+```
+
+### Simulator Issues
+```bash
+# Reset simulator
+xcrun simctl erase A707456B-44DB-472F-9722-C88153CDFFA1
+
+# Check simulator status
+./Scripts/simulator_automation.sh status
+```
+
+### SSH Connection Failures
+```bash
+# Verify libssh2 installation
+brew list libssh2
+
+# Check SSH key permissions
+chmod 600 ~/.ssh/id_rsa
+```
 
 ## 📄 License
 
@@ -187,14 +288,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🚦 Project Status
 
-- ✅ Core Architecture
-- ✅ UI/UX Design System
-- ✅ API Integration
-- ✅ Security Implementation
-- ✅ SSH Terminal
-- 🚧 App Store Preparation
-- 🚧 Performance Optimization
-- 📋 Beta Testing
+### Completed ✅
+- Core Architecture with MVVM-C pattern
+- Complete UI/UX Design System with Cyberpunk theme
+- Claude AI API Integration with streaming
+- Security Implementation (Jailbreak detection, Keychain, Biometrics)
+- SSH Terminal with libssh2 integration
+- Project Management System
+- System Monitoring Dashboard
+- Offline Support with Core Data
+- WebSocket Communication
+- Push Notifications
+
+### In Progress 🚧
+- App Store Preparation
+- Performance Optimization
+- UI Test Suite Completion
+
+### Planned 📋
+- Beta Testing Program
+- iPad Support
+- macOS Catalyst Version
+- CloudKit Sync
+- Widget Extensions
 
 ---
 

@@ -440,8 +440,8 @@ private struct SliderThumb: View {
                             in: 0...100,
                             label: "Progress",
                             valueFormat: "%.1f%%",
-                            trackHeight: 10,
-                            thumbSize: 28
+                            thumbSize: 28,
+                            trackHeight: 10
                         )
                     }
                     

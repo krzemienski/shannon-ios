@@ -3,7 +3,7 @@
 // This file handles crash detection, reporting, and recovery
 
 import Foundation
-import OSLog
+import os.log
 #if os(iOS)
 import UIKit
 #endif
@@ -67,13 +67,14 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     /// Add crash handler
-    public func addCrashHandler(_ handler: @escaping (CrashReport) -> Void) {
+    public func addCrashHandler(_ handler: @escaping @Sendable (CrashReport) -> Void) {
         crashQueue.async(flags: .barrier) { [weak self] in
             self?.crashHandlers.append(handler)
         }
     }
     
     /// Manually report an error as a crash
+    @MainActor
     public func reportError(_ error: Error, fatal: Bool = false) {
         let crashReport = CrashReport(
             id: UUID(),
@@ -96,7 +97,8 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     /// Report a custom crash
-    public func reportCustomCrash(reason: String, details: [String: Any]? = nil) {
+    @MainActor
+    public func reportCustomCrash(reason: String, details: [String: String]? = nil) {
         let crashReport = CrashReport(
             id: UUID(),
             timestamp: Date(),
@@ -160,14 +162,16 @@ public final class CrashReporter: @unchecked Sendable {
     
     private func setupCrashHandling() {
         // Setup notification observers
+        #if os(iOS)
+        let notificationName = UIApplication.willTerminateNotification
+        #else
+        let notificationName = NSNotification.Name("NSApplicationWillTerminateNotification")
+        #endif
+        
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillTerminate),
-            #if os(iOS)
-            name: UIApplication.willTerminateNotification,
-            #else
-            name: NSNotification.Name("NSApplicationWillTerminateNotification"),
-            #endif
+            name: notificationName,
             object: nil
         )
     }
@@ -180,7 +184,11 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     private func uninstallExceptionHandler() {
-        NSSetUncaughtExceptionHandler(previousExceptionHandler)
+        if let handler = previousExceptionHandler {
+            NSSetUncaughtExceptionHandler(handler)
+        } else {
+            NSSetUncaughtExceptionHandler(nil)
+        }
     }
     
     private func installSignalHandlers() {
@@ -203,6 +211,7 @@ public final class CrashReporter: @unchecked Sendable {
         CrashReporter.shared.handleSignal(signal)
     }
     
+    @MainActor
     private func handleException(_ exception: NSException) {
         let crashReport = CrashReport(
             id: UUID(),
@@ -217,7 +226,7 @@ public final class CrashReporter: @unchecked Sendable {
             appInfo: captureAppInfo(),
             customData: [
                 "exception_name": exception.name.rawValue,
-                "exception_userInfo": exception.userInfo ?? [:]
+                "exception_userInfo": String(describing: exception.userInfo ?? [:])
             ]
         )
         
@@ -227,6 +236,7 @@ public final class CrashReporter: @unchecked Sendable {
         previousExceptionHandler?(exception)
     }
     
+    @MainActor
     private func handleSignal(_ signal: Int32) {
         let signalName = getSignalName(signal)
         
@@ -241,7 +251,7 @@ public final class CrashReporter: @unchecked Sendable {
             threadInfo: captureThreadInfo(),
             systemInfo: captureSystemInfo(),
             appInfo: captureAppInfo(),
-            customData: ["signal": signal]
+            customData: ["signal": String(signal)]
         )
         
         saveCrashReport(crashReport)
@@ -265,6 +275,7 @@ public final class CrashReporter: @unchecked Sendable {
         }
     }
     
+    @MainActor
     @objc private func applicationWillTerminate() {
         // Save session end information
         let sessionEnd = CrashReport(
@@ -353,6 +364,7 @@ public final class CrashReporter: @unchecked Sendable {
         )
     }
     
+    @MainActor
     private func captureSystemInfo() -> SystemInfo {
         let processInfo = Foundation.ProcessInfo.processInfo
         
@@ -429,7 +441,7 @@ public final class CrashReporter: @unchecked Sendable {
 // MARK: - Supporting Types
 
 /// Crash report structure
-public struct CrashReport: Codable {
+public struct CrashReport: Codable, Sendable {
     public let id: UUID
     public let timestamp: Date
     public let sessionId: UUID
@@ -440,7 +452,7 @@ public struct CrashReport: Codable {
     public let threadInfo: ThreadInfo?
     public let systemInfo: SystemInfo
     public let appInfo: AppInfo
-    public let customData: [String: Any]?
+    public let customData: [String: String]?  // Changed from Any to String for Sendable
     
     enum CodingKeys: String, CodingKey {
         case id, timestamp, sessionId, sessionDuration, type, reason, stackTrace
@@ -459,7 +471,7 @@ public struct CrashReport: Codable {
         threadInfo = try container.decodeIfPresent(ThreadInfo.self, forKey: .threadInfo)
         systemInfo = try container.decode(SystemInfo.self, forKey: .systemInfo)
         appInfo = try container.decode(AppInfo.self, forKey: .appInfo)
-        customData = nil // Handle custom data separately if needed
+        customData = try container.decodeIfPresent([String: String].self, forKey: .customData)
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -474,12 +486,12 @@ public struct CrashReport: Codable {
         try container.encodeIfPresent(threadInfo, forKey: .threadInfo)
         try container.encode(systemInfo, forKey: .systemInfo)
         try container.encode(appInfo, forKey: .appInfo)
-        // Handle custom data encoding if needed
+        try container.encodeIfPresent(customData, forKey: .customData)
     }
     
     init(id: UUID, timestamp: Date, sessionId: UUID, sessionDuration: TimeInterval,
          type: CrashType, reason: String, stackTrace: String?, threadInfo: ThreadInfo?,
-         systemInfo: SystemInfo, appInfo: AppInfo, customData: [String: Any]?) {
+         systemInfo: SystemInfo, appInfo: AppInfo, customData: [String: String]?) {
         self.id = id
         self.timestamp = timestamp
         self.sessionId = sessionId
@@ -495,7 +507,7 @@ public struct CrashReport: Codable {
 }
 
 /// Crash types
-public enum CrashType: String, Codable {
+public enum CrashType: String, Codable, Sendable {
     case exception = "exception"
     case signal = "signal"
     case fatalError = "fatal_error"
@@ -505,7 +517,7 @@ public enum CrashType: String, Codable {
 }
 
 /// Thread information
-public struct ThreadInfo: Codable {
+public struct ThreadInfo: Codable, Sendable {
     public let threadId: String
     public let isMainThread: Bool
     public let stackTrace: [String]
@@ -513,7 +525,7 @@ public struct ThreadInfo: Codable {
 }
 
 /// System information
-public struct SystemInfo: Codable {
+public struct SystemInfo: Codable, Sendable {
     public let osVersion: String
     public let deviceModel: String
     public let deviceName: String
@@ -525,14 +537,14 @@ public struct SystemInfo: Codable {
 }
 
 /// Disk space information
-public struct DiskSpace: Codable {
+public struct DiskSpace: Codable, Sendable {
     public let total: Int64
     public let free: Int64
     public let used: Int64
 }
 
 /// App information
-public struct AppInfo: Codable {
+public struct AppInfo: Codable, Sendable {
     public let appVersion: String
     public let buildNumber: String
     public let bundleIdentifier: String

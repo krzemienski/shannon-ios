@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22225" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="NO" userDefinedModelVersionIdentifier="">
+    
+    <!-- ChatSession Entity -->
+    <entity name="ChatSession" representedClassName="ChatSessionEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isPinned" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="lastSyncedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="metadata" optional="YES" attributeType="Binary"/>
+        <attribute name="tags" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[String]"/>
+        <relationship name="messages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Message" inverseName="session" inverseEntity="Message"/>
+        <relationship name="syncState" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="SyncState" inverseName="chatSession" inverseEntity="SyncState"/>
+    </entity>
+    
+    <!-- Message Entity -->
+    <entity name="Message" representedClassName="MessageEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="content" attributeType="String"/>
+        <attribute name="role" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isStreaming" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="metadata" optional="YES" attributeType="Binary"/>
+        <attribute name="tokenCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="toolCalls" optional="YES" attributeType="Binary"/>
+        <relationship name="session" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatSession" inverseName="messages" inverseEntity="ChatSession"/>
+    </entity>
+    
+    <!-- Project Entity -->
+    <entity name="Project" representedClassName="ProjectEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="path" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lastAccessedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="settings" optional="YES" attributeType="Binary"/>
+        <attribute name="environmentVariables" optional="YES" attributeType="Binary"/>
+        <attribute name="sshConfig" optional="YES" attributeType="Binary"/>
+        <relationship name="files" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="File" inverseName="project" inverseEntity="File"/>
+        <relationship name="syncState" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="SyncState" inverseName="project" inverseEntity="SyncState"/>
+    </entity>
+    
+    <!-- File Entity -->
+    <entity name="File" representedClassName="FileEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="path" attributeType="String"/>
+        <attribute name="content" optional="YES" attributeType="Binary"/>
+        <attribute name="contentHash" optional="YES" attributeType="String"/>
+        <attribute name="size" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isDirectory" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="mimeType" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="cachedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="expiresAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="files" inverseEntity="Project"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="File" inverseName="children" inverseEntity="File"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="File" inverseName="parent" inverseEntity="File"/>
+    </entity>
+    
+    <!-- Operation Entity (Queued Operations) -->
+    <entity name="Operation" representedClassName="OperationEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="type" attributeType="String"/>
+        <attribute name="status" attributeType="String" defaultValueString="pending"/>
+        <attribute name="priority" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="payload" attributeType="Binary"/>
+        <attribute name="result" optional="YES" attributeType="Binary"/>
+        <attribute name="error" optional="YES" attributeType="String"/>
+        <attribute name="retryCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxRetries" attributeType="Integer 16" defaultValueString="3" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="scheduledAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="executedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dependsOn" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformer" customClassName="[String]"/>
+    </entity>
+    
+    <!-- SyncState Entity -->
+    <entity name="SyncState" representedClassName="SyncStateEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="entityId" attributeType="String"/>
+        <attribute name="entityType" attributeType="String"/>
+        <attribute name="localVersion" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="remoteVersion" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="lastSyncedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="syncStatus" attributeType="String" defaultValueString="idle"/>
+        <attribute name="conflictStatus" optional="YES" attributeType="String"/>
+        <attribute name="localChanges" optional="YES" attributeType="Binary"/>
+        <attribute name="remoteChanges" optional="YES" attributeType="Binary"/>
+        <attribute name="resolvedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="chatSession" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ChatSession" inverseName="syncState" inverseEntity="ChatSession"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Project" inverseName="syncState" inverseEntity="Project"/>
+    </entity>
+    
+    <!-- CachedData Entity -->
+    <entity name="CachedData" representedClassName="CachedDataEntity" syncable="YES">
+        <attribute name="id" attributeType="String"/>
+        <attribute name="key" attributeType="String"/>
+        <attribute name="data" attributeType="Binary"/>
+        <attribute name="type" attributeType="String"/>
+        <attribute name="size" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="accessCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="priority" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="lastAccessedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="expiresAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="metadata" optional="YES" attributeType="Binary"/>
+    </entity>
+    
+    <!-- Settings Entity -->
+    <entity name="Settings" representedClassName="SettingsEntity" syncable="YES">
+        <attribute name="id" attributeType="String" defaultValueString="default"/>
+        <attribute name="apiEndpoint" optional="YES" attributeType="String"/>
+        <attribute name="apiKey" optional="YES" attributeType="Binary"/>
+        <attribute name="theme" attributeType="String" defaultValueString="system"/>
+        <attribute name="autoSave" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="syncEnabled" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="offlineModeEnabled" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="cacheSize" attributeType="Integer 64" defaultValueString="524288000" usesScalarValueType="YES"/>
+        <attribute name="syncInterval" attributeType="Integer 32" defaultValueString="300" usesScalarValueType="YES"/>
+        <attribute name="lastSyncedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="preferences" optional="YES" attributeType="Binary"/>
+    </entity>
+    
+</model>

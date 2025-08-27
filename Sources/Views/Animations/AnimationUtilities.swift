@@ -228,7 +228,7 @@ struct LoadingDots: View {
         HStack(spacing: 4) {
             ForEach(0..<3) { index in
                 Circle()
-                    .fill(Theme.primary)
+                    .fill(Color.green)
                     .frame(width: 8, height: 8)
                     .scaleEffect(isAnimating[index] ? 1.2 : 0.8)
                     .animation(
@@ -253,7 +253,7 @@ struct PulsingCircle: View {
     
     var body: some View {
         Circle()
-            .stroke(Theme.primary, lineWidth: 2)
+            .stroke(Color.green, lineWidth: 2)
             .frame(width: 40, height: 40)
             .scaleEffect(scale)
             .opacity(opacity)
@@ -278,9 +278,9 @@ struct SpinningRing: View {
             .stroke(
                 AngularGradient(
                     gradient: Gradient(colors: [
-                        Theme.primary,
-                        Theme.primary.opacity(0.5),
-                        Theme.primary.opacity(0)
+                        Color.green,
+                        Color.green.opacity(0.5),
+                        Color.green.opacity(0)
                     ]),
                     center: .center
                 ),
@@ -339,14 +339,14 @@ class PageTransitionManager: ObservableObject {
         }
         
         // Text animations
-        SwiftUI.Text("Cyberpunk UI")
-            .font(Theme.Typography.title as Font)
-            .foregroundColor(Theme.primary)
+        Text("Cyberpunk UI")
+            .font(SwiftUI.Font.largeTitle)
+            .foregroundStyle(Color.green)
             .pulse()
         
-        SwiftUI.Text("Loading...")
-            .font(Theme.Typography.body)
-            .foregroundColor(Theme.foreground)
+        Text("Loading...")
+            .font(SwiftUI.Font.body)
+            .foregroundStyle(Color.primary)
             .shimmer()
         
         // Button with animation
@@ -355,12 +355,12 @@ class PageTransitionManager: ObservableObject {
         } label: {
             Text("Glowing Button")
                 .padding()
-                .background(Theme.primary)
+                .background(Color.green)
                 .cornerRadius(ThemeRadius.md)
         }
         .neonGlow()
     }
     .padding()
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Theme.background)
+    .background(Color.black)
 }

@@ -236,7 +236,8 @@ struct PaginatedMessagesView: View {
                     }
                     
                     ForEach(paginator.visibleMessages) { message in
-                        MessageView(message: message)
+                        // MessageView requires ChatMessageUI, not Message
+                        Text(message.content)
                             .id(message.id)
                             .onAppear {
                                 paginator.loadMoreIfNeeded(currentMessage: message)

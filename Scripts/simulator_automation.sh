@@ -11,8 +11,8 @@ set -e  # Exit on error
 
 # Persistent Simulator UUID for iPhone 16 Pro Max (iOS 18.6)
 readonly SIMULATOR_UUID="A707456B-44DB-472F-9722-C88153CDFFA1"
-readonly APP_BUNDLE_ID="com.claudecode.ios"
-readonly SCHEME_NAME="ClaudeCode"
+readonly APP_BUNDLE_ID="com.claudecodeswift.ios"
+readonly SCHEME_NAME="ClaudeCodeSwift"
 readonly PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly LOGS_DIR="${PROJECT_ROOT}/logs"
 readonly BUILD_DIR="${PROJECT_ROOT}/build"
@@ -92,7 +92,7 @@ start_log_capture() {
     xcrun simctl spawn "$SIMULATOR_UUID" log stream \
         --level=debug \
         --style=syslog \
-        --predicate 'processImagePath CONTAINS "ClaudeCode"' \
+        --predicate 'processImagePath CONTAINS "ClaudeCodeSwift"' \
         > "$log_file" 2>&1 &
     
     LOG_PID=$!
@@ -115,7 +115,7 @@ build_app() {
     log_info "PKG_CONFIG_PATH set for libssh2"
     
     # Check if xcodeproj exists
-    if [ ! -d "${PROJECT_ROOT}/ClaudeCode.xcodeproj" ]; then
+    if [ ! -d "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" ]; then
         log_warning "Xcode project not found. Generating with XcodeGen..."
         if command -v xcodegen &> /dev/null; then
             (cd "$PROJECT_ROOT" && PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodegen)
@@ -129,7 +129,7 @@ build_app() {
     # Build with xcodebuild (with PKG_CONFIG_PATH for libssh2)
     if command -v xcbeautify &> /dev/null; then
         PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodebuild \
-            -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
+            -project "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" \
             -scheme "$SCHEME_NAME" \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
             clean build \
@@ -139,7 +139,7 @@ build_app() {
             }
     else
         PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodebuild \
-            -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
+            -project "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" \
             -scheme "$SCHEME_NAME" \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
             clean build || {
@@ -156,7 +156,7 @@ install_and_launch() {
     log_info "Installing app on simulator..."
     
     # Find the app bundle in DerivedData
-    local app_path=$(find ~/Library/Developer/Xcode/DerivedData/ClaudeCode-*/Build/Products/Debug-iphonesimulator -name "ClaudeCode.app" -type d 2>/dev/null | head -n 1)
+    local app_path=$(find ~/Library/Developer/Xcode/DerivedData/ClaudeCodeSwift-*/Build/Products/Debug-iphonesimulator -name "ClaudeCodeSwift.app" -type d 2>/dev/null | head -n 1)
     
     if [ -z "$app_path" ]; then
         log_error "App bundle not found in DerivedData"
@@ -261,7 +261,7 @@ main() {
             export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/libssh2/lib/pkgconfig:/opt/homebrew/opt/openssl@3/lib/pkgconfig"
             
             # Generate project if needed
-            if [ ! -d "${PROJECT_ROOT}/ClaudeCode.xcodeproj" ]; then
+            if [ ! -d "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" ]; then
                 log_warning "Xcode project not found. Generating with XcodeGen..."
                 (cd "$PROJECT_ROOT" && PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodegen)
                 log_success "Xcode project generated"
@@ -270,7 +270,7 @@ main() {
             # Run unit tests
             log_info "Running unit tests..."
             PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodebuild test \
-                -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
+                -project "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" \
                 -scheme "$SCHEME_NAME" \
                 -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
                 -derivedDataPath "$BUILD_DIR" \
@@ -302,7 +302,7 @@ main() {
             export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:/opt/homebrew/opt/libssh2/lib/pkgconfig:/opt/homebrew/opt/openssl@3/lib/pkgconfig"
             
             # Generate project if needed
-            if [ ! -d "${PROJECT_ROOT}/ClaudeCode.xcodeproj" ]; then
+            if [ ! -d "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" ]; then
                 log_warning "Xcode project not found. Generating with XcodeGen..."
                 (cd "$PROJECT_ROOT" && PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodegen)
                 log_success "Xcode project generated"
@@ -419,7 +419,7 @@ main() {
             VERBOSE_LOGGING="$VERBOSE_LOGGING" \
             CLEANUP_AFTER_TESTS="$CLEANUP_AFTER_TESTS" \
             xcodebuild test \
-                -project "${PROJECT_ROOT}/ClaudeCode.xcodeproj" \
+                -project "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" \
                 -scheme "$SCHEME_NAME" \
                 -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
                 -derivedDataPath "$BUILD_DIR" \

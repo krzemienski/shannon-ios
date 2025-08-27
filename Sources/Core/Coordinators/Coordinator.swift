@@ -63,7 +63,7 @@ class BaseCoordinator: Coordinator {
 }
 
 /// Navigation coordinator for managing navigation state
-protocol NavigationCoordinator: Coordinator {
+protocol NavigationCoordinatorProtocol: Coordinator {
     associatedtype Route: Hashable
     
     /// Current navigation path

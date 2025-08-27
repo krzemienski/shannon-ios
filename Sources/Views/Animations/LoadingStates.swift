@@ -352,7 +352,7 @@ struct SimpleEmptyStateView: View {
 // MARK: - Error State View
 
 struct ErrorStateView: View {
-    let error: Error
+    let error: String
     let onRetry: (() -> Void)?
     
     var body: some View {
@@ -365,7 +365,7 @@ struct ErrorStateView: View {
                 .font(Theme.Typography.title2)
                 .foregroundColor(Theme.foreground)
             
-            Text(error.localizedDescription)
+            Text(error)
                 .font(Theme.Typography.body)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)

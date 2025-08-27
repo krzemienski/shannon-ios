@@ -296,8 +296,15 @@ extension MCPTool {
             name: "Read File",
             description: "Read contents of a file from the file system",
             version: "1.0.0",
-            category: nil,
-            inputSchema: JSONSchema(type: .object, properties: [:]),
+            category: .filesystem,
+            inputSchema: JSONSchema(
+                type: "object",
+                properties: [:],
+                required: nil,
+                additionalProperties: nil,
+                description: nil,
+                examples: nil
+            ),
             outputSchema: nil,
             examples: nil,
             permissions: nil,
@@ -307,64 +314,119 @@ extension MCPTool {
             replacedBy: nil
         ),
         MCPTool(
+            id: "write-file",
+            serverId: "filesystem",
             name: "Write File",
             description: "Write or create a file with specified content",
-            category: .fileSystem,
-            usageCount: 189,
-            lastUsed: Date().addingTimeInterval(-3600),
-            requiresConfig: false,
-            parameters: [
-                Parameter(name: "path", type: "string", required: true),
-                Parameter(name: "content", type: "string", required: true)
-            ]
+            version: "1.0.0",
+            category: .filesystem,
+            inputSchema: JSONSchema(
+                type: "object",
+                properties: [:],
+                required: ["path", "content"],
+                additionalProperties: nil,
+                description: nil,
+                examples: nil
+            ),
+            outputSchema: nil,
+            examples: nil,
+            permissions: nil,
+            rateLimit: nil,
+            metadata: nil,
+            isDeprecated: false,
+            replacedBy: nil
         ),
         MCPTool(
+            id: "git-status",
+            serverId: "git",
             name: "Git Status",
             description: "Check the status of a git repository",
-            category: .git,
-            usageCount: 67,
-            lastUsed: Date().addingTimeInterval(-7200),
-            requiresConfig: false,
-            parameters: [
-                Parameter(name: "repo_path", type: "string", required: false)
-            ]
+            version: "1.0.0",
+            category: .utility,
+            inputSchema: JSONSchema(
+                type: "object",
+                properties: [:],
+                required: nil,
+                additionalProperties: nil,
+                description: nil,
+                examples: nil
+            ),
+            outputSchema: nil,
+            examples: nil,
+            permissions: nil,
+            rateLimit: nil,
+            metadata: nil,
+            isDeprecated: false,
+            replacedBy: nil
         ),
         MCPTool(
+            id: "execute-command",
+            serverId: "terminal",
             name: "Execute Command",
             description: "Execute a shell command in the terminal",
-            category: .terminal,
-            usageCount: 143,
-            lastUsed: Date().addingTimeInterval(-900),
-            requiresConfig: true,
-            parameters: [
-                Parameter(name: "command", type: "string", required: true),
-                Parameter(name: "cwd", type: "string", required: false)
-            ]
+            version: "1.0.0",
+            category: .utility,
+            inputSchema: JSONSchema(
+                type: "object",
+                properties: [:],
+                required: ["command"],
+                additionalProperties: nil,
+                description: nil,
+                examples: nil
+            ),
+            outputSchema: nil,
+            examples: nil,
+            permissions: nil,
+            rateLimit: nil,
+            metadata: nil,
+            isDeprecated: false,
+            replacedBy: nil
         ),
         MCPTool(
+            id: "query-database",
+            serverId: "database",
             name: "Query Database",
             description: "Execute SQL queries on connected databases",
+            version: "1.0.0",
             category: .database,
-            usageCount: 34,
-            lastUsed: nil,
-            requiresConfig: true,
-            parameters: [
-                Parameter(name: "query", type: "string", required: true),
-                Parameter(name: "database", type: "string", required: true)
-            ]
+            inputSchema: JSONSchema(
+                type: "object",
+                properties: [:],
+                required: ["query", "database"],
+                additionalProperties: nil,
+                description: nil,
+                examples: nil
+            ),
+            outputSchema: nil,
+            examples: nil,
+            permissions: nil,
+            rateLimit: nil,
+            metadata: nil,
+            isDeprecated: false,
+            replacedBy: nil
         ),
         MCPTool(
+            id: "api-request",
+            serverId: "api",
             name: "API Request",
             description: "Make HTTP requests to external APIs",
-            category: .api,
-            usageCount: 89,
-            lastUsed: Date().addingTimeInterval(-14400),
-            requiresConfig: false,
-            parameters: [
-                Parameter(name: "url", type: "string", required: true),
-                Parameter(name: "method", type: "string", required: true),
-                Parameter(name: "body", type: "object", required: false)
-            ]
+            version: "1.0.0",
+            category: .network,
+            inputSchema: JSONSchema(
+                type: "object",
+                properties: [:],
+                required: ["url"],
+                additionalProperties: nil,
+                description: nil,
+                examples: nil
+            ),
+            outputSchema: nil,
+            examples: nil,
+            permissions: nil,
+            rateLimit: nil,
+            metadata: nil,
+            isDeprecated: false,
+            replacedBy: nil
         )
     ]
 }

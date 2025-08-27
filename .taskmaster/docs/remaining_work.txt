@@ -1,0 +1,44 @@
+# Claude Code iOS - Remaining Work
+
+## Project Overview
+The Claude Code iOS app is functionally complete but needs final testing, bug fixes, and App Store preparation.
+
+## Remaining Work Breakdown
+
+### Phase 1: Testing and Bug Fixes
+- Comprehensive UI testing using simulator automation
+- Test all screens: Chat, Projects, Tools, Monitor, Settings
+- Verify real backend connectivity (localhost:8000)
+- Check SSE streaming functionality
+- Fix any UI glitches or crashes
+- Verify dark theme consistency
+- Test error handling and edge cases
+
+### Phase 2: App Store Preparation
+- Generate App Store screenshots using automation script
+- Create App Store preview video
+- Update metadata in App Store Connect
+- Generate app icons for all required sizes
+- Prepare promotional text and descriptions
+- Create privacy policy and terms of service
+
+### Phase 3: Beta Testing Setup
+- Configure TestFlight build
+- Set up beta tester groups
+- Create beta testing documentation
+- Implement crash reporting for beta
+- Set up user feedback collection
+
+## Technical Requirements
+- Must use Scripts/simulator_automation.sh for all testing
+- Real backend required at http://localhost:8000/v1/
+- No mock data allowed
+- Must maintain 60 FPS performance
+- Dark cyberpunk theme throughout
+
+## Success Criteria
+- All features working with real backend
+- No crashes or critical bugs
+- Smooth 60 FPS performance
+- Professional App Store presence
+- Ready for beta testing

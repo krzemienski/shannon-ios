@@ -1,10 +1,10 @@
-name: ClaudeCode
+name: ClaudeCodeSwift
 
-# XcodeGen Configuration for Claude Code iOS
+# XcodeGen Configuration for Claude Code Swift iOS
 # Tasks 101-106: Complete Project Configuration
 
 options:
-  bundleIdPrefix: com.claudecode
+  bundleIdPrefix: com.claudecodeswift
   deploymentTarget:
     iOS: 18.4
   createIntermediateGroups: true
@@ -32,6 +32,11 @@ configs:
 
 settings:
   base:
+    # Architecture Settings
+    ARCHS: "$(ARCHS_STANDARD)"
+    VALID_ARCHS: "arm64 x86_64"
+    ONLY_ACTIVE_ARCH: YES
+    
     # Deployment
     IPHONEOS_DEPLOYMENT_TARGET: 18.4
     TARGETED_DEVICE_FAMILY: 1,2
@@ -98,16 +103,13 @@ settings:
     LOCALIZATION_PREFERS_STRING_CATALOGS: YES
     
 targets:
-  ClaudeCode:
+  ClaudeCodeSwift:
     type: application
     platform: iOS
-    bundleId: com.claudecode.ios
+    bundleId: com.claudecodeswift.ios
     info:
       path: Info.plist
     sources:
-      # Main app entry point
-      - path: Sources/App/ClaudeCodeApp.swift
-        compilerFlags: -enable-actor-data-race-checks
       - path: Sources
         excludes:
           - "App/MinimalApp.swift"  # Exclude the temporary minimal app
@@ -136,9 +138,9 @@ targets:
     settings:
       base:
         # Bundle Settings
-        PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios
-        PRODUCT_NAME: ClaudeCode
-        EXECUTABLE_NAME: ClaudeCode
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecodeswift.ios
+        PRODUCT_NAME: ClaudeCodeSwift
+        EXECUTABLE_NAME: ClaudeCodeSwift
         INFOPLIST_FILE: Info.plist
         INFOPLIST_OUTPUT_FORMAT: xml
         INFOPLIST_PREPROCESS: NO
@@ -154,7 +156,7 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad: UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
         
         # App Information
-        INFOPLIST_KEY_CFBundleDisplayName: Claude Code
+        INFOPLIST_KEY_CFBundleDisplayName: Claude Code Swift
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
         INFOPLIST_KEY_NSHumanReadableCopyright: "© 2024 Claude Code"
         
@@ -240,14 +242,16 @@ targets:
       - path: UITests
         excludes:
           - "**/.DS_Store"
+          - "**/README.md"
+          - "**/*.md"
         createIntermediateGroups: true
     dependencies:
-      - target: ClaudeCode
+      - target: ClaudeCodeSwift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.claudecode.ios.uitests
+        PRODUCT_BUNDLE_IDENTIFIER: com.claudecodeswift.ios.uitests
         GENERATE_INFOPLIST_FILE: YES
-        TEST_TARGET_NAME: ClaudeCode
+        TEST_TARGET_NAME: ClaudeCodeSwift
         SWIFT_EMIT_LOC_STRINGS: NO
       configs:
         Debug:
@@ -269,10 +273,10 @@ packages:
     from: 0.7.0
 
 schemes:
-  ClaudeCode:
+  ClaudeCodeSwift:
     build:
       targets:
-        ClaudeCode: all
+        ClaudeCodeSwift: all
       parallelizeBuild: true
       buildImplicitDependencies: true
       preActions:
@@ -283,14 +287,14 @@ schemes:
             # if [ -f "${PROJECT_DIR}/Scripts/bootstrap.sh" ]; then
             #   "${PROJECT_DIR}/Scripts/bootstrap.sh" check
             # fi
-          settingsTarget: ClaudeCode
+          settingsTarget: ClaudeCodeSwift
         - name: Pre-Build Info
           script: echo "🚀 Starting build for ${PRODUCT_NAME}..."
-          settingsTarget: ClaudeCode
+          settingsTarget: ClaudeCodeSwift
       postActions:
         - name: Post-Build Info
           script: echo "✅ Build completed for ${PRODUCT_NAME}"
-          settingsTarget: ClaudeCode
+          settingsTarget: ClaudeCodeSwift
     run:
       config: Debug
       simulateLocation:
@@ -328,7 +332,7 @@ schemes:
           script: |
             echo "🧪 Preparing UI test environment..."
             # Prepare for functional UI tests
-          settingsTarget: ClaudeCode
+          settingsTarget: ClaudeCodeSwift
     profile:
       config: Release
       askForAppToLaunch: false
@@ -337,14 +341,14 @@ schemes:
       config: Debug
     archive:
       config: Release
-      customArchiveName: ClaudeCode-${MARKETING_VERSION}
+      customArchiveName: ClaudeCodeSwift-${MARKETING_VERSION}
       revealArchiveInOrganizer: true
       postActions:
         - name: Archive Notification
           script: |
-            echo "📦 Archive created: ClaudeCode-${MARKETING_VERSION}"
+            echo "📦 Archive created: ClaudeCodeSwift-${MARKETING_VERSION}"
             echo "Location: ${ARCHIVE_PATH}"
-          settingsTarget: ClaudeCode
+          settingsTarget: ClaudeCodeSwift
   
   # ClaudeCode-TestFlight scheme will be added once TestFlight configuration is properly set up
   # ClaudeCode-TestFlight:

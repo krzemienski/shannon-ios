@@ -62,11 +62,22 @@ struct SkeletonView: View {
 // MARK: - Loading Content View
 
 struct LoadingContentView<Content: View, LoadedContent: View>: View {
-    enum LoadingState {
+    enum LoadingState: Equatable {
         case loading
         case loaded
-        case error(Error)
+        case error(String)  // Changed to String for Equatable conformance
         case empty
+        
+        static func == (lhs: LoadingState, rhs: LoadingState) -> Bool {
+            switch (lhs, rhs) {
+            case (.loading, .loading), (.loaded, .loaded), (.empty, .empty):
+                return true
+            case let (.error(lhsError), .error(rhsError)):
+                return lhsError == rhsError
+            default:
+                return false
+            }
+        }
     }
     
     let state: LoadingState

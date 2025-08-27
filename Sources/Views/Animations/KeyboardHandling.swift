@@ -31,7 +31,7 @@ class KeyboardObserver: ObservableObject {
                 }
                 return (frame.height, duration)
             }
-            .sink { [weak self] height, duration in
+            .sink { [weak self] (height: CGFloat, duration: Double) in
                 withAnimation(.easeOut(duration: duration)) {
                     self?.keyboardHeight = height
                     self?.isKeyboardVisible = true
@@ -74,7 +74,7 @@ class KeyboardObserver: ObservableObject {
 
 // MARK: - Keyboard Adaptive Modifier
 
-struct KeyboardAdaptive: ViewModifier {
+struct KeyboardAdaptiveModifier: ViewModifier {
     @StateObject private var keyboard = KeyboardObserver()
     let additionalPadding: CGFloat
     
@@ -102,20 +102,20 @@ struct KeyboardDismissible: ViewModifier {
 
 // MARK: - Keyboard Toolbar
 
-struct KeyboardToolbar<Content: View>: ViewModifier {
-    let content: () -> Content
+struct KeyboardToolbar<ToolbarContent: View>: ViewModifier {
+    let toolbarContent: () -> ToolbarContent
     @StateObject private var keyboard = KeyboardObserver()
     
-    func body(content baseContent: Content) -> some View {
+    func body(content: Content) -> some View {
         ZStack(alignment: .bottom) {
-            baseContent
+            content
             
             if keyboard.isKeyboardVisible {
                 VStack(spacing: 0) {
                     Divider()
                         .background(Theme.border)
                     
-                    content()
+                    toolbarContent()
                         .padding(.horizontal)
                         .padding(.vertical, 8)
                         .background(Theme.card)
@@ -309,7 +309,7 @@ struct SmartTextField: View {
 
 extension View {
     func keyboardAdaptive(additionalPadding: CGFloat = 0) -> some View {
-        modifier(KeyboardAdaptive(additionalPadding: additionalPadding))
+        modifier(KeyboardAdaptiveModifier(additionalPadding: additionalPadding))
     }
     
     func keyboardDismissible() -> some View {
@@ -317,7 +317,7 @@ extension View {
     }
     
     func keyboardToolbar<Content: View>(@ViewBuilder content: @escaping () -> Content) -> some View {
-        modifier(KeyboardToolbar(content: content))
+        modifier(KeyboardToolbar(toolbarContent: content))
     }
     
     func hideKeyboard() {

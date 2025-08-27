@@ -409,11 +409,7 @@ enum SettingsViewSection: String, CaseIterable {
     }
 }
 
-struct ConnectionTestResult {
-    let success: Bool
-    let message: String
-    let details: String?
-}
+// Moved ConnectionTestResult to SSHConfigurationView.swift to avoid duplication
 
 struct ExportedSettings: Codable {
     let baseURL: String

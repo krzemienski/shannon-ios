@@ -424,3 +424,18 @@ public struct AppNotificationSettings: Codable {
         self.vibrationEnabled = vibrationEnabled
     }
 }
+
+// MARK: - Connection Test Result
+
+/// Result of a connection test for API or SSH connections
+public struct ConnectionTestResult {
+    public let success: Bool
+    public let message: String
+    public let details: String?
+    
+    public init(success: Bool, message: String, details: String? = nil) {
+        self.success = success
+        self.message = message
+        self.details = details
+    }
+}

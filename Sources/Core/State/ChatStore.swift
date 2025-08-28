@@ -311,6 +311,22 @@ final class ChatStore: ObservableObject {
         return conversation
     }
     
+    /// Clear all conversations and associated data
+    func clearAll() async {
+        // Clear in-memory data
+        conversations.removeAll()
+        currentConversation = nil
+        pendingChanges = false
+        
+        // Delete persisted data
+        let fileURL = documentsDirectory.appendingPathComponent(conversationsFile)
+        try? FileManager.default.removeItem(at: fileURL)
+        
+        // Delete conversations directory
+        let conversationsDir = documentsDirectory.appendingPathComponent("conversations")
+        try? FileManager.default.removeItem(at: conversationsDir)
+    }
+    
     // MARK: - Private Methods
     
     private func setupAutoSave() {

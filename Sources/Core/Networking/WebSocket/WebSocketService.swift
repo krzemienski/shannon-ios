@@ -374,14 +374,33 @@ struct WebSocketMessage: Codable {
         case data
     }
     
+    init(type: MessageType, channel: String, data: [String: Any]) {
+        self.type = type
+        self.channel = channel
+        self.data = data
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decode(MessageType.self, forKey: .type)
+        channel = try container.decode(String.self, forKey: .channel)
+        
+        // Decode data as AnyCodable to handle heterogeneous types
+        if container.contains(.data) {
+            let anyCodableDict = try container.decode([String: AnyCodable].self, forKey: .data)
+            data = anyCodableDict.mapValues { $0.value }
+        } else {
+            data = [:]
+        }
+    }
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(channel, forKey: .channel)
         
-        // Convert data dictionary to JSON data
-        let jsonData = try JSONSerialization.data(withJSONObject: data)
-        let jsonObject = try JSONSerialization.jsonObject(with: jsonData)
-        try container.encode(jsonObject as? [String: String], forKey: .data)
+        // Convert data dictionary to AnyCodable for encoding
+        let anyCodableDict = data.mapValues { AnyCodable($0) }
+        try container.encode(anyCodableDict, forKey: .data)
     }
 }

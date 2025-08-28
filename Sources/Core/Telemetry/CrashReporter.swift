@@ -4,12 +4,14 @@
 
 import Foundation
 import os.log
+import Combine
 #if os(iOS)
 import UIKit
 #endif
 
 /// Crash reporting system for capturing and reporting application crashes
-public final class CrashReporter: @unchecked Sendable {
+@MainActor
+public final class CrashReporter: ObservableObject, @unchecked Sendable {
     
     // MARK: - Properties
     
@@ -68,8 +70,8 @@ public final class CrashReporter: @unchecked Sendable {
     
     /// Add crash handler
     public func addCrashHandler(_ handler: @escaping @Sendable (CrashReport) -> Void) {
-        crashQueue.async(flags: .barrier) { [weak self] in
-            self?.crashHandlers.append(handler)
+        Task { @MainActor in
+            crashHandlers.append(handler)
         }
     }
     
@@ -182,11 +184,7 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     private func uninstallExceptionHandler() {
-        if let handler = previousExceptionHandler {
-            NSSetUncaughtExceptionHandler(handler)
-        } else {
-            NSSetUncaughtExceptionHandler(nil)
-        }
+        NSSetUncaughtExceptionHandler(nil)
     }
     
     private func installSignalHandlers() {
@@ -345,8 +343,8 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     private func notifyHandlers(_ report: CrashReport) {
-        crashQueue.async { [weak self] in
-            self?.crashHandlers.forEach { $0(report) }
+        Task { @MainActor in
+            crashHandlers.forEach { $0(report) }
         }
     }
     
@@ -359,35 +357,41 @@ public final class CrashReporter: @unchecked Sendable {
         )
     }
     
-    private func captureSystemInfo() -> SystemInfo {
+    nonisolated private func captureSystemInfo() -> SystemInfo {
         let processInfo = Foundation.ProcessInfo.processInfo
+        
+        var deviceModel = "Unknown"
+        var deviceName = "Unknown"
+        var batteryLevel: Float = -1.0
+        
+        #if os(iOS)
+        // Use DispatchQueue to safely access UIDevice on main thread
+        let semaphore = DispatchSemaphore(value: 0)
+        DispatchQueue.main.async {
+            deviceModel = UIDevice.current.model
+            deviceName = UIDevice.current.name
+            batteryLevel = UIDevice.current.batteryLevel
+            semaphore.signal()
+        }
+        semaphore.wait()
+        #else
+        deviceModel = "Mac"
+        deviceName = ProcessInfo.processInfo.hostName
+        batteryLevel = -1.0
+        #endif
+        
+        // Create memory usage and disk space without calling MainActor methods
+        let memoryUsage = getMemoryUsageNonisolated()
+        let diskSpace = getDiskSpaceNonisolated()
         
         return SystemInfo(
             osVersion: processInfo.operatingSystemVersionString,
-            deviceModel: {
-                #if os(iOS)
-                return UIDevice.current.model
-                #else
-                return "Mac"
-                #endif
-            }(),
-            deviceName: {
-                #if os(iOS)
-                return UIDevice.current.name
-                #else
-                return ProcessInfo.processInfo.hostName
-                #endif
-            }(),
+            deviceModel: deviceModel,
+            deviceName: deviceName,
             systemUptime: processInfo.systemUptime,
-            memoryUsage: getMemoryUsage(),
-            diskSpace: getDiskSpace(),
-            batteryLevel: {
-                #if os(iOS)
-                return UIDevice.current.batteryLevel
-                #else
-                return -1.0
-                #endif
-            }(),
+            memoryUsage: memoryUsage,
+            diskSpace: diskSpace,
+            batteryLevel: batteryLevel,
             isLowPowerMode: processInfo.isLowPowerModeEnabled
         )
     }
@@ -420,6 +424,34 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     private func getDiskSpace() -> DiskSpace {
+        do {
+            let systemAttributes = try FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory())
+            let totalSpace = systemAttributes[.systemSize] as? Int64 ?? 0
+            let freeSpace = systemAttributes[.systemFreeSize] as? Int64 ?? 0
+            
+            return DiskSpace(total: totalSpace, free: freeSpace, used: totalSpace - freeSpace)
+        } catch {
+            return DiskSpace(total: 0, free: 0, used: 0)
+        }
+    }
+    
+    nonisolated private func getMemoryUsageNonisolated() -> Int64 {
+        var info = mach_task_basic_info()
+        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
+        
+        let result = withUnsafeMutablePointer(to: &info) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: 1) {
+                task_info(mach_task_self_,
+                         task_flavor_t(MACH_TASK_BASIC_INFO),
+                         $0,
+                         &count)
+            }
+        }
+        
+        return result == KERN_SUCCESS ? Int64(info.resident_size) : 0
+    }
+    
+    nonisolated private func getDiskSpaceNonisolated() -> DiskSpace {
         do {
             let systemAttributes = try FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory())
             let totalSpace = systemAttributes[.systemSize] as? Int64 ?? 0

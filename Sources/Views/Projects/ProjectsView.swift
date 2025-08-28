@@ -337,9 +337,9 @@ extension Project {
     ]
 }
 
-// MARK: - New Project View
+// MARK: - New Project View (Inline)
 
-struct NewProjectView: View {
+struct InlineNewProjectView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var description = ""
@@ -524,7 +524,10 @@ struct NewProjectView: View {
 }
 
 // MARK: - Project Detail View
+// ProjectDetailView is defined in Views/Projects/ProjectDetailView.swift
 
+// This was a duplicate definition - removed
+/*
 struct ProjectDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let project: Project
@@ -669,6 +672,7 @@ struct ProjectDetailView: View {
         }
     }
 }
+*/
 
 // MARK: - Helper Views
 

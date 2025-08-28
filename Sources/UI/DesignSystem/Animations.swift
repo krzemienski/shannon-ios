@@ -72,10 +72,10 @@ public struct Animations {
     // MARK: - Transition Animations
     public struct Transitions {
         /// Slide transition
-        public static let slide = AnyTransition.slide.combined(with: .opacity)
+        nonisolated(unsafe) public static let slide = AnyTransition.slide.combined(with: .opacity)
         
         /// Scale transition
-        public static let scale = AnyTransition.scale.combined(with: .opacity)
+        nonisolated(unsafe) public static let scale = AnyTransition.scale.combined(with: .opacity)
         
         /// Move and fade transition
         public static func moveAndFade(edge: Edge) -> AnyTransition {
@@ -88,7 +88,7 @@ public struct Animations {
         }
         
         /// Custom transition
-        public static let custom = AnyTransition.modifier(
+        nonisolated(unsafe) public static let custom = AnyTransition.modifier(
             active: CustomTransitionModifier(progress: 0),
             identity: CustomTransitionModifier(progress: 1)
         )
@@ -120,32 +120,7 @@ private struct CustomTransitionModifier: ViewModifier {
 }
 
 // MARK: - Animation Effects
-public extension View {
-    /// Pulse animation effect
-    func pulse(duration: Double = 1.5) -> some View {
-        self.modifier(PulseEffect(duration: duration))
-    }
-    
-    /// Shake animation effect
-    func shake(amount: CGFloat = 10) -> some View {
-        self.modifier(ShakeEffect(amount: amount))
-    }
-    
-    /// Bounce animation effect
-    func bounce(height: CGFloat = 20) -> some View {
-        self.modifier(BounceEffect(height: height))
-    }
-    
-    /// Glow animation effect
-    func glow(color: Color = .green, radius: CGFloat = 10) -> some View {
-        self.modifier(GlowEffect(color: color, radius: radius))
-    }
-    
-    /// Shimmer animation effect
-    func shimmer() -> some View {
-        self.modifier(ShimmerEffect())
-    }
-}
+// Note: View extension methods are defined in ViewExtensions.swift
 
 // MARK: - Pulse Effect
 private struct PulseEffect: ViewModifier {

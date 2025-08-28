@@ -4,7 +4,11 @@ import OSLog
 /// Enhanced API client for Claude Code backend communication
 /// Implements tasks 301-350 from TASK_PLAN.md
 @MainActor
-class APIClient: ObservableObject {
+public class APIClient: ObservableObject {
+    // MARK: - Singleton
+    
+    public static let shared = APIClient()
+    
     // MARK: - Properties
     
     private let session: URLSession
@@ -45,7 +49,7 @@ class APIClient: ObservableObject {
     private var latencyMonitor = LatencyMonitor()  // Task 348: Latency monitoring
     private var dnsCache: [String: String] = [:]  // Task 341: DNS caching
     private var requestDeduplication: [String: Task<Data, Error>] = [:]  // Task 342
-    private let metricsCollector = MetricsCollector()  // Task 349: Metrics collection
+    private let metricsCollector = RequestMetricsCollector()  // Task 349: Metrics collection
     
     // Request batching (Task 343)
     private var batchedRequests: [BatchRequest] = []
@@ -614,6 +618,22 @@ class APIClient: ObservableObject {
         lastError = nil
     }
     
+    func setBaseURL(_ url: URL) {
+        // Update the base URL in APIConfig
+        // Note: This would require making APIConfig.baseURL mutable
+        // For now, this is a no-op placeholder
+        logger.info("setBaseURL called with \(url)")
+    }
+    
+    func testConnection() async -> Bool {
+        // Test the connection to the API
+        return await checkHealth()
+    }
+    
+    func clearCache() {
+        invalidateCache()
+    }
+    
     // MARK: - Caching Methods (Tasks 321-323)
     
     private func getCachedResponse(for key: String) -> Data? {
@@ -744,15 +764,8 @@ enum NetworkType {
 
 // CachedResponse - Using type from NetworkModels.swift
 
-struct RequestMetric {
-    let endpoint: String
-    let latency: TimeInterval
-    let success: Bool
-    let bytesTransferred: Int
-    let timestamp: Date
-    let statusCode: Int?
-    let errorType: String?
-}
+// RequestMetric is defined in NetworkModels.swift and RequestPrioritizer.swift
+// Using the one from RequestPrioritizer for internal metrics
 
 // RequestMetrics - Using type from NetworkModels.swift
 
@@ -1024,15 +1037,7 @@ extension Array {
     }
 }
 
-// String extension for SHA256
-extension String {
-    func sha256() -> String {
-        // Simple hash for cache key - in production use CryptoKit
-        return self.replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: ":", with: "_")
-            .replacingOccurrences(of: "?", with: "_")
-    }
-}
+// SHA256 extension is defined in FileTransferService.swift
 
 // MARK: - Supporting Types
 

@@ -369,13 +369,7 @@ struct PromptTemplatesSheet: View {
     }
 }
 
-// MARK: - Settings Store Extensions
-
-extension SettingsStore {
-    @Published var showTokenUsage: Bool = true
-    @Published var enableCodeHighlighting: Bool = true
-    @Published var systemPrompt: String = "You are a helpful, harmless, and honest AI assistant."
-}
+// Properties moved to SettingsStore class
 
 #Preview {
     NavigationStack {

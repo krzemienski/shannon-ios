@@ -8,10 +8,10 @@ public protocol Validatable {
 }
 
 // MARK: - Validation Errors
-public enum ValidationError: LocalizedError {
+public enum ValidationError: LocalizedError, Sendable {
     case missingRequiredField(String)
     case invalidValue(field: String, reason: String)
-    case outOfRange(field: String, min: Any?, max: Any?)
+    case outOfRange(field: String, min: String?, max: String?)
     case invalidFormat(field: String, expected: String)
     case tooLong(field: String, maxLength: Int)
     case tooShort(field: String, minLength: Int)
@@ -70,42 +70,42 @@ extension ChatCompletionRequest: Validatable {
         // Validate temperature
         if let temp = temperature {
             if temp < 0 || temp > 2 {
-                throw ValidationError.outOfRange(field: "temperature", min: 0, max: 2)
+                throw ValidationError.outOfRange(field: "temperature", min: "0", max: "2")
             }
         }
         
         // Validate top_p
         if let topP = topP {
             if topP < 0 || topP > 1 {
-                throw ValidationError.outOfRange(field: "top_p", min: 0, max: 1)
+                throw ValidationError.outOfRange(field: "top_p", min: "0", max: "1")
             }
         }
         
         // Validate max_tokens
         if let maxTokens = maxTokens {
             if maxTokens < 1 {
-                throw ValidationError.outOfRange(field: "max_tokens", min: 1, max: nil)
+                throw ValidationError.outOfRange(field: "max_tokens", min: "1", max: nil)
             }
         }
         
         // Validate n
         if let n = n {
             if n < 1 || n > 10 {
-                throw ValidationError.outOfRange(field: "n", min: 1, max: 10)
+                throw ValidationError.outOfRange(field: "n", min: "1", max: "10")
             }
         }
         
         // Validate presence_penalty
         if let penalty = presencePenalty {
             if penalty < -2 || penalty > 2 {
-                throw ValidationError.outOfRange(field: "presence_penalty", min: -2, max: 2)
+                throw ValidationError.outOfRange(field: "presence_penalty", min: "-2", max: "2")
             }
         }
         
         // Validate frequency_penalty
         if let penalty = frequencyPenalty {
             if penalty < -2 || penalty > 2 {
-                throw ValidationError.outOfRange(field: "frequency_penalty", min: -2, max: 2)
+                throw ValidationError.outOfRange(field: "frequency_penalty", min: "-2", max: "2")
             }
         }
         
@@ -245,14 +245,14 @@ extension ProjectSettings: Validatable {
         // Validate temperature
         if let temp = temperature {
             if temp < 0 || temp > 2 {
-                throw ValidationError.outOfRange(field: "temperature", min: 0, max: 2)
+                throw ValidationError.outOfRange(field: "temperature", min: "0", max: "2")
             }
         }
         
         // Validate max tokens
         if let maxTokens = maxTokens {
             if maxTokens < 1 {
-                throw ValidationError.outOfRange(field: "maxTokens", min: 1, max: nil)
+                throw ValidationError.outOfRange(field: "maxTokens", min: "1", max: nil)
             }
         }
     }
@@ -280,14 +280,14 @@ extension SessionMetadata: Validatable {
         // Validate temperature
         if let temp = temperature {
             if temp < 0 || temp > 2 {
-                throw ValidationError.outOfRange(field: "temperature", min: 0, max: 2)
+                throw ValidationError.outOfRange(field: "temperature", min: "0", max: "2")
             }
         }
         
         // Validate max tokens
         if let maxTokens = maxTokens {
             if maxTokens < 1 {
-                throw ValidationError.outOfRange(field: "maxTokens", min: 1, max: nil)
+                throw ValidationError.outOfRange(field: "maxTokens", min: "1", max: nil)
             }
         }
     }
@@ -308,7 +308,7 @@ extension SSHConfig: Validatable {
         
         // Validate port
         if port < 1 || port > 65535 {
-            throw ValidationError.outOfRange(field: "port", min: 1, max: 65535)
+            throw ValidationError.outOfRange(field: "port", min: "1", max: "65535")
         }
         
         // Validate username
@@ -343,7 +343,7 @@ extension ToolExecutionRequest: Validatable {
         // Validate timeout
         if let timeout = timeout {
             if timeout < 0 || timeout > 300 {
-                throw ValidationError.outOfRange(field: "timeout", min: 0, max: 300)
+                throw ValidationError.outOfRange(field: "timeout", min: "0", max: "300")
             }
         }
     }
@@ -376,12 +376,12 @@ extension Pagination: Validatable {
     public func validate() throws {
         // Validate page
         if page < 1 {
-            throw ValidationError.outOfRange(field: "page", min: 1, max: nil)
+            throw ValidationError.outOfRange(field: "page", min: "1", max: nil)
         }
         
         // Validate page size
         if pageSize < 1 || pageSize > 100 {
-            throw ValidationError.outOfRange(field: "pageSize", min: 1, max: 100)
+            throw ValidationError.outOfRange(field: "pageSize", min: "1", max: "100")
         }
     }
 }

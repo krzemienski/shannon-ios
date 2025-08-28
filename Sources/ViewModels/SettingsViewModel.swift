@@ -183,10 +183,12 @@ final class SettingsViewModel: ObservableObject {
             let sshManager = DependencyContainer.shared.sshManager
             
             // Create SSH config from settings
-            let config = SSHConfig(
+            let config = AppSSHConfig(
+                name: "SSH Connection",
                 host: settingsStore.sshHost,
-                port: settingsStore.sshPort,
+                port: UInt16(settingsStore.sshPort),
                 username: settingsStore.sshUsername,
+                authMethod: settingsStore.sshPrivateKey != nil ? .publicKey : .password,
                 privateKeyPath: settingsStore.sshPrivateKey,
                 passphrase: settingsStore.sshPassphrase
             )
@@ -196,20 +198,14 @@ final class SettingsViewModel: ObservableObject {
             var errorMessage = ""
             
             if config.authMethod == .publicKey {
-                await sshManager.connectWithKey(
-                    host: config.host,
-                    port: config.port,
-                    username: config.username,
-                    privateKeyPath: config.privateKeyPath ?? "",
-                    passphrase: config.passphrase
-                )
+                try? await sshManager.connect(config: config)
             } else {
                 // Password auth - would need password from somewhere
                 errorMessage = "Password authentication not configured"
             }
             
             // Check if connected
-            success = sshManager.connectionState == .connected
+            success = sshManager.isConnected
             if success {
                 // Disconnect after test
                 await sshManager.disconnect()

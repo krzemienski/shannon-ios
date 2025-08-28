@@ -15,7 +15,7 @@ struct EnhancedOnboardingView: View {
     @State private var currentPage = 0
     @State private var showSkipButton = true
     @State private var animateContent = false
-    @State private var selectedPreferences = UserPreferences()
+    @State private var selectedPreferences = OnboardingUserPreferences()
     @State private var apiKey = ""
     @State private var baseURL = "http://localhost:8000/v1"
     @Environment(\.dismiss) private var dismiss
@@ -497,10 +497,10 @@ struct APISetupStepView: View {
 // MARK: - Preferences Step
 
 struct PreferencesStepView: View {
-    @Binding var preferences: UserPreferences
+    @Binding var preferences: OnboardingUserPreferences
     @State private var selectedLanguages: Set<String> = []
     
-    let experienceLevels = UserPreferences.ExperienceLevel.allCases
+    let experienceLevels = OnboardingUserPreferences.ExperienceLevel.allCases
     let useCases = [
         "Mobile Development",
         "Web Development",
@@ -824,7 +824,7 @@ struct PermissionRow: View {
 }
 
 struct ExperienceLevelCard: View {
-    let level: UserPreferences.ExperienceLevel
+    let level: OnboardingUserPreferences.ExperienceLevel
     let isSelected: Bool
     let onTap: () -> Void
     

@@ -338,8 +338,8 @@ public struct EnhancedTerminalView: View {
     
     // MARK: - Toolbar Content
     
-    @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
+    @ViewBuilder
+    private var toolbarContent: some View {
         ToolbarItem(placement: .navigationBarLeading) {
             Menu {
                 Button(action: {
@@ -400,7 +400,7 @@ public struct EnhancedTerminalView: View {
 
 // MARK: - Terminal Tab
 
-struct TerminalTab: View {
+struct EnhancedTerminalTab: View {
     let session: SSHSession
     let isActive: Bool
     let onSelect: () -> Void

@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct MonitorView: View {
-    @State private var selectedMetric: MonitorMetricType = .tokenUsage
+    @State private var selectedMetric: MonitorViewMetricType = .tokenUsage
     @State private var selectedTimeRange: MonitorTimeRange = .today
     @State private var isSSHConnected = false
     @State private var sshLogs: [SSHLogEntry] = []
@@ -42,7 +42,7 @@ struct MonitorView: View {
                     // Metric Selector
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: ThemeSpacing.sm) {
-                            ForEach(MonitorMetricType.allCases, id: \.self) { metric in
+                            ForEach(MonitorViewMetricType.allCases, id: \.self) { metric in
                                 MetricChip(
                                     metric: metric,
                                     isSelected: selectedMetric == metric
@@ -409,7 +409,7 @@ struct ActivityRow: View {
 // MARK: - Helper Views
 
 struct MetricChip: View {
-    let metric: MonitorMetricType
+    let metric: MonitorViewMetricType
     let isSelected: Bool
     let onTap: () -> Void
     
@@ -432,7 +432,7 @@ struct MetricChip: View {
 
 // MARK: - Models
 
-enum MonitorMetricType: String, CaseIterable {
+enum MonitorViewMetricType: String, CaseIterable {
     case tokenUsage = "Tokens"
     case apiCalls = "API Calls"
     case responseTime = "Response Time"

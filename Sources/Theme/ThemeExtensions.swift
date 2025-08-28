@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+// Import the Theme struct from Theme.swift
+// This provides static color properties for the dark cyberpunk theme
+
 // MARK: - Static Color Properties (Dark Cyberpunk Theme)
-public extension Theme {
+extension Theme {
     /// Primary background color - Deep dark blue-black
     public static var background: Color {
         Color(hsl: DarkCyberpunk.backgroundHSL.h, DarkCyberpunk.backgroundHSL.s, DarkCyberpunk.backgroundHSL.l)
@@ -74,7 +77,7 @@ public extension Theme {
         Color(hsl: 210, 12, 12)
     }
     
-    // MARK: - Spacing
+    // MARK: - Spacing (Reference to ThemeSpacing)
     enum Spacing {
         static let xs: CGFloat = 4
         static let sm: CGFloat = 8
@@ -84,12 +87,15 @@ public extension Theme {
         static let xxl: CGFloat = 48
     }
     
-    // MARK: - Corner Radius (Alias to ThemeRadius for compatibility)
+    // MARK: - Corner Radius
     struct CornerRadius {
-        static let sm = ThemeRadius.sm
-        static let md = ThemeRadius.md
-        static let lg = ThemeRadius.lg
-        static let xl = ThemeRadius.xl
+        static let sm = Theme.Radius.sm
+        static let md = Theme.Radius.md
+        static let lg = Theme.Radius.lg
+        static let xl = Theme.Radius.xl
         static let full = CGFloat(9999)
     }
 }
+
+// The typealias at the bottom of SettingsStore.swift creates Theme = AppTheme
+// This enables us to use Theme.primary, Theme.background, etc. throughout the app

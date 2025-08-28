@@ -59,20 +59,20 @@ struct CoordinatorView: View {
     private func sheetContent(for sheetType: SheetType) -> some View {
         switch sheetType {
         case .newProject:
-            NewProjectView { project in
+            NewProjectView(onSave: { project in
                 // Handle project creation - implementation to be added
                 print("New project created: \(project.name)")
-            }
+            })
         case .projectSettings(let id):
             ProjectSettingsView(
-                projectId: id,
+                projectId: UUID(uuidString: id) ?? UUID(),
                 coordinator: coordinator.projectsCoordinator
             )
         case .newConversation:
             NewConversationView(coordinator: coordinator.chatCoordinator)
         case .conversationSettings(let id):
             ConversationSettingsView(
-                conversationId: id,
+                conversationId: UUID(uuidString: id) ?? UUID(),
                 coordinator: coordinator.chatCoordinator
             )
         case .toolDetails(let id):
@@ -191,11 +191,11 @@ struct ChatNavigationView: View {
             ))
                 .environmentObject(coordinator)
         case .search:
-            ChatSearchView()
+            ChatSearchView(searchText: .constant(""))
                 .environmentObject(coordinator)
         case .settings(let id):
             ConversationSettingsView(
-                conversationId: id,
+                conversationId: UUID(uuidString: id) ?? UUID(),
                 coordinator: coordinator
             )
         case .toolExecution(let toolId, let conversationId):
@@ -275,7 +275,9 @@ struct ToolsNavigationView: View {
             ToolCategoryView(category: category.rawValue)
                 .environmentObject(coordinator)
         case .detail(let id):
-            ToolDetailView(toolId: id)
+            // For now, create a placeholder view until proper tool store integration
+            Text("Tool Detail: \(id)")
+                .navigationTitle("Tool")
                 .environmentObject(coordinator)
         case .execution(let id, _):  // Ignore parameters, use a default executionId
             ToolExecutionView(toolId: id, executionId: "exec-\(UUID().uuidString)")
@@ -311,6 +313,7 @@ struct MonitorNavigationView: View {
             MonitorExportView()
                 .environmentObject(coordinator)
         case .alertConfig(let metric):
+            // metric is already AlertMetricType
             AlertConfigurationView(metricType: metric)
                 .environmentObject(coordinator)
         }

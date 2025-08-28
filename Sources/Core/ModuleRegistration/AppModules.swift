@@ -8,7 +8,7 @@
 import Foundation
 
 /// Core module for fundamental services
-struct CoreModule: ServiceContainer {
+struct CoreModule: ModuleRegistration {
     func register() {
         let locator = ServiceLocator.shared
         let container = DIContainer.shared
@@ -38,7 +38,7 @@ struct CoreModule: ServiceContainer {
 }
 
 /// API module for network services
-struct APIModule: ServiceContainer {
+struct APIModule: ModuleRegistration {
     func register() {
         let locator = ServiceLocator.shared
         let container = DIContainer.shared
@@ -70,7 +70,7 @@ struct APIModule: ServiceContainer {
 }
 
 /// State module for stores
-struct StateModule: ServiceContainer {
+struct StateModule: ModuleRegistration {
     func register() {
         let locator = ServiceLocator.shared
         let container = DIContainer.shared
@@ -122,7 +122,7 @@ struct StateModule: ServiceContainer {
 }
 
 /// ViewModel module
-struct ViewModelModule: ServiceContainer {
+struct ViewModelModule: ModuleRegistration {
     func register() {
         let container = DIContainer.shared
         
@@ -187,7 +187,7 @@ struct ViewModelModule: ServiceContainer {
 }
 
 /// Coordinator module
-struct CoordinatorModule: ServiceContainer {
+struct CoordinatorModule: ModuleRegistration {
     func register() {
         let container = DIContainer.shared
         
@@ -224,7 +224,7 @@ public struct AppModuleRegistration {
     
     /// Register all app modules
     public static func registerAllModules() {
-        let modules: [ServiceContainer] = [
+        let modules: [DependencyContainer] = [
             CoreModule(),
             APIModule(),
             StateModule(),

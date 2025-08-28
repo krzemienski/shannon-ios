@@ -108,7 +108,7 @@ targets:
     platform: iOS
     bundleId: com.claudecodeswift.ios
     info:
-      path: Info.plist
+      path: Resources/Info.plist
     sources:
       - path: Sources
         excludes:
@@ -136,9 +136,14 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.claudecodeswift.ios
         PRODUCT_NAME: ClaudeCodeSwift
         EXECUTABLE_NAME: ClaudeCodeSwift
-        INFOPLIST_FILE: Info.plist
+        INFOPLIST_FILE: Resources/Info.plist
         INFOPLIST_OUTPUT_FORMAT: xml
         INFOPLIST_PREPROCESS: NO
+        
+        # Code signing for simulator (ad-hoc signing)
+        CODE_SIGNING_REQUIRED: YES
+        CODE_SIGNING_ALLOWED: YES
+        CODE_SIGN_IDENTITY: "-"
         
         # UI Settings
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES

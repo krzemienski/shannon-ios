@@ -9,8 +9,8 @@ import SwiftUI
 
 struct MonitorExportView: View {
     @EnvironmentObject var coordinator: MonitorCoordinator
-    @State private var exportFormat = ExportFormat.csv
-    @State private var dateRange = DateRange.lastWeek
+    @State private var exportFormat: ExportViewFormat = .csv
+    @State private var dateRange = ExportDateRange.lastWeek
     @State private var includeSSHLogs = true
     @State private var includePerformanceMetrics = true
     
@@ -18,7 +18,7 @@ struct MonitorExportView: View {
         Form {
             Section("Export Format") {
                 Picker("Format", selection: $exportFormat) {
-                    ForEach(ExportFormat.allCases, id: \.self) { format in
+                    ForEach(ExportViewFormat.allCases, id: \.self) { format in
                         Text(format.rawValue.uppercased()).tag(format)
                     }
                 }
@@ -27,7 +27,7 @@ struct MonitorExportView: View {
             
             Section("Date Range") {
                 Picker("Range", selection: $dateRange) {
-                    ForEach(DateRange.allCases, id: \.self) { range in
+                    ForEach(ExportDateRange.allCases, id: \.self) { range in
                         Text(range.title).tag(range)
                     }
                 }
@@ -56,13 +56,13 @@ struct MonitorExportView: View {
     }
 }
 
-enum ExportFormat: String, CaseIterable {
+enum ExportViewFormat: String, CaseIterable {
     case csv = "csv"
     case json = "json"
     case xml = "xml"
 }
 
-enum DateRange: CaseIterable {
+enum ExportDateRange: CaseIterable {
     case today
     case lastWeek
     case lastMonth

@@ -94,8 +94,8 @@ final class SettingsCoordinator: BaseCoordinator, ObservableObject {
             
             // Update API client
             dependencyContainer.apiClient.setAPIKey(apiKey)
-            if let baseURL = baseURL {
-                dependencyContainer.apiClient.setBaseURL(baseURL)
+            if let baseURL = baseURL, let url = URL(string: baseURL) {
+                dependencyContainer.apiClient.setBaseURL(url)
             }
         }
     }
@@ -104,12 +104,7 @@ final class SettingsCoordinator: BaseCoordinator, ObservableObject {
         isTestingConnection = true
         defer { isTestingConnection = false }
         
-        do {
-            return try await dependencyContainer.apiClient.testConnection()
-        } catch {
-            handleSettingsError(error)
-            return false
-        }
+        return await dependencyContainer.apiClient.testConnection()
     }
     
     // MARK: - SSH Configuration
@@ -239,15 +234,16 @@ final class SettingsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func requestNotificationPermission() async -> Bool {
-        await dependencyContainer.appState.requestNotificationPermission()
+        return await dependencyContainer.appState.requestNotificationPermission()
     }
     
     // MARK: - Privacy
     
-    func updatePrivacySettings(_ settings: PrivacySettings) {
+    func updatePrivacySettings(_ settings: PrivacySettings) -> Bool {
         Task {
             await dependencyContainer.settingsStore.updatePrivacySettings(settings)
         }
+        return true
     }
     
     func toggleAnalytics(_ enabled: Bool) {

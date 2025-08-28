@@ -1,5 +1,9 @@
 import Foundation
 
+// Type alias for compatibility with streaming chunk
+public typealias ChatCompletionChunk = ChatStreamChunk
+public typealias ToolFunction = ChatFunction
+
 // MARK: - Chat Completion Models (Tasks 401-410)
 
 /// OpenAI-compatible chat completion request
@@ -742,8 +746,8 @@ public struct RequestMetrics: Codable {
     public let totalBytesTransferred: Int64
 }
 
-/// Metrics collector
-public class MetricsCollector: ObservableObject {
+/// Request metrics collector
+public class RequestMetricsCollector: ObservableObject {
     @Published public var metrics = RequestMetrics(
         totalRequests: 0,
         successfulRequests: 0,

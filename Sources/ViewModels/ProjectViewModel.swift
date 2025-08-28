@@ -37,7 +37,7 @@ final class ProjectViewModel: ObservableObject {
     @Published var sshHost = ""
     @Published var sshPort = 22
     @Published var sshUsername = ""
-    @Published var sshAuthMethod: SSHAuthMethod = .publicKey
+    @Published var sshAuthMethod: AppSSHAuthMethod = .publicKey
     @Published var sshPrivateKey = ""
     @Published var sshPassphrase = ""
     
@@ -234,7 +234,7 @@ final class ProjectViewModel: ObservableObject {
     func saveSSHConfig() {
         guard let project = selectedProject, canSaveSSHConfig else { return }
         
-        let config = SSHConfig(
+        let config = AppSSHConfig(
             host: sshHost,
             port: sshPort,
             username: sshUsername,
@@ -254,7 +254,7 @@ final class ProjectViewModel: ObservableObject {
         
         isLoading = true
         
-        let config = SSHConfig(
+        let config = AppSSHConfig(
             host: sshHost,
             port: sshPort,
             username: sshUsername,
@@ -275,7 +275,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Connect SSH for project
-    func connectSSH(with config: SSHConfig) async {
+    func connectSSH(with config: AppSSHConfig) async {
         isLoading = true
         
         do {

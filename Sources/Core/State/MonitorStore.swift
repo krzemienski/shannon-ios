@@ -225,6 +225,21 @@ final class MonitorStore: ObservableObject {
             systemLogs.removeLast()
         }
     }
+    
+    /// Clear all monitoring data and reset to defaults
+    func clearAll() async {
+        cpuUsage = 0
+        memoryUsage = MemoryUsage()
+        diskUsage = DiskUsage()
+        networkStats = NetworkStats()
+        activeConnections.removeAll()
+        processInfo.removeAll()
+        systemLogs.removeAll()
+        isMonitoring = false
+        
+        // Stop monitoring if active
+        stopMonitoring()
+    }
 }
 
 // MARK: - Models
@@ -292,15 +307,9 @@ struct SSHMonitorConnection: Identifiable {
     let bytesTransferred: Int
 }
 
-struct ProcessInfo: Identifiable {
-    let id = UUID()
-    let name: String
-    let pid: Int
-    let cpuUsage: Double
-    let memoryUsage: Int
-    let status: ProcessStatus
-}
+// ProcessInfo is defined in Models/Network/MonitoringModels.swift
 
+// ProcessStatus is defined in MonitoringModels.swift (if not already there)
 enum ProcessStatus {
     case running
     case sleeping

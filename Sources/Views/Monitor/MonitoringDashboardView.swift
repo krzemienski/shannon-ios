@@ -10,10 +10,17 @@ import Charts
 
 /// Main monitoring dashboard view
 struct MonitoringDashboardView: View {
-    @StateObject private var telemetry = TelemetryManager.shared
+    // Singletons that conform to ObservableObject
+    @ObservedObject private var telemetry = TelemetryManager.shared
+    @ObservedObject private var crashReporter = CrashReporter.shared
     @StateObject private var metricsCollector = MetricsCollector()
-    @StateObject private var performanceTracker = PerformanceTracker()
-    @StateObject private var crashReporter = CrashReporter.shared
+    private let performanceMonitor = PerformanceMonitor.shared
+    // Create a dummy PerformanceTracker for the UI
+    @StateObject private var performanceTracker = PerformanceTracker(
+        id: UUID(),
+        operation: "Dashboard",
+        startTime: Date()
+    )
     @State private var selectedTab = MonitoringTab.overview
     @State private var refreshTimer: Timer?
     
@@ -44,7 +51,7 @@ struct MonitoringDashboardView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(MonitoringTab.allCases, id: \.self) { tab in
-                            TabButton(
+                            MonitorTabButton(
                                 title: tab.rawValue,
                                 icon: tab.icon,
                                 isSelected: selectedTab == tab
@@ -297,7 +304,7 @@ struct OverviewSection: View {
 
 // MARK: - Components
 
-struct TabButton: View {
+struct MonitorTabButton: View {
     let title: String
     let icon: String
     let isSelected: Bool

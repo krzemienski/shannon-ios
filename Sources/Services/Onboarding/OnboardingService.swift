@@ -37,7 +37,7 @@ public struct OnboardingStep: Identifiable {
 
 // MARK: - User Preferences
 
-public struct UserPreferences: Codable {
+public struct OnboardingUserPreferences: Codable {
     public var theme: String = "auto"
     public var primaryUseCase: String = ""
     public var experienceLevel: ExperienceLevel = .beginner
@@ -69,8 +69,8 @@ public struct OnboardingProgress: Codable {
     public var startedAt: Date = Date()
     public var completedAt: Date?
     public var skippedSteps: Set<String> = []
-    public var preferences: UserPreferences = UserPreferences()
-    public var analyticsEvents: [[String: Any]] = []
+    public var preferences: OnboardingUserPreferences = OnboardingUserPreferences()
+    public var analyticsEvents: [[String: AnyCodable]] = []
 }
 
 // MARK: - Onboarding Service
@@ -238,7 +238,7 @@ public class OnboardingService: ObservableObject {
     }
     
     /// Update user preferences
-    public func updatePreferences(_ preferences: UserPreferences) {
+    public func updatePreferences(_ preferences: OnboardingUserPreferences) {
         progress.preferences = preferences
         saveProgress()
         
@@ -324,7 +324,7 @@ public class OnboardingService: ObservableObject {
             progress.preferences.primaryUseCase = useCase
         }
         if let level = data["experienceLevel"] as? String,
-           let experienceLevel = UserPreferences.ExperienceLevel(rawValue: level) {
+           let experienceLevel = OnboardingUserPreferences.ExperienceLevel(rawValue: level) {
             progress.preferences.experienceLevel = experienceLevel
         }
         if let languages = data["preferredLanguages"] as? [String] {
@@ -348,7 +348,7 @@ public class OnboardingService: ObservableObject {
         }
     }
     
-    private func applyPreferences(_ preferences: UserPreferences) {
+    private func applyPreferences(_ preferences: OnboardingUserPreferences) {
         // Apply theme
         if let theme = ColorScheme(rawValue: preferences.theme) {
             ThemeManager.shared.setColorScheme(theme)
@@ -368,7 +368,7 @@ public class OnboardingService: ObservableObject {
         }
         
         if let data = userDefaults.data(forKey: preferencesKey),
-           let prefs = try? JSONDecoder().decode(UserPreferences.self, from: data) {
+           let prefs = try? JSONDecoder().decode(OnboardingUserPreferences.self, from: data) {
             progress.preferences = prefs
         }
     }

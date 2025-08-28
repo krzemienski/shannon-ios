@@ -10,7 +10,7 @@ import SwiftUI
 struct ChatView: View {
     let session: ChatSession
     @EnvironmentObject private var appState: AppState
-    @StateObject private var viewModel = ChatViewModel()
+    @StateObject private var viewModel = SimpleChatViewModel()
     @State private var messageText = ""
     @FocusState private var isInputFocused: Bool
     @State private var showingToolTimeline = false
@@ -281,7 +281,7 @@ struct ThinkingIndicator: View {
 
 // MARK: - Chat View Model
 
-class ChatViewModel: ObservableObject {
+class SimpleChatViewModel: ObservableObject {
     @Published var messages: [ChatMessageUI] = ChatMessageUI.mockData
     @Published var isLoading = false
     @Published var tokenUsage = 0

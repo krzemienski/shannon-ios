@@ -6,6 +6,25 @@
 //
 
 import SwiftUI
+import Speech
+import AVFoundation
+
+// TODO: Implement proper VoiceInputService
+class VoiceInputService: NSObject, ObservableObject, @unchecked Sendable {
+    nonisolated(unsafe) static let shared = VoiceInputService()
+    
+    @Published var isRecording = false
+    @Published var transcriptionResult = ""
+    @Published var error: Error?
+    
+    func startRecording() {
+        isRecording = true
+    }
+    
+    func stopRecording() {
+        isRecording = false
+    }
+}
 
 extension CodeEditorView {
     /// Voice input toolbar for code editor

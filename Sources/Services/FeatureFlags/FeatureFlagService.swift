@@ -409,7 +409,9 @@ public class FeatureFlagService: ObservableObject {
 // MARK: - SwiftUI Environment
 
 private struct FeatureFlagEnvironmentKey: EnvironmentKey {
-    static let defaultValue = FeatureFlagService.shared
+    static var defaultValue: FeatureFlagService {
+        FeatureFlagService.shared
+    }
 }
 
 public extension EnvironmentValues {

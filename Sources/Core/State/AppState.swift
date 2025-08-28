@@ -29,6 +29,12 @@ class AppState: ObservableObject {
     @Published var isFirstLaunch = false
     @Published var isAuthenticated = true // Default to true for now
     
+    // Selection State
+    @Published var selectedToolId: String?
+    @Published var selectedMonitorId: String?
+    @Published var selectedSettingPath: String?
+    @Published var apiHealthy = false
+    
     // WebSocket Connection Status
     @Published var webSocketConnected = false
     @Published var webSocketReconnecting = false
@@ -310,6 +316,35 @@ class AppState: ObservableObject {
         if webSocketConnected {
             try? await webSocketService.subscribeToChat(chatId)
         }
+    }
+    
+    // MARK: - Missing Methods
+    
+    func reset() {
+        // Reset app state
+        selectedChatId = nil
+        selectedProjectId = nil
+        selectedToolId = nil
+        selectedMonitorId = nil
+        selectedSettingPath = nil
+        
+        isInitialized = false
+        apiHealthy = false
+        webSocketConnected = false
+        
+        // Clear preferences
+        userDefaults.removeObject(forKey: "selectedChatId")
+        userDefaults.removeObject(forKey: "selectedProjectId")
+        userDefaults.removeObject(forKey: "selectedToolId")
+        userDefaults.removeObject(forKey: "selectedMonitorId")
+        userDefaults.removeObject(forKey: "selectedSettingPath")
+    }
+    
+    func requestNotificationPermission() async -> Bool {
+        // Request notification permission (stub implementation)
+        // This would normally integrate with UNUserNotificationCenter
+        // For now, return true to indicate success
+        return true
     }
 }
 

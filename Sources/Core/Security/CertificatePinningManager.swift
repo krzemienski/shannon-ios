@@ -11,17 +11,20 @@ import Security
 import OSLog
 
 /// Manager for SSL/TLS certificate pinning
-public final class CertificatePinningManager: NSObject {
+public final class CertificatePinningManager: NSObject, @unchecked Sendable {
     // MARK: - Properties
     
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "CertificatePinning")
     
     // Pinned certificates (SHA256 hashes of public keys)
-    private var pinnedCertificates: Set<String> = []
-    private var pinnedPublicKeys: Set<String> = []
+    private let pinnedCertificates = NSLock()
+    private var _pinnedCertificates: Set<String> = []
+    private let pinnedPublicKeys = NSLock()
+    private var _pinnedPublicKeys: Set<String> = []
     
     // Backup pins for certificate rotation
-    private var backupPins: Set<String> = []
+    private let backupPinsLock = NSLock()
+    private var _backupPins: Set<String> = []
     
     // Configuration
     private let enforceStrictPinning: Bool

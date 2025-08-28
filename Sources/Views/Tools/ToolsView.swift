@@ -35,7 +35,7 @@ struct ToolsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: ThemeSpacing.sm) {
                         ForEach(ToolCategory.allCases, id: \.self) { category in
-                            CategoryChip(
+                            ToolCategoryChip(
                                 category: category,
                                 isSelected: selectedCategory == category,
                                 count: tools.filter { category == .all || $0.category == category }.count
@@ -93,7 +93,7 @@ struct ToolsView: View {
 
 // MARK: - Category Chip
 
-struct CategoryChip: View {
+struct ToolCategoryChip: View {
     let category: MCPToolCategory
     let isSelected: Bool
     let count: Int
@@ -299,11 +299,10 @@ extension MCPTool {
             category: .filesystem,
             inputSchema: JSONSchema(
                 type: "object",
-                properties: [:],
+                properties: nil,
                 required: nil,
                 additionalProperties: nil,
-                description: nil,
-                examples: nil
+                description: nil
             ),
             outputSchema: nil,
             examples: nil,
@@ -325,8 +324,7 @@ extension MCPTool {
                 properties: [:],
                 required: ["path", "content"],
                 additionalProperties: nil,
-                description: nil,
-                examples: nil
+                description: nil
             ),
             outputSchema: nil,
             examples: nil,
@@ -345,11 +343,10 @@ extension MCPTool {
             category: .utility,
             inputSchema: JSONSchema(
                 type: "object",
-                properties: [:],
+                properties: nil,
                 required: nil,
                 additionalProperties: nil,
-                description: nil,
-                examples: nil
+                description: nil
             ),
             outputSchema: nil,
             examples: nil,
@@ -371,8 +368,7 @@ extension MCPTool {
                 properties: [:],
                 required: ["command"],
                 additionalProperties: nil,
-                description: nil,
-                examples: nil
+                description: nil
             ),
             outputSchema: nil,
             examples: nil,
@@ -394,8 +390,7 @@ extension MCPTool {
                 properties: [:],
                 required: ["query", "database"],
                 additionalProperties: nil,
-                description: nil,
-                examples: nil
+                description: nil
             ),
             outputSchema: nil,
             examples: nil,
@@ -417,8 +412,7 @@ extension MCPTool {
                 properties: [:],
                 required: ["url"],
                 additionalProperties: nil,
-                description: nil,
-                examples: nil
+                description: nil
             ),
             outputSchema: nil,
             examples: nil,

@@ -67,56 +67,9 @@ extension AnyTransition {
 
 // MARK: - Custom View Modifiers
 
-/// Pulsing animation modifier
-struct PulseModifier: ViewModifier {
-    @State private var isPulsing = false
-    let duration: Double
-    let scale: CGFloat
-    
-    func body(content: Content) -> some View {
-        content
-            .scaleEffect(isPulsing ? scale : 1.0)
-            .onAppear {
-                withAnimation(
-                    .easeInOut(duration: duration)
-                    .repeatForever(autoreverses: true)
-                ) {
-                    isPulsing = true
-                }
-            }
-    }
-}
+// PulseModifier is defined in ViewExtensions.swift
 
-/// Shimmer loading effect modifier
-struct ShimmerModifier: ViewModifier {
-    @State private var phase: CGFloat = 0
-    let duration: Double
-    
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.white.opacity(0),
-                        Color.white.opacity(0.3),
-                        Color.white.opacity(0)
-                    ]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .offset(x: phase * 400 - 200)
-                .mask(content)
-            )
-            .onAppear {
-                withAnimation(
-                    .linear(duration: duration)
-                    .repeatForever(autoreverses: false)
-                ) {
-                    phase = 1
-                }
-            }
-    }
-}
+// ShimmerModifier is defined in ViewExtensions.swift
 
 /// Glitch effect modifier
 struct GlitchModifier: ViewModifier {
@@ -187,37 +140,8 @@ struct TypewriterModifier: ViewModifier {
 }
 
 // MARK: - View Extensions
-
-extension View {
-    /// Apply pulse animation
-    func pulse(duration: Double = 1.5, scale: CGFloat = 1.05) -> some View {
-        modifier(PulseModifier(duration: duration, scale: scale))
-    }
-    
-    /// Apply shimmer effect
-    func shimmer(duration: Double = 1.5) -> some View {
-        modifier(ShimmerModifier(duration: duration))
-    }
-    
-    /// Apply typewriter animation
-    func typewriter(_ text: String, speed: Double = 0.05) -> some View {
-        modifier(TypewriterModifier(text: text, speed: speed))
-    }
-    
-    /// Apply neon glow
-    func neonGlow(intensity: Double = 1.0) -> some View {
-        modifier(NeonGlowModifier(intensity: intensity))
-    }
-    
-    /// Animate on appear with custom animation
-    func animateOnAppear<V: Equatable>(
-        _ animation: Animation = .cyberpunkSpring,
-        value: V,
-        delay: Double = 0
-    ) -> some View {
-        self.animation(animation.delay(delay), value: value)
-    }
-}
+// Note: View extension methods are defined in ViewExtensions.swift
+// AnimationUtilities provides additional animation-specific extensions
 
 // MARK: - Loading Animations
 

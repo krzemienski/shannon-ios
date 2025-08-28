@@ -707,7 +707,8 @@ class StreamDecompressor {
 }
 
 /// Chat stream chunk for OpenAI-compatible streaming
-struct ChatStreamChunk: Codable {
+public struct ChatStreamChunk: Codable {
+    public typealias ChatCompletionChunk = ChatStreamChunk  // Alias for compatibility
     let id: String
     let object: String
     let created: Int

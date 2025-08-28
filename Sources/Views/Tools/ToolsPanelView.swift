@@ -485,18 +485,7 @@ struct StatCard: View {
     }
 }
 
-// MARK: - Tool Info Model
-
-struct PanelToolInfo: Identifiable {
-    let id = UUID().uuidString
-    let name: String
-    let category: String
-    let icon: String
-    let description: String
-    let usage: String
-    let examples: [String]
-    let lastUsed: Date?
-}
+// Note: PanelToolInfo is now defined in Models/ViewModels.swift
 
 // MARK: - Preview
 

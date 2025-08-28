@@ -415,20 +415,7 @@ struct ColorPickerSheet: View {
     }
 }
 
-// MARK: - Settings Store Extensions
-
-extension SettingsStore {
-    @Published var useBoldText: Bool = false
-    @Published var useMonospaceCode: Bool = true
-    @Published var highContrast: Bool = false
-    @Published var reduceTransparency: Bool = false
-    @Published var enableAnimations: Bool = true
-    @Published var reduceMotion: Bool = false
-    @Published var animationSpeed: Double = 1.0
-    @Published var smartInvert: Bool = false
-    @Published var buttonShapes: Bool = false
-    @Published var differentiateWithoutColor: Bool = false
-}
+// Properties moved to SettingsStore class
 
 #Preview {
     NavigationStack {

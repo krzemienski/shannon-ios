@@ -156,6 +156,86 @@ final class SettingsStore: ObservableObject {
         }
     }
     
+    // MARK: - Accessibility Settings
+    @Published var useBoldText: Bool = false {
+        didSet {
+            UserDefaults.standard.set(useBoldText, forKey: Keys.useBoldText)
+        }
+    }
+    
+    @Published var useMonospaceCode: Bool = true {
+        didSet {
+            UserDefaults.standard.set(useMonospaceCode, forKey: Keys.useMonospaceCode)
+        }
+    }
+    
+    @Published var highContrast: Bool = false {
+        didSet {
+            UserDefaults.standard.set(highContrast, forKey: Keys.highContrast)
+        }
+    }
+    
+    @Published var reduceTransparency: Bool = false {
+        didSet {
+            UserDefaults.standard.set(reduceTransparency, forKey: Keys.reduceTransparency)
+        }
+    }
+    
+    @Published var enableAnimations: Bool = true {
+        didSet {
+            UserDefaults.standard.set(enableAnimations, forKey: Keys.enableAnimations)
+        }
+    }
+    
+    @Published var reduceMotion: Bool = false {
+        didSet {
+            UserDefaults.standard.set(reduceMotion, forKey: Keys.reduceMotion)
+        }
+    }
+    
+    @Published var animationSpeed: Double = 1.0 {
+        didSet {
+            UserDefaults.standard.set(animationSpeed, forKey: Keys.animationSpeed)
+        }
+    }
+    
+    @Published var smartInvert: Bool = false {
+        didSet {
+            UserDefaults.standard.set(smartInvert, forKey: Keys.smartInvert)
+        }
+    }
+    
+    @Published var buttonShapes: Bool = false {
+        didSet {
+            UserDefaults.standard.set(buttonShapes, forKey: Keys.buttonShapes)
+        }
+    }
+    
+    @Published var differentiateWithoutColor: Bool = false {
+        didSet {
+            UserDefaults.standard.set(differentiateWithoutColor, forKey: Keys.differentiateWithoutColor)
+        }
+    }
+    
+    // MARK: - Chat UI Settings
+    @Published var showTokenUsage: Bool = true {
+        didSet {
+            UserDefaults.standard.set(showTokenUsage, forKey: Keys.showTokenUsage)
+        }
+    }
+    
+    @Published var enableCodeHighlighting: Bool = true {
+        didSet {
+            UserDefaults.standard.set(enableCodeHighlighting, forKey: Keys.enableCodeHighlighting)
+        }
+    }
+    
+    @Published var systemPrompt: String = "You are a helpful, harmless, and honest AI assistant." {
+        didSet {
+            UserDefaults.standard.set(systemPrompt, forKey: Keys.systemPrompt)
+        }
+    }
+    
     // MARK: - Private Properties
     private let keychainManager = KeychainManager.shared
     private let userDefaults = UserDefaults.standard
@@ -302,7 +382,7 @@ final class SettingsStore: ObservableObject {
         switch theme {
         case .light:
             window?.overrideUserInterfaceStyle = .light
-        case .dark:
+        case .dark, .cyberpunk:
             window?.overrideUserInterfaceStyle = .dark
         case .system:
             window?.overrideUserInterfaceStyle = .unspecified
@@ -341,10 +421,144 @@ final class SettingsStore: ObservableObject {
         // Developer
         static let debugMode = "settings.debugMode"
         static let showNetworkActivity = "settings.showNetworkActivity"
+        
+        // Accessibility
+        static let useBoldText = "settings.useBoldText"
+        static let useMonospaceCode = "settings.useMonospaceCode"
+        static let highContrast = "settings.highContrast"
+        static let reduceTransparency = "settings.reduceTransparency"
+        static let enableAnimations = "settings.enableAnimations"
+        static let reduceMotion = "settings.reduceMotion"
+        static let animationSpeed = "settings.animationSpeed"
+        static let smartInvert = "settings.smartInvert"
+        static let buttonShapes = "settings.buttonShapes"
+        static let differentiateWithoutColor = "settings.differentiateWithoutColor"
+        
+        // Chat UI
+        static let showTokenUsage = "settings.showTokenUsage"
+        static let enableCodeHighlighting = "settings.enableCodeHighlighting"
+        static let systemPrompt = "settings.systemPrompt"
+    }
+    
+    // MARK: - Public Methods
+    
+    func updateAPIConfiguration(apiKey: String, baseURL: String?) {
+        // Store API configuration
+        self.apiKey = apiKey
+        if let baseURL = baseURL {
+            self.baseURL = baseURL
+        }
+    }
+    
+    func updateSSHConfiguration(_ config: AppSSHConfig) {
+        // Store SSH configuration
+        sshEnabled = true
+        sshHost = config.host
+        sshPort = Int(config.port)
+        sshUsername = config.username
+    }
+    
+    var sshConfiguration: AppSSHConfig? {
+        guard sshEnabled else { return nil }
+        return AppSSHConfig(
+            name: "SSH Connection",
+            host: sshHost,
+            port: UInt16(sshPort),
+            username: sshUsername
+        )
+    }
+    
+    func updateTheme(_ newTheme: AppTheme) {
+        theme = newTheme
+    }
+    
+    func updateFontSize(_ size: FontSize) {
+        fontSize = size
+    }
+    
+    func toggleReduceMotion(_ enabled: Bool) {
+        reduceMotion = enabled
+    }
+    
+    func exportSettings() async throws -> URL {
+        // Export settings as JSON
+        let settings: [String: Any] = [
+            "theme": theme.rawValue,
+            "fontSize": fontSize.rawValue,
+            "enableHaptics": enableHaptics,
+            "enableSounds": enableSounds,
+            "temperature": temperature,
+            "maxTokens": maxTokens,
+            "streamResponses": streamResponses,
+            "saveHistory": saveHistory
+        ]
+        
+        let data = try JSONSerialization.data(withJSONObject: settings)
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsURL.appendingPathComponent("settings_\(Date().timeIntervalSince1970).json")
+        try data.write(to: fileURL)
+        return fileURL
+    }
+    
+    func importSettings(from url: URL) async throws {
+        // Import settings from JSON
+        let data = try Data(contentsOf: url)
+        guard let settings = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+        
+        if let themeRaw = settings["theme"] as? String,
+           let theme = AppTheme(rawValue: themeRaw) {
+            self.theme = theme
+        }
+        
+        if let fontSizeRaw = settings["fontSize"] as? String,
+           let fontSize = FontSize(rawValue: fontSizeRaw) {
+            self.fontSize = fontSize
+        }
+        
+        if let enableHaptics = settings["enableHaptics"] as? Bool {
+            self.enableHaptics = enableHaptics
+        }
+        
+        if let enableSounds = settings["enableSounds"] as? Bool {
+            self.enableSounds = enableSounds
+        }
+        
+        if let temperature = settings["temperature"] as? Double {
+            self.temperature = temperature
+        }
+        
+        if let maxTokens = settings["maxTokens"] as? Int {
+            self.maxTokens = maxTokens
+        }
+    }
+    
+    func updateNotificationSettings(_ settings: NotificationSettings) {
+        // Update notification settings
+        UserDefaults.standard.set(settings.enabled, forKey: "notifications.enabled")
+        UserDefaults.standard.set(settings.soundEnabled, forKey: "notifications.soundEnabled")
+        UserDefaults.standard.set(settings.vibrationEnabled, forKey: "notifications.vibrationEnabled")
+        UserDefaults.standard.set(settings.showPreviews, forKey: "notifications.showPreviews")
+    }
+    
+    func updatePrivacySettings(_ settings: PrivacySettings) {
+        // Update privacy settings
+        enableTelemetry = settings.telemetryEnabled
+        UserDefaults.standard.set(settings.analyticsEnabled, forKey: "privacy.analyticsEnabled")
+        UserDefaults.standard.set(settings.crashReportingEnabled, forKey: "privacy.crashReportingEnabled")
+        UserDefaults.standard.set(settings.shareUsageData, forKey: "privacy.shareUsageData")
+    }
+    
+    func toggleAnalytics(_ enabled: Bool) {
+        enableTelemetry = enabled
     }
 }
 
 // MARK: - Supporting Types
+
+// AppTheme is defined in ThemeManager.swift
+// Type alias for compatibility
+// Removed typealias to avoid conflict with Theme struct
+// Use AppTheme directly instead
 
 enum FontSize: String, CaseIterable {
     case small = "small"

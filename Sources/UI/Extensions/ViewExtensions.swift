@@ -81,7 +81,7 @@ struct SafeAreaInsetsKey: View {
 }
 
 struct SafeAreaInsetsPreferenceKey: PreferenceKey {
-    static var defaultValue = EdgeInsets()
+    static let defaultValue: EdgeInsets = EdgeInsets()
     static func reduce(value: inout EdgeInsets, nextValue: () -> EdgeInsets) {
         value = nextValue()
     }

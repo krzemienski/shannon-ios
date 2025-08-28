@@ -52,9 +52,9 @@ struct StreamingIndicator: View {
                 .padding(.horizontal, ThemeSpacing.sm)
                 .padding(.vertical, ThemeSpacing.xs)
                 .background(Theme.card)
-                .cornerRadius(Theme.CornerRadius.xs)
+                .cornerRadius(Theme.Radius.xs)
                 .overlay(
-                    RoundedRectangle(cornerRadius: Theme.CornerRadius.xs)
+                    RoundedRectangle(cornerRadius: Theme.Radius.xs)
                         .stroke(Theme.border, lineWidth: 1)
                 )
             }
@@ -88,8 +88,10 @@ struct StreamingIndicator: View {
     private func startAnimations() {
         // Start dot animation
         Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
-            withAnimation {
-                animatingDots = (animatingDots + 1) % dotCount
+            Task { @MainActor in
+                withAnimation {
+                    animatingDots = (animatingDots + 1) % dotCount
+                }
             }
         }
         
@@ -211,9 +213,9 @@ struct StreamingWaveView: View {
                 
                 path.move(to: CGPoint(x: 0, y: midHeight))
                 
-                for x in stride(from: 0, through: width, by: 1) {
+                for x in stride(from: CGFloat(0), through: width, by: CGFloat(1)) {
                     let relativeX = x / wavelength
-                    let sine = sin(relativeX * .pi * 2 + phase)
+                    let sine = sin(relativeX * CGFloat.pi * CGFloat(2) + phase)
                     let y = midHeight + sine * (height / 4)
                     path.addLine(to: CGPoint(x: x, y: y))
                 }

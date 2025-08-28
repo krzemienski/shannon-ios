@@ -9,7 +9,7 @@ import SwiftUI
 
 /// SSH configuration view for setting up connections
 public struct SSHConfigurationView: View {
-    @State private var config = SSHConfig.default
+    @State private var config = AppSSHConfig.default
     @State private var password = ""
     @State private var privateKey = ""
     @State private var passphrase = ""
@@ -25,8 +25,8 @@ public struct SSHConfigurationView: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    let onConnect: (SSHConfig) -> Void
-    let onSave: ((SSHConfig) -> Void)?
+    let onConnect: (AppSSHConfig) -> Void
+    let onSave: ((AppSSHConfig) -> Void)?
     
     // MARK: - Body
     
@@ -120,9 +120,9 @@ public struct SSHConfigurationView: View {
     private var authenticationSection: some View {
         Section("Authentication") {
             Picker("Method", selection: $config.authMethod) {
-                Text("Password").tag(SSHAuthMethod.password)
-                Text("SSH Key").tag(SSHAuthMethod.publicKey)
-                Text("Keyboard Interactive").tag(SSHAuthMethod.keyboardInteractive)
+                Text("Password").tag(AppSSHAuthMethod.password)
+                Text("SSH Key").tag(AppSSHAuthMethod.publicKey)
+                Text("Keyboard Interactive").tag(AppSSHAuthMethod.keyboardInteractive)
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(.vertical, 4)
@@ -446,7 +446,7 @@ public struct SSHConfigurationView: View {
 // MARK: - SSH Connection Sheet
 
 struct SSHConnectionSheet: View {
-    let onConnect: (SSHConfig) -> Void
+    let onConnect: (AppSSHConfig) -> Void
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {

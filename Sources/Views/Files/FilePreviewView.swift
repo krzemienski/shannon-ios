@@ -220,7 +220,7 @@ struct PDFPreviewView: View {
     }
 }
 
-struct PDFKitView: UIViewRepresentable {
+struct FilePDFKitView: UIViewRepresentable {
     let document: PDFDocument
     
     func makeUIView(context: Context) -> PDFView {
@@ -494,7 +494,7 @@ struct FilePreviewErrorStateView: View {
 
 // MARK: - Share Sheet
 
-struct ShareSheet: UIViewControllerRepresentable {
+struct FileShareSheet: UIViewControllerRepresentable {
     let items: [Any]
     
     func makeUIViewController(context: Context) -> UIActivityViewController {

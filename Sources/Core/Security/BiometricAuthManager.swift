@@ -278,27 +278,27 @@ public enum BiometricPolicy {
 
 // MARK: - Session Configuration
 
-public struct BiometricSessionConfiguration {
+public struct BiometricSessionConfiguration: Sendable {
     public let timeout: TimeInterval
     public let allowPasscodeFallback: Bool
     public let requireReauthForSensitiveOperations: Bool
     public let maxFailedAttempts: Int
     
-    public static let `default` = BiometricSessionConfiguration(
+    nonisolated(unsafe) public static let `default` = BiometricSessionConfiguration(
         timeout: 300, // 5 minutes
         allowPasscodeFallback: true,
         requireReauthForSensitiveOperations: true,
         maxFailedAttempts: 3
     )
     
-    public static let strict = BiometricSessionConfiguration(
+    nonisolated(unsafe) public static let strict = BiometricSessionConfiguration(
         timeout: 60, // 1 minute
         allowPasscodeFallback: false,
         requireReauthForSensitiveOperations: true,
         maxFailedAttempts: 1
     )
     
-    public static let relaxed = BiometricSessionConfiguration(
+    nonisolated(unsafe) public static let relaxed = BiometricSessionConfiguration(
         timeout: 900, // 15 minutes
         allowPasscodeFallback: true,
         requireReauthForSensitiveOperations: false,

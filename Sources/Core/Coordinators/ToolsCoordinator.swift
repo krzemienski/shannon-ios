@@ -192,7 +192,7 @@ final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Success/Error Handling
     
-    private func handleToolExecutionSuccess(toolId: String, result: ToolExecutionResult) {
+    private func handleToolExecutionSuccess(toolId: String, result: ToolExecutionResponse) {
         isShowingToolExecution = false
         
         // Store execution in history

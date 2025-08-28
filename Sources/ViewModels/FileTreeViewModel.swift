@@ -343,12 +343,12 @@ public final class FileTreeViewModel: ObservableObject {
         var currentPath = ""
         
         // Add root
-        breadcrumbs.append(BreadcrumbItem(name: "Project", path: "/"))
+        breadcrumbs.append(BreadcrumbItem(title: "Project", path: "/", icon: "folder"))
         
         // Add path components
         for component in components {
             currentPath += "/" + component
-            breadcrumbs.append(BreadcrumbItem(name: component, path: currentPath))
+            breadcrumbs.append(BreadcrumbItem(title: component, path: currentPath, icon: "folder"))
         }
         
         self.breadcrumbs = breadcrumbs
@@ -412,8 +412,4 @@ public final class FileTreeViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-public struct BreadcrumbItem: Identifiable {
-    public let id = UUID()
-    public let name: String
-    public let path: String
-}
+// BreadcrumbItem is now imported from FileManagementModels

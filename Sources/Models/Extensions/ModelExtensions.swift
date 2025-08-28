@@ -15,447 +15,281 @@ extension ChatMessage {
     
     /// Get the text content from the message
     public var textContent: String {
-        switch content {
-        case .text(let text):
-            return text
-        case .array(let parts):
-            return parts.compactMap { part in
-                if case .text = part.type {
-                    return part.text
-                }
-                return nil
-            }.joined(separator: "\n")
-        case .none:
-            return ""
-        }
+        return content ?? ""
     }
     
     /// Check if message contains images
     public var hasImages: Bool {
-        guard case .array(let parts) = content else { return false }
-        return parts.contains { $0.type == .imageUrl }
+        // For now, messages don't support images directly
+        return false
     }
     
     /// Get role display color
     public var roleColor: Color {
-        switch role {
-        case .system:
+        switch role.lowercased() {
+        case "system":
             return Color.gray
-        case .user:
+        case "user":
             return Color(hue: 142/360, saturation: 0.7, brightness: 0.45)
-        case .assistant:
+        case "assistant":
             return Color(hue: 280/360, saturation: 0.7, brightness: 0.5)
-        case .tool, .function:
+        case "tool", "function":
             return Color.orange
+        default:
+            return Color.primary
         }
     }
     
-    /// Get role icon
-    public var roleIcon: String {
-        switch role {
-        case .system:
-            return "gear"
-        case .user:
-            return "person.circle.fill"
-        case .assistant:
-            return "cpu"
-        case .tool, .function:
-            return "wrench.and.screwdriver.fill"
+    /// Get role display name
+    public var roleDisplayName: String {
+        switch role.lowercased() {
+        case "system":
+            return "System"
+        case "user":
+            return "User"
+        case "assistant":
+            return "Assistant"
+        case "tool", "function":
+            return "Tool"
+        default:
+            return role.capitalized
         }
     }
 }
 
 // MARK: - Session Extensions
-extension SessionInfo {
-    /// Get a summary of the session
-    public var summary: String {
-        let messageCount = messages.count
-        let duration = updatedAt.timeIntervalSince(createdAt)
-        let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .abbreviated
-        formatter.maximumUnitCount = 2
-        let durationString = formatter.string(from: duration) ?? "0s"
-        
-        return "\(messageCount) messages • \(durationString)"
+extension ChatSession {
+    /// Get conversation statistics
+    public var stats: ConversationStats {
+        // Using placeholder values since ChatSession doesn't have messages array
+        ConversationStats(
+            messageCount: 0,
+            userMessages: 0,
+            assistantMessages: 0,
+            totalTokens: 0,
+            estimatedCost: 0.0
+        )
     }
     
-    /// Get the last message preview
-    public var lastMessagePreview: String? {
-        messages.last?.textContent
+    /// Get last message timestamp  
+    public var lastMessageTime: Date? {
+        return timestamp
     }
     
-    /// Calculate total tokens used
-    public var totalTokens: Int {
-        stats?.totalTokens ?? 0
-    }
-    
-    /// Get estimated cost
-    public var estimatedCost: String {
-        let cost = stats?.totalCost ?? 0
-        return String(format: "$%.4f", cost)
+    /// Check if session is favorite
+    public var isFavorite: Bool {
+        // This would need to be stored in metadata or a separate property
+        return tags.contains("favorite")
     }
 }
 
 // MARK: - Project Extensions
-extension ProjectInfo {
-    /// Get project status badge
-    public var statusBadge: (text: String, color: Color) {
-        if !isActive {
-            return ("Inactive", Color.gray)
-        } else if isFavorite {
-            return ("Favorite", Color.yellow)
-        } else {
-            return ("Active", Color.green)
+extension Project {
+    /// Check if project was accessed recently
+    public var isRecentlyActive: Bool {
+        // A project is active if accessed recently
+        guard let lastAccessed = lastAccessedAt else { return false }
+        let daysSinceAccess = Date().timeIntervalSince(lastAccessed) / 86400
+        return daysSinceAccess < 7
+    }
+    
+    /// Check if project is favorite
+    public var isFavorite: Bool {
+        // This would need to be stored in metadata
+        return false
+    }
+    
+    /// Get project statistics
+    public var statistics: ProjectStatistics? {
+        // Return basic statistics
+        return ProjectStatistics(
+            fileCount: 0, // Placeholder - actual file count would be calculated
+            totalSize: Int64(1000), // Placeholder
+            language: detectPrimaryLanguage(),
+            lastModified: lastAccessedAt ?? createdAt
+        )
+    }
+    
+    /// Detect primary language from path
+    private func detectPrimaryLanguage() -> String {
+        if path.contains("swift") || path.contains("ios") {
+            return "Swift"
+        } else if path.contains("node") || path.contains("js") {
+            return "JavaScript"
+        } else if path.contains("python") || path.contains("py") {
+            return "Python"
+        }
+        return "Unknown"
+    }
+}
+
+// MARK: - Tool Extensions
+extension Tool {
+    /// Tool category color
+    public var categoryColor: Color {
+        switch category {
+        case .fileSystem:
+            return Color.blue
+        case .shell:
+            return Color.green
+        case .git:
+            return Color.orange
+        case .search:
+            return Color.purple
+        case .network:
+            return Color.cyan
+        case .other:
+            return Color.gray
+        }
+    }
+    
+    /// Check if tool requires special permissions
+    public var requiresPermission: Bool {
+        // Some tools might need file system or network access
+        return requiredPermissions?.isEmpty == false
+    }
+    
+    /// Get required permissions
+    public var requiredPermissions: [String]? {
+        // This would be defined per tool
+        switch name {
+        case "File Explorer":
+            return ["file_system_read", "file_system_write"]
+        case "Terminal":
+            return ["process_execution"]
+        case "Git":
+            return ["file_system_write", "network"]
+        default:
+            return nil
+        }
+    }
+}
+
+// MARK: - Usage Extensions  
+extension UsageStats {
+    /// Get formatted cost string
+    public var formattedCost: String {
+        return String(format: "$%.2f", totalCost)
+    }
+    
+    /// Check if within budget
+    public func isWithinBudget(_ budget: Double) -> Bool {
+        return totalCost <= budget
+    }
+    
+    /// Get average cost per session
+    public var averageCostPerSession: Double {
+        guard sessionsCount > 0 else { return 0 }
+        return totalCost / Double(sessionsCount)
+    }
+}
+
+// MARK: - Supporting Types
+
+/// Conversation statistics
+public struct ConversationStats {
+    public let messageCount: Int
+    public let userMessages: Int
+    public let assistantMessages: Int
+    public let totalTokens: Int
+    public let estimatedCost: Double
+}
+
+/// Project statistics
+public struct ProjectStatistics {
+    public let fileCount: Int
+    public let totalSize: Int64
+    public let language: String
+    public let lastModified: Date
+}
+
+/// Model capability enum
+public enum ModelCapability: String {
+    case streaming
+    case functionCalling = "function_calling"
+    case vision
+    case codeGeneration = "code_generation"
+    case embeddings
+}
+
+// ModelPricing is now defined in ProjectModels.swift
+
+/// SSH Session Status (for SSH-related extensions)
+public enum SSHSessionStatus: String, CaseIterable {
+    case connected = "Connected"
+    case disconnected = "Disconnected"
+    case connecting = "Connecting"
+    case error = "Error"
+    
+    public var color: Color {
+        switch self {
+        case .connected:
+            return .green
+        case .disconnected:
+            return .gray
+        case .connecting:
+            return .orange
+        case .error:
+            return .red
+        }
+    }
+    
+    public var icon: String {
+        switch self {
+        case .connected:
+            return "checkmark.circle.fill"
+        case .disconnected:
+            return "xmark.circle"
+        case .connecting:
+            return "arrow.triangle.2.circlepath"
+        case .error:
+            return "exclamationmark.triangle.fill"
+        }
+    }
+}
+
+// MARK: - File Tree Extensions
+extension FileTreeNode {
+    /// Get file icon based on extension
+    public var fileIcon: String {
+        if isDirectory {
+            return "folder.fill"
+        }
+        
+        let ext = (name as NSString).pathExtension.lowercased()
+        switch ext {
+        case "swift":
+            return "swift"
+        case "js", "jsx", "ts", "tsx":
+            return "curlybraces"
+        case "html", "htm":
+            return "globe"
+        case "css", "scss", "sass":
+            return "paintbrush.fill"
+        case "json", "xml", "yaml", "yml":
+            return "doc.text"
+        case "md", "markdown":
+            return "doc.richtext"
+        case "png", "jpg", "jpeg", "gif", "svg":
+            return "photo"
+        case "mp4", "mov", "avi":
+            return "video.fill"
+        case "mp3", "wav", "aac":
+            return "music.note"
+        case "pdf":
+            return "doc.fill"
+        case "zip", "tar", "gz":
+            return "archivebox.fill"
+        default:
+            return "doc"
         }
     }
     
     /// Get formatted file size
     public var formattedSize: String? {
-        guard let size = metadata?.statistics?.size else { return nil }
-        return ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
-    }
-    
-    /// Get language icon
-    public var languageIcon: String {
-        switch metadata?.language?.lowercased() {
-        case "swift":
-            return "swift"
-        case "python":
-            return "🐍"
-        case "javascript", "typescript":
-            return "globe"
-        case "java":
-            return "cup.and.saucer"
-        case "c", "c++", "cpp":
-            return "c.circle"
-        case "go":
-            return "g.circle"
-        case "rust":
-            return "r.circle"
-        default:
-            return "doc.text"
-        }
-    }
-}
-
-// MARK: - Tool Extensions
-extension ToolInfo {
-    /// Get category icon
-    public var categoryIcon: String {
-        switch category?.lowercased() {
-        case "filesystem":
-            return "folder"
-        case "network":
-            return "network"
-        case "database":
-            return "cylinder"
-        case "computation":
-            return "function"
-        case "analysis":
-            return "chart.line.uptrend.xyaxis"
-        case "generation":
-            return "wand.and.stars"
-        case "monitoring":
-            return "chart.bar.xaxis"
-        default:
-            return "wrench"
-        }
-    }
-    
-    /// Get permission level
-    public var permissionLevel: String {
-        guard let permissions = requiredPermissions else { return "None" }
-        if permissions.isEmpty { return "None" }
-        if permissions.contains("admin") || permissions.contains("root") {
-            return "High"
-        } else if permissions.count > 3 {
-            return "Medium"
-        } else {
-            return "Low"
-        }
-    }
-}
-
-// MARK: - Model Extensions
-extension APIModel {
-    /// Get formatted context window
-    public var formattedContextWindow: String {
-        guard let window = capabilities?.contextWindow else { return "Unknown" }
-        if window >= 1_000_000 {
-            return "\(window / 1_000_000)M tokens"
-        } else if window >= 1_000 {
-            return "\(window / 1_000)K tokens"
-        } else {
-            return "\(window) tokens"
-        }
-    }
-    
-    /// Get formatted price per 1K tokens
-    public func formattedPrice(for type: PriceType) -> String? {
-        guard let pricing = pricing else { return nil }
-        
-        let price: Double?
-        switch type {
-        case .prompt:
-            price = pricing.promptTokenPrice
-        case .completion:
-            price = pricing.completionTokenPrice
-        }
-        
-        guard let p = price else { return nil }
-        return String(format: "$%.4f", p)
-    }
-    
-    public enum PriceType {
-        case prompt
-        case completion
-    }
-    
-    /// Check if model supports a specific feature
-    public func supports(_ feature: ModelFeature) -> Bool {
-        guard let capabilities = capabilities else { return false }
-        
-        switch feature {
-        case .functions:
-            return capabilities.supportsFunctions
-        case .vision:
-            return capabilities.supportsVision
-        case .streaming:
-            return capabilities.supportsStreaming
-        case .systemMessage:
-            return capabilities.supportsSystemMessage
-        case .toolUse:
-            return capabilities.supportsToolUse
-        }
-    }
-    
-    public enum ModelFeature {
-        case functions
-        case vision
-        case streaming
-        case systemMessage
-        case toolUse
-    }
-}
-
-// MARK: - Usage Extensions
-extension Usage {
-    /// Get formatted total cost
-    public func formattedCost(with pricing: ModelPricing?) -> String {
-        guard let pricing = pricing else { return "$0.0000" }
-        let cost = calculateCost(pricing: pricing)
-        return String(format: "$%.4f", cost)
-    }
-    
-    /// Get usage breakdown
-    public var breakdown: String {
-        var parts: [String] = []
-        parts.append("\(promptTokens) prompt")
-        parts.append("\(completionTokens) completion")
-        if let cached = cachedTokens, cached > 0 {
-            parts.append("\(cached) cached")
-        }
-        return parts.joined(separator: " • ")
-    }
-}
-
-// MARK: - Error Extensions
-extension APIErrorCode {
-    /// Get user-friendly error message
-    public var userMessage: String {
-        switch self {
-        case .invalidRequest:
-            return "The request was invalid. Please check your input."
-        case .authentication:
-            return "Authentication failed. Please check your API key."
-        case .permissionDenied:
-            return "You don't have permission to perform this action."
-        case .notFound:
-            return "The requested resource was not found."
-        case .rateLimitExceeded:
-            return "Rate limit exceeded. Please try again later."
-        case .serverError:
-            return "A server error occurred. Please try again."
-        case .serviceUnavailable:
-            return "The service is temporarily unavailable."
-        case .timeout:
-            return "The request timed out. Please try again."
-        case .conflict:
-            return "A conflict occurred. The resource may have been modified."
-        case .payloadTooLarge:
-            return "The request is too large. Please reduce the size."
-        case .unprocessableEntity:
-            return "The request could not be processed."
-        case .quotaExceeded:
-            return "Your quota has been exceeded."
-        case .invalidApiKey:
-            return "The API key is invalid or expired."
-        case .modelNotFound:
-            return "The specified model was not found."
-        case .contextLengthExceeded:
-            return "The context length exceeds the model's limit."
-        case .contentFilter:
-            return "The content was filtered due to policy violations."
-        case .invalidToolUse:
-            return "Invalid tool usage detected."
-        }
-    }
-    
-    /// Get error severity
-    public var severity: ErrorSeverity {
-        switch self {
-        case .authentication, .invalidApiKey, .permissionDenied:
-            return .critical
-        case .serverError, .serviceUnavailable:
-            return .high
-        case .rateLimitExceeded, .quotaExceeded, .timeout:
-            return .medium
-        case .invalidRequest, .notFound, .conflict:
-            return .low
-        default:
-            return .medium
-        }
-    }
-    
-    public enum ErrorSeverity {
-        case low
-        case medium
-        case high
-        case critical
-    }
-}
-
-// MARK: - SSH Extensions
-extension SSHSessionStatus {
-    /// Get status color
-    public var statusColor: Color {
-        switch self {
-        case .connected, .authenticated:
-            return .green
-        case .connecting:
-            return .orange
-        case .disconnecting:
-            return .yellow
-        case .disconnected:
-            return .gray
-        case .error:
-            return .red
-        case .idle:
-            return .blue
-        }
-    }
-    
-    /// Get status icon
-    public var statusIcon: String {
-        switch self {
-        case .connected, .authenticated:
-            return "checkmark.circle.fill"
-        case .connecting:
-            return "arrow.triangle.2.circlepath"
-        case .disconnecting:
-            return "xmark.circle"
-        case .disconnected:
-            return "circle"
-        case .error:
-            return "exclamationmark.triangle.fill"
-        case .idle:
-            return "moon.zzz"
-        }
-    }
-}
-
-// MARK: - Process Extensions
-extension ProcessState {
-    /// Get state display name
-    public var displayName: String {
-        switch self {
-        case .running:
-            return "Running"
-        case .sleeping:
-            return "Sleeping"
-        case .stopped:
-            return "Stopped"
-        case .zombie:
-            return "Zombie"
-        case .idle:
-            return "Idle"
-        case .unknown:
-            return "Unknown"
-        }
-    }
-    
-    /// Get state color
-    public var stateColor: Color {
-        switch self {
-        case .running:
-            return .green
-        case .sleeping:
-            return .blue
-        case .stopped:
-            return .orange
-        case .zombie:
-            return .red
-        case .idle:
-            return .gray
-        case .unknown:
-            return .gray
-        }
-    }
-}
-
-// MARK: - Trace Extensions
-extension TraceLevel {
-    /// Get level color
-    public var levelColor: Color {
-        switch self {
-        case .verbose:
-            return .gray
-        case .debug:
-            return .blue
-        case .info:
-            return .green
-        case .warning:
-            return .orange
-        case .error:
-            return .red
-        case .critical:
-            return .purple
-        }
-    }
-    
-    /// Get level icon
-    public var levelIcon: String {
-        switch self {
-        case .verbose:
-            return "text.alignleft"
-        case .debug:
-            return "ant.circle"
-        case .info:
-            return "info.circle"
-        case .warning:
-            return "exclamationmark.triangle"
-        case .error:
-            return "xmark.octagon"
-        case .critical:
-            return "flame"
-        }
-    }
-}
-
-// MARK: - Date Extensions
-extension Date {
-    /// Format as relative time
-    public var relativeTime: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: self, relativeTo: Date())
-    }
-    
-    /// Format as short date/time
-    public var shortDateTime: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        return formatter.string(from: self)
+        guard let size = size else { return nil }
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: size)
     }
 }

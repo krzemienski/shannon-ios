@@ -323,7 +323,7 @@ public final class PerformanceMonitor: @unchecked Sendable {
 // MARK: - Supporting Types
 
 /// Performance tracker for individual operations
-public class PerformanceTracker {
+public class PerformanceTracker: ObservableObject {
     public let id: UUID
     public let operation: String
     public let startTime: Date

@@ -5,7 +5,7 @@ import SwiftUI
 public struct ThemeShadows {
     
     /// Shadow configuration
-    public struct Shadow {
+    public struct Shadow: Sendable {
         let color: HSLColor
         let radius: CGFloat
         let x: CGFloat
@@ -76,42 +76,43 @@ public struct ThemeShadows {
     
     // MARK: - Component Specific Shadows
     
+    @MainActor
     public struct Component {
         /// Card shadow
-        public static let card = md
+        public static var card: Shadow { md }
         
         /// Button shadow (elevated)
-        public static let button = sm
+        public static var button: Shadow { sm }
         
         /// Button shadow (pressed)
-        public static let buttonPressed = xs
+        public static var buttonPressed: Shadow { xs }
         
         /// Floating action button
-        public static let fab = lg
+        public static var fab: Shadow { lg }
         
         /// Dialog/Modal shadow
-        public static let dialog = xxl
+        public static var dialog: Shadow { xxl }
         
         /// Dropdown menu shadow
-        public static let dropdown = lg
+        public static var dropdown: Shadow { lg }
         
         /// Tooltip shadow
-        public static let tooltip = sm
+        public static var tooltip: Shadow { sm }
         
         /// Navigation bar shadow
-        public static let navbar = xs
+        public static var navbar: Shadow { xs }
         
         /// Sidebar shadow
-        public static let sidebar = md
+        public static var sidebar: Shadow { md }
         
         /// Popover shadow
-        public static let popover = xl
+        public static var popover: Shadow { xl }
     }
     
     // MARK: - Inset Shadows
     
     /// Inner shadow for pressed/inset states
-    public struct Inset {
+    public struct Inset: Sendable {
         public static let sm = Shadow(
             color: HSLColor(hue: 0, saturation: 0, lightness: 0, alpha: 0.06),
             radius: 2,

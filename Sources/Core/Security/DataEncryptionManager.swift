@@ -487,8 +487,4 @@ extension AES.GCM.Nonce {
     }
 }
 
-extension AES.GCM.Tag {
-    var data: Data {
-        return self.withUnsafeBytes { Data($0) }
-    }
-}
+// AES.GCM.Tag extension removed - type doesn't exist in CryptoKit

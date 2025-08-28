@@ -184,7 +184,7 @@ public struct ResourceLimits: Codable, Equatable {
 
 // MARK: - Task 183: MCPTool Detailed Model
 /// Detailed MCP tool information
-public struct MCPTool: Codable, Identifiable, Equatable {
+public struct MCPTool: Codable, Identifiable, Equatable, Sendable {
     public let id: String
     public let serverId: String
     public let name: String
@@ -219,11 +219,11 @@ public struct MCPTool: Codable, Identifiable, Equatable {
 }
 
 /// Tool example for documentation
-public struct ToolExample: Codable, Equatable {
+public struct ToolExample: Codable, Equatable, Sendable {
     public let name: String?
     public let description: String?
-    public let input: [String: Any]?
-    public let output: [String: Any]?
+    public let input: [String: AnyCodable]?
+    public let output: [String: AnyCodable]?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -237,17 +237,8 @@ public struct ToolExample: Codable, Equatable {
         name = try container.decodeIfPresent(String.self, forKey: .name)
         description = try container.decodeIfPresent(String.self, forKey: .description)
         
-        if let inputDict = try container.decodeIfPresent([String: AnyCodable].self, forKey: .input) {
-            input = inputDict.mapValues { $0.value }
-        } else {
-            input = nil
-        }
-        
-        if let outputDict = try container.decodeIfPresent([String: AnyCodable].self, forKey: .output) {
-            output = outputDict.mapValues { $0.value }
-        } else {
-            output = nil
-        }
+        input = try container.decodeIfPresent([String: AnyCodable].self, forKey: .input)
+        output = try container.decodeIfPresent([String: AnyCodable].self, forKey: .output)
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -255,15 +246,8 @@ public struct ToolExample: Codable, Equatable {
         try container.encodeIfPresent(name, forKey: .name)
         try container.encodeIfPresent(description, forKey: .description)
         
-        if let input = input {
-            let inputDict = input.mapValues { AnyCodable($0) }
-            try container.encode(inputDict, forKey: .input)
-        }
-        
-        if let output = output {
-            let outputDict = output.mapValues { AnyCodable($0) }
-            try container.encode(outputDict, forKey: .output)
-        }
+        try container.encodeIfPresent(input, forKey: .input)
+        try container.encodeIfPresent(output, forKey: .output)
     }
     
     public static func == (lhs: ToolExample, rhs: ToolExample) -> Bool {
@@ -274,7 +258,7 @@ public struct ToolExample: Codable, Equatable {
 }
 
 /// Tool category
-public enum ToolCategory: String, Codable {
+public enum ToolCategory: String, Codable, Sendable {
     case filesystem
     case network
     case database
@@ -291,13 +275,13 @@ public enum ToolCategory: String, Codable {
 }
 
 /// JSON Schema for tool input/output
-public struct JSONSchema: Codable {
+public struct JSONSchema: Codable, Sendable {
     public let type: String
     public let properties: [String: PropertyDefinition]?
     public let required: [String]?
     public let additionalProperties: Bool?
     public let description: String?
-    public let examples: [Any]?
+    // Note: examples field removed as [Any] cannot be Sendable
     
     enum CodingKeys: String, CodingKey {
         case type
@@ -305,7 +289,6 @@ public struct JSONSchema: Codable {
         case required
         case additionalProperties = "additional_properties"
         case description
-        case examples
     }
     
     public init(from decoder: Decoder) throws {
@@ -315,12 +298,6 @@ public struct JSONSchema: Codable {
         required = try container.decodeIfPresent([String].self, forKey: .required)
         additionalProperties = try container.decodeIfPresent(Bool.self, forKey: .additionalProperties)
         description = try container.decodeIfPresent(String.self, forKey: .description)
-        
-        if let examplesArray = try container.decodeIfPresent([AnyCodable].self, forKey: .examples) {
-            examples = examplesArray.map { $0.value }
-        } else {
-            examples = nil
-        }
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -330,11 +307,20 @@ public struct JSONSchema: Codable {
         try container.encodeIfPresent(required, forKey: .required)
         try container.encodeIfPresent(additionalProperties, forKey: .additionalProperties)
         try container.encodeIfPresent(description, forKey: .description)
-        
-        if let examples = examples {
-            let examplesArray = examples.map { AnyCodable($0) }
-            try container.encode(examplesArray, forKey: .examples)
-        }
+    }
+    
+    public init(
+        type: String,
+        properties: [String: PropertyDefinition]? = nil,
+        required: [String]? = nil,
+        additionalProperties: Bool? = nil,
+        description: String? = nil
+    ) {
+        self.type = type
+        self.properties = properties
+        self.required = required
+        self.additionalProperties = additionalProperties
+        self.description = description
     }
 }
 
@@ -350,14 +336,14 @@ extension JSONSchema: Equatable {
 }
 
 /// Property definition in JSON schema
-public indirect enum PropertyDefinitionItems: Codable, Equatable {
+public indirect enum PropertyDefinitionItems: Codable, Equatable, Sendable {
     case definition(PropertyDefinition)
 }
 
-public struct PropertyDefinition: Codable {
+public struct PropertyDefinition: Codable, Sendable {
     public let type: String
     public let description: String?
-    public let defaultValue: Any?
+    public let defaultValue: AnyCodable?
     public let enumValues: [String]?
     public let minimum: Double?
     public let maximum: Double?
@@ -392,11 +378,7 @@ public struct PropertyDefinition: Codable {
             items = nil
         }
         
-        if let defaultCodable = try container.decodeIfPresent(AnyCodable.self, forKey: .defaultValue) {
-            defaultValue = defaultCodable.value
-        } else {
-            defaultValue = nil
-        }
+        defaultValue = try container.decodeIfPresent(AnyCodable.self, forKey: .defaultValue)
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -412,9 +394,7 @@ public struct PropertyDefinition: Codable {
             try container.encode(itemsDef, forKey: .items)
         }
         
-        if let defaultValue = defaultValue {
-            try container.encode(AnyCodable(defaultValue), forKey: .defaultValue)
-        }
+        try container.encodeIfPresent(defaultValue, forKey: .defaultValue)
     }
 }
 
@@ -433,7 +413,7 @@ extension PropertyDefinition: Equatable {
 }
 
 /// Tool permissions
-public struct ToolPermissions: Codable, Equatable {
+public struct ToolPermissions: Codable, Equatable, Sendable {
     public let filesystem: FilesystemPermissions?
     public let network: NetworkPermissions?
     public let process: ProcessPermissions?
@@ -441,7 +421,7 @@ public struct ToolPermissions: Codable, Equatable {
 }
 
 /// Filesystem permissions
-public struct FilesystemPermissions: Codable, Equatable {
+public struct FilesystemPermissions: Codable, Equatable, Sendable {
     public let read: Bool
     public let write: Bool
     public let delete: Bool
@@ -458,7 +438,7 @@ public struct FilesystemPermissions: Codable, Equatable {
 }
 
 /// Network permissions
-public struct NetworkPermissions: Codable, Equatable {
+public struct NetworkPermissions: Codable, Equatable, Sendable {
     public let allowedHosts: [String]?
     public let allowedPorts: [Int]?
     public let allowedProtocols: [String]?
@@ -471,14 +451,14 @@ public struct NetworkPermissions: Codable, Equatable {
 }
 
 /// Process permissions
-public struct ProcessPermissions: Codable, Equatable {
+public struct ProcessPermissions: Codable, Equatable, Sendable {
     public let spawn: Bool
     public let kill: Bool
     public let signal: Bool
 }
 
 /// Rate limit configuration
-public struct RateLimit: Codable, Equatable {
+public struct RateLimit: Codable, Equatable, Sendable {
     public let requestsPerMinute: Int?
     public let requestsPerHour: Int?
     public let requestsPerDay: Int?
@@ -493,7 +473,7 @@ public struct RateLimit: Codable, Equatable {
 }
 
 /// Tool metadata
-public struct ToolMetadata: Codable, Equatable {
+public struct ToolMetadata: Codable, Equatable, Sendable {
     public let author: String?
     public let license: String?
     public let homepage: String?

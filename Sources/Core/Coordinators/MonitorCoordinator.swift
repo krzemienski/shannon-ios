@@ -18,7 +18,7 @@ final class MonitorCoordinator: BaseCoordinator, ObservableObject {
     @Published var selectedMonitorType: MonitorType = .system
     @Published var isShowingExport = false
     @Published var isShowingSettings = false
-    @Published var timeRange: TimeRange = .lastHour
+    @Published var timeRange: TimeRange = .oneHour
     
     // MARK: - Dependencies
     
@@ -184,7 +184,7 @@ final class MonitorCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Alerts
     
-    func configureAlert(for metric: MetricType, threshold: Double, condition: AlertCondition) {
+    func configureAlert(for metric: MonitorMetricType, threshold: Double, condition: AlertCondition) {
         Task {
             await dependencyContainer.monitorStore.configureAlert(
                 metric: metric,
@@ -194,7 +194,7 @@ final class MonitorCoordinator: BaseCoordinator, ObservableObject {
         }
     }
     
-    func removeAlert(for metric: MetricType) {
+    func removeAlert(for metric: MonitorMetricType) {
         Task {
             await dependencyContainer.monitorStore.removeAlert(for: metric)
         }
@@ -232,7 +232,7 @@ enum MonitorRoute: Hashable {
     case detail(MonitorType)
     case settings
     case export
-    case alertConfig(MetricType)
+    case alertConfig(AlertMetricType)
 }
 
 // MARK: - Supporting Types
@@ -257,44 +257,7 @@ enum MonitorType: String, CaseIterable, Identifiable {
     }
 }
 
-enum TimeRange: String, CaseIterable, Identifiable {
-    case lastMinute = "1m"
-    case lastFiveMinutes = "5m"
-    case lastFifteenMinutes = "15m"
-    case lastHour = "1h"
-    case lastSixHours = "6h"
-    case lastDay = "24h"
-    case lastWeek = "7d"
-    case lastMonth = "30d"
-    
-    var id: String { rawValue }
-    
-    var displayName: String {
-        switch self {
-        case .lastMinute: return "Last Minute"
-        case .lastFiveMinutes: return "Last 5 Minutes"
-        case .lastFifteenMinutes: return "Last 15 Minutes"
-        case .lastHour: return "Last Hour"
-        case .lastSixHours: return "Last 6 Hours"
-        case .lastDay: return "Last Day"
-        case .lastWeek: return "Last Week"
-        case .lastMonth: return "Last Month"
-        }
-    }
-    
-    var seconds: TimeInterval {
-        switch self {
-        case .lastMinute: return 60
-        case .lastFiveMinutes: return 300
-        case .lastFifteenMinutes: return 900
-        case .lastHour: return 3600
-        case .lastSixHours: return 21600
-        case .lastDay: return 86400
-        case .lastWeek: return 604800
-        case .lastMonth: return 2592000
-        }
-    }
-}
+// TimeRange is defined in NetworkModels.swift and is used here
 
 enum MonitorExportFormat: String, CaseIterable {
     case json = "JSON"
@@ -306,14 +269,7 @@ enum MonitorExportFormat: String, CaseIterable {
     }
 }
 
-enum MetricType: String, CaseIterable {
-    case cpuUsage = "CPU Usage"
-    case memoryUsage = "Memory Usage"
-    case diskUsage = "Disk Usage"
-    case networkBandwidth = "Network Bandwidth"
-    case responseTime = "Response Time"
-    case errorRate = "Error Rate"
-}
+// Note: MonitorMetricType is now defined in Models/ViewModels.swift
 
 enum AlertCondition: String, CaseIterable {
     case above = "Above"
@@ -321,11 +277,4 @@ enum AlertCondition: String, CaseIterable {
     case equals = "Equals"
 }
 
-struct MetricAlert: Identifiable {
-    let id = UUID()
-    let metric: MetricType
-    let threshold: Double
-    let condition: AlertCondition
-    let triggered: Bool
-    let timestamp: Date
-}
+// MetricAlert is defined in ViewModels/MonitorViewModel.swift

@@ -168,6 +168,20 @@ public enum ExportFormat: String, Codable, CaseIterable {
     }
 }
 
+// MARK: - Metric Data Point
+/// Data point for metrics visualization
+public struct MetricDataPoint: Codable, Equatable {
+    public let timestamp: Date
+    public let value: Double
+    public let label: String?
+    
+    public init(timestamp: Date, value: Double, label: String? = nil) {
+        self.timestamp = timestamp
+        self.value = value
+        self.label = label
+    }
+}
+
 // MARK: - Task 191: FilterCriteria Model
 /// Filter criteria for queries
 public struct FilterCriteria: Codable, Equatable {
@@ -500,6 +514,15 @@ public struct AdvancedPreferences: Codable, Equatable {
 }
 
 // MARK: - Task 196: Notification Models
+
+// Notification Priority enum
+public enum NotificationPriority: String, Codable, Equatable {
+    case low = "low"
+    case normal = "normal"
+    case high = "high"
+    case urgent = "urgent"
+}
+
 /// Notification model
 public struct AppNotification: Codable, Identifiable, Equatable {
     public let id: String

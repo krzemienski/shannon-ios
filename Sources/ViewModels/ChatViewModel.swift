@@ -44,7 +44,7 @@ final class ChatViewModel: ObservableObject {
     private let apiClient: APIClient
     private let appState: AppState
     private var sseClient: SSEClient?
-    private var streamingService: StreamingChatService?
+    // private var streamingService: StreamingChatService? // TODO: Implement StreamingChatService
     private var cancellables = Set<AnyCancellable>()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "ChatViewModel")
     private let conversationId: String?
@@ -480,7 +480,7 @@ final class ChatViewModel: ObservableObject {
     
     // MARK: - Error Handling
     
-    private func handleAPIError(_ apiError: APIConfig.APIError) {
+    private func handleAPIError(_ apiError: APIError) {
         let errorMessage: String
         
         switch apiError {

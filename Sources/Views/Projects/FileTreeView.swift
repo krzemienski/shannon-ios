@@ -483,7 +483,7 @@ extension View {
     }
 }
 
-struct TooltipView: View {
+struct FileTreeTooltipView: View {
     let text: String
     
     var body: some View {

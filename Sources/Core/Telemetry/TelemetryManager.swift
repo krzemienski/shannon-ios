@@ -5,9 +5,11 @@
 import Foundation
 import OSLog
 import Logging
+import Combine
 
 /// Central telemetry manager that coordinates all telemetry operations
-public final class TelemetryManager: @unchecked Sendable {
+@MainActor
+public final class TelemetryManager: ObservableObject, @unchecked Sendable {
     
     // MARK: - Properties
     

@@ -8,6 +8,7 @@
 import Foundation
 
 /// A type-erased codable value
+@preconcurrency
 public struct AnyCodable: Codable {
     public let value: Any
     

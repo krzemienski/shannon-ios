@@ -126,7 +126,7 @@ enum CardVariant {
 
 // MARK: - Interactive Card
 
-struct InteractiveCard<Content: View>: View {
+struct LegacyInteractiveCard<Content: View>: View {
     let content: Content
     let action: () -> Void
     @State private var isPressed = false
@@ -249,7 +249,7 @@ enum StatusType {
 
 // MARK: - Metric Card
 
-struct MetricCard: View {
+struct LegacyMetricCard: View {
     let title: String
     let value: String
     let change: Double?

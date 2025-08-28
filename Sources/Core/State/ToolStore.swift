@@ -259,6 +259,21 @@ final class ToolStore: ObservableObject {
             data: nil
         )
     }
+    
+    // MARK: - Missing Methods
+    
+    func clearAll() {
+        availableTools.removeAll()
+        recentTools.removeAll()
+        favoriteTools.removeAll()
+        toolExecutions.removeAll()
+    }
+    
+    func clearCache() {
+        // Clear any cached tool data
+        recentTools.removeAll()
+        toolExecutions.removeAll()
+    }
 }
 
 // MARK: - Models

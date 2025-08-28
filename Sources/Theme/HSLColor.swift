@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// HSL color representation for the theme system
-public struct HSLColor: Equatable, Hashable, Codable {
+public struct HSLColor: Equatable, Hashable, Codable, Sendable {
     /// Hue component (0-360 degrees)
     public let hue: Double
     /// Saturation component (0-100%)

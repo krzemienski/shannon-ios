@@ -57,28 +57,28 @@ struct SSHMonitoringSection: View {
                 StatCard(
                     title: "Active Connections",
                     value: "\(sshMonitor.globalStats.activeConnections)",
-                    trend: nil,
+                    icon: "network",
                     color: .green
                 )
                 
                 StatCard(
                     title: "Total Connections",
                     value: "\(sshMonitor.globalStats.totalConnections)",
-                    trend: "+\(sshMonitor.globalStats.reconnectCount) reconnects",
+                    icon: "link",
                     color: .blue
                 )
                 
                 StatCard(
                     title: "Commands Executed",
                     value: "\(sshMonitor.globalStats.totalCommands)",
-                    trend: String(format: "%.1f%% success", sshMonitor.globalStats.successRate * 100),
+                    icon: "terminal",
                     color: sshMonitor.globalStats.successRate > 0.95 ? .green : .orange
                 )
                 
                 StatCard(
                     title: "Data Transferred",
                     value: formatBytes(sshMonitor.globalStats.totalBytesTransferred),
-                    trend: nil,
+                    icon: "arrow.up.arrow.down",
                     color: .purple
                 )
             }
@@ -255,7 +255,7 @@ struct SSHMonitoringSection: View {
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        ForEach(sshMonitor.recentOperations.suffix(10), id: \.startTime) { operation in
+                        ForEach(Array(sshMonitor.recentOperations.suffix(10)), id: \.id) { operation in
                             OperationCard(operation: operation)
                         }
                     }
@@ -267,7 +267,7 @@ struct SSHMonitoringSection: View {
         .cornerRadius(12)
         .sheet(isPresented: $showingExportSheet) {
             if let data = exportedData {
-                ShareSheet(items: [data])
+                SSHShareSheet(activityItems: [data])
             }
         }
     }
@@ -300,7 +300,18 @@ struct SSHMonitoringSection: View {
     
     private func exportOperations() {
         do {
-            exportedData = try sshMonitor.exportToJSON()
+            let exportData = SSHExportData(
+                exportDate: Date(),
+                globalStats: sshMonitor.globalStats,
+                performanceMetrics: sshMonitor.performanceMetrics,
+                recentOperations: sshMonitor.recentOperations,
+                connectionStats: Array(sshMonitor.connectionStats.values)
+            )
+            
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            encoder.dateEncodingStrategy = .iso8601
+            exportedData = try encoder.encode(exportData)
             showingExportSheet = true
         } catch {
             // Handle error
@@ -316,7 +327,7 @@ struct SSHMonitoringSection: View {
 
 // MARK: - Component Views
 
-struct StatCard: View {
+struct SSHStatCard: View {
     let title: String
     let value: String
     let trend: String?
@@ -372,11 +383,12 @@ struct ActiveOperationRow: View {
                 )
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(operation.operationType.rawValue.capitalized)
+                Text(operation.command)
                     .font(.caption)
                     .fontWeight(.medium)
+                    .lineLimit(1)
                 
-                Text("\(operation.host):\(operation.port)")
+                Text(operation.host)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -406,9 +418,9 @@ struct HostStatsRow: View {
                         .fontWeight(.medium)
                     
                     HStack(spacing: 8) {
-                        Label("\(stats.activeConnections)", systemImage: "circle.fill")
+                        Label(stats.isActive ? "Active" : "Idle", systemImage: "circle.fill")
                             .font(.caption2)
-                            .foregroundColor(.green)
+                            .foregroundColor(stats.isActive ? .green : .gray)
                         
                         Label("\(stats.totalCommands)", systemImage: "terminal")
                             .font(.caption2)
@@ -436,7 +448,7 @@ struct HostDetailsView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 16) {
                 DetailItem(label: "Total Connections", value: "\(stats.totalConnections)")
-                DetailItem(label: "Failed", value: "\(stats.failedConnections)")
+                DetailItem(label: "Success Rate", value: String(format: "%.1f%%", stats.successRate * 100))
             }
             
             HStack(spacing: 16) {
@@ -446,7 +458,7 @@ struct HostDetailsView: View {
             
             HStack(spacing: 16) {
                 DetailItem(label: "Avg Connection Time", value: String(format: "%.2fs", stats.averageConnectionTime))
-                DetailItem(label: "Avg Command Time", value: String(format: "%.2fs", stats.averageCommandTime))
+                DetailItem(label: "Avg Latency", value: String(format: "%.2fs", stats.averageLatency))
             }
             
             if stats.totalBytesTransferred > 0 {
@@ -454,7 +466,7 @@ struct HostDetailsView: View {
             }
             
             if let lastConnection = stats.lastConnectionTime {
-                DetailItem(label: "Last Connection", value: RelativeDateFormatter.shared.string(from: lastConnection))
+                DetailItem(label: "Last Connection", value: RelativeDateTimeFormatter.shared.string(for: lastConnection)!)
             }
         }
         .padding()
@@ -515,7 +527,7 @@ struct PerformanceMetricView: View {
 }
 
 struct OperationCard: View {
-    let operation: SSHOperationMetrics
+    let operation: SSHOperation
     
     private var statusColor: Color {
         operation.success ? .green : .red
@@ -528,9 +540,10 @@ struct OperationCard: View {
                     .fill(statusColor)
                     .frame(width: 6, height: 6)
                 
-                Text(operation.operationType.rawValue.capitalized)
+                Text(operation.command)
                     .font(.caption2)
                     .fontWeight(.medium)
+                    .lineLimit(1)
             }
             
             Text(operation.host)
@@ -538,11 +551,9 @@ struct OperationCard: View {
                 .foregroundColor(.secondary)
                 .lineLimit(1)
             
-            if let duration = operation.duration {
-                Text(String(format: "%.2fs", duration))
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
+            Text(String(format: "%.2fs", operation.duration))
+                .font(.caption2)
+                .foregroundColor(.secondary)
         }
         .padding(8)
         .frame(width: 100)
@@ -555,7 +566,7 @@ struct AlertRow: View {
     let alert: SSHAlert
     
     private var alertColor: Color {
-        switch alert.level {
+        switch alert.severity {
         case .info: return .blue
         case .warning: return .orange
         case .error: return .red
@@ -565,7 +576,7 @@ struct AlertRow: View {
     
     var body: some View {
         HStack {
-            Image(systemName: iconForLevel(alert.level))
+            Image(systemName: iconForLevel(alert.severity))
                 .font(.caption)
                 .foregroundColor(alertColor)
             
@@ -574,7 +585,7 @@ struct AlertRow: View {
                     .font(.caption)
                     .foregroundColor(.primary)
                 
-                Text(RelativeDateFormatter.shared.string(from: alert.timestamp))
+                Text(RelativeDateTimeFormatter.shared.string(for: alert.timestamp)!)
                     .font(.caption2)
                     .foregroundColor(.secondary)
             }
@@ -584,7 +595,7 @@ struct AlertRow: View {
         .padding(.vertical, 4)
     }
     
-    private func iconForLevel(_ level: SSHAlertLevel) -> String {
+    private func iconForLevel(_ level: SSHAlert.AlertSeverity) -> String {
         switch level {
         case .info: return "info.circle"
         case .warning: return "exclamationmark.triangle"
@@ -596,11 +607,11 @@ struct AlertRow: View {
 
 // MARK: - Share Sheet
 
-struct ShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
+struct SSHShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
     
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
     }
     
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
@@ -608,12 +619,22 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 // MARK: - Date Formatter
 
-extension RelativeDateFormatter {
-    static let shared: RelativeDateFormatter = {
-        let formatter = RelativeDateFormatter()
+extension RelativeDateTimeFormatter {
+    nonisolated(unsafe) static let shared: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter
     }()
+}
+
+// MARK: - Export Data
+
+struct SSHExportData: Codable {
+    let exportDate: Date
+    let globalStats: SSHGlobalStats
+    let performanceMetrics: SSHPerformanceMetrics
+    let recentOperations: [SSHOperation]
+    let connectionStats: [SSHConnectionStats]
 }
 
 // MARK: - Previews

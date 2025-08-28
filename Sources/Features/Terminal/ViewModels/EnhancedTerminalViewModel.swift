@@ -18,7 +18,7 @@ public class EnhancedTerminalViewModel: ObservableObject {
     @Published public var secondarySession: SSHSession?
     @Published public var commandHistory: [String] = []
     @Published public var isRecording = false
-    @Published public var settings = TerminalSettings()
+    @Published public var settings = EnhancedTerminalSettings()
     @Published public var connectionStatusText = "Disconnected"
     @Published public var connectionStatusColor: Color = .gray
     
@@ -224,20 +224,33 @@ public class EnhancedTerminalViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-/// Terminal settings
-public struct TerminalSettings {
+/// Cursor style for enhanced terminal
+public enum CursorStyle: String, Codable, CaseIterable {
+    case block = "block"
+    case underline = "underline"
+    case bar = "bar"
+}
+
+/// Terminal settings for enhanced terminal
+public struct EnhancedTerminalSettings {
     public var fontSize: CGFloat = 14
     public var fontFamily = "SF Mono"
     public var colorScheme = "cyberpunk"
     public var cursorStyle = CursorStyle.block
     public var bellSound = true
     public var scrollbackLines = 10000
+    
+    public init() {}
 }
 
 /// Recording session
-private struct RecordingSession {
-    let startTime: Date
-    var events: [TerminalEvent] = []
+public struct RecordingSession {
+    public let startTime: Date
+    public var events: [TerminalEvent] = []
+    
+    public init(startTime: Date = Date()) {
+        self.startTime = startTime
+    }
     
     var duration: TimeInterval {
         Date().timeIntervalSince(startTime)
@@ -245,7 +258,7 @@ private struct RecordingSession {
 }
 
 /// Terminal event for recording
-private struct TerminalEvent {
+public struct TerminalEvent {
     let timestamp: TimeInterval
     let type: EventType
     let data: Data

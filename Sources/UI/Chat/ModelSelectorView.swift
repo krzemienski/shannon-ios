@@ -27,32 +27,32 @@ struct ModelSelectorView: View {
             name: "Claude 3 Opus",
             provider: "Anthropic",
             contextWindow: 200000,
-            capabilities: [.reasoning, .coding, .analysis, .creative],
-            tier: .premium
+            capabilities: [ModelFeature.reasoning, .coding, .analysis, .creative],
+            tier: ModelTier.premium
         ),
         ModelInfo(
             id: "claude-3-sonnet-20240229",
             name: "Claude 3 Sonnet",
             provider: "Anthropic",
             contextWindow: 200000,
-            capabilities: [.reasoning, .coding, .analysis],
-            tier: .standard
+            capabilities: [ModelFeature.reasoning, .coding, .analysis],
+            tier: ModelTier.standard
         ),
         ModelInfo(
             id: "claude-3-haiku-20240307",
             name: "Claude 3 Haiku",
             provider: "Anthropic",
             contextWindow: 200000,
-            capabilities: [.coding, .analysis],
-            tier: .fast
+            capabilities: [ModelFeature.coding, .analysis],
+            tier: ModelTier.fast
         ),
         ModelInfo(
             id: "claude-2.1",
             name: "Claude 2.1",
             provider: "Anthropic",
             contextWindow: 200000,
-            capabilities: [.reasoning, .coding],
-            tier: .legacy
+            capabilities: [ModelFeature.reasoning, .coding],
+            tier: ModelTier.legacy
         ),
         
         // OpenAI models
@@ -61,24 +61,24 @@ struct ModelSelectorView: View {
             name: "GPT-4 Turbo",
             provider: "OpenAI",
             contextWindow: 128000,
-            capabilities: [.reasoning, .coding, .vision],
-            tier: .premium
+            capabilities: [ModelFeature.reasoning, .coding, .vision],
+            tier: ModelTier.premium
         ),
         ModelInfo(
             id: "gpt-4",
             name: "GPT-4",
             provider: "OpenAI",
             contextWindow: 8192,
-            capabilities: [.reasoning, .coding],
-            tier: .standard
+            capabilities: [ModelFeature.reasoning, .coding],
+            tier: ModelTier.standard
         ),
         ModelInfo(
             id: "gpt-3.5-turbo",
             name: "GPT-3.5 Turbo",
             provider: "OpenAI",
             contextWindow: 16385,
-            capabilities: [.coding],
-            tier: .fast
+            capabilities: [ModelFeature.coding],
+            tier: ModelTier.fast
         )
     ]
     
@@ -382,11 +382,11 @@ struct ModelInfo: Identifiable {
     let name: String
     let provider: String
     let contextWindow: Int
-    let capabilities: [ModelCapability]
+    let capabilities: [ModelFeature]
     let tier: ModelTier
 }
 
-enum ModelCapability: String {
+enum ModelFeature: String {
     case reasoning = "Reasoning"
     case coding = "Coding"
     case analysis = "Analysis"

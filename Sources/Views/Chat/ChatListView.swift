@@ -187,20 +187,7 @@ struct ChatSession: Identifiable {
         self.tags = tags
     }
     
-    // Initializer with explicit id for backend integration
-    init(id: String,
-         title: String,
-         lastMessage: String,
-         timestamp: Date,
-         icon: String,
-         tags: [String]) {
-        self.id = id
-        self.title = title
-        self.lastMessage = lastMessage
-        self.timestamp = timestamp
-        self.icon = icon
-        self.tags = tags
-    }
+    // Removed duplicate initializer - already defined above
     
     var formattedDate: String {
         let formatter = RelativeDateTimeFormatter()

@@ -8,6 +8,7 @@
 import SwiftUI
 import PhotosUI
 import UniformTypeIdentifiers
+import OSLog
 import VisionKit
 
 /// File picker view with support for multiple file types and sources

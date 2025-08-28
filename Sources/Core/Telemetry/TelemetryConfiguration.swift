@@ -201,13 +201,7 @@ public enum ExportDestination: String, Codable, Sendable {
     case localStorage = "local_storage"
 }
 
-/// Export format types
-public enum ExportFormat: String, Codable, Sendable {
-    case json = "json"
-    case csv = "csv"
-    case protobuf = "protobuf"
-    case custom = "custom"
-}
+// ExportFormat is now imported from MonitoringModels.swift
 
 // MARK: - Performance Thresholds
 

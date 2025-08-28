@@ -126,7 +126,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Add SSH configuration to project
-    func addSSHConfig(to project: Project, config: SSHConfig) {
+    func addSSHConfig(to project: Project, config: AppSSHConfig) {
         updateProject(project) { proj in
             proj.sshConfig = config
         }
@@ -209,6 +209,13 @@ final class ProjectStore: ObservableObject {
         }
     }
     
+    /// Clear all projects
+    func clearAll() {
+        projects.removeAll()
+        currentProject = nil
+        pendingChanges = true
+    }
+    
     deinit {
         autoSaveTimer?.invalidate()
     }
@@ -223,7 +230,7 @@ struct Project: Identifiable, Codable, Equatable {
     var type: ProjectType
     var description: String?
     var isActive: Bool
-    var sshConfig: SSHConfig?
+    var sshConfig: AppSSHConfig?
     var environmentVariables: [String: String]?
     let createdAt: Date
     var lastAccessedAt: Date?
@@ -234,7 +241,7 @@ struct Project: Identifiable, Codable, Equatable {
          type: ProjectType = .general,
          description: String? = nil,
          isActive: Bool = false,
-         sshConfig: SSHConfig? = nil,
+         sshConfig: AppSSHConfig? = nil,
          environmentVariables: [String: String]? = nil,
          createdAt: Date = Date(),
          lastAccessedAt: Date? = nil) {
@@ -277,48 +284,6 @@ enum ProjectType: String, Codable, CaseIterable {
         case .ml: return "brain"
         }
     }
-}
-
-struct SSHConfig: Codable, Equatable {
-    var host: String
-    var port: Int
-    var username: String
-    var authMethod: ProjectSSHAuthMethod
-    var privateKeyPath: String?
-    var passphrase: String?
-    var knownHostsPath: String?
-    
-    static let `default` = SSHConfig(
-        host: "",
-        port: 22,
-        username: "",
-        authMethod: .publicKey,
-        privateKeyPath: nil,
-        passphrase: nil,
-        knownHostsPath: nil
-    )
-    
-    init(host: String,
-         port: Int = 22,
-         username: String,
-         authMethod: ProjectSSHAuthMethod = .publicKey,
-         privateKeyPath: String? = nil,
-         passphrase: String? = nil,
-         knownHostsPath: String? = nil) {
-        self.host = host
-        self.port = port
-        self.username = username
-        self.authMethod = authMethod
-        self.privateKeyPath = privateKeyPath
-        self.passphrase = passphrase
-        self.knownHostsPath = knownHostsPath
-    }
-}
-
-enum ProjectSSHAuthMethod: String, Codable {
-    case password = "password"
-    case publicKey = "publicKey"
-    case keyboardInteractive = "keyboardInteractive"
 }
 
 enum ProjectError: LocalizedError {

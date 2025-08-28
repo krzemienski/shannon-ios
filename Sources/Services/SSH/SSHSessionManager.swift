@@ -42,8 +42,14 @@ final class SSHSessionManager: ObservableObject {
     }
 }
 
-struct SSHSession: Identifiable {
-    let id: String
-    let name: String
-    var isActive: Bool = false
+public struct SSHSession: Identifiable {
+    public let id: String
+    public let name: String
+    public var isActive: Bool = false
+    
+    public init(id: String, name: String, isActive: Bool = false) {
+        self.id = id
+        self.name = name
+        self.isActive = isActive
+    }
 }

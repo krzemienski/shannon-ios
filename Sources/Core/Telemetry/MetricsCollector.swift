@@ -5,14 +5,15 @@
 import Foundation
 import OSLog
 import UIKit
+import Combine
 
 /// Metrics collector for gathering app performance and usage data
-public final class MetricsCollector: @unchecked Sendable {
+@MainActor
+public final class MetricsCollector: ObservableObject, @unchecked Sendable {
     
     // MARK: - Properties
     
     private let logger = Logger(subsystem: "com.claudecode.telemetry", category: "Metrics")
-    private let metricsQueue = DispatchQueue(label: "com.claudecode.telemetry.metrics", attributes: .concurrent)
     private var metricsTimer: Timer?
     private var collectionInterval: TimeInterval = 60.0 // Default 1 minute
     
@@ -30,7 +31,7 @@ public final class MetricsCollector: @unchecked Sendable {
     /// Shared instance
     public static let shared = MetricsCollector()
     
-    private init() {
+    public init() {
         setupDefaultAggregators()
         startCollectionTimer()
     }
@@ -39,9 +40,9 @@ public final class MetricsCollector: @unchecked Sendable {
     
     /// Start collecting metrics
     public func startCollecting(interval: TimeInterval = 60.0) {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.collectionInterval = interval
-            self?.startCollectionTimer()
+        Task { @MainActor in
+            self.collectionInterval = interval
+            self.startCollectionTimer()
         }
         
         logger.info("Started metrics collection with interval: \(interval)s")
@@ -49,9 +50,9 @@ public final class MetricsCollector: @unchecked Sendable {
     
     /// Stop collecting metrics
     public func stopCollecting() {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.metricsTimer?.invalidate()
-            self?.metricsTimer = nil
+        Task { @MainActor in
+            self.metricsTimer?.invalidate()
+            self.metricsTimer = nil
         }
         
         logger.info("Stopped metrics collection")
@@ -59,11 +60,11 @@ public final class MetricsCollector: @unchecked Sendable {
     
     /// Record a performance metric
     public func recordPerformanceMetric(name: String, value: Double, unit: String = "ms") {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.performanceMetrics[name] = value
+        Task { @MainActor in
+            self.performanceMetrics[name] = value
             
             // Update aggregator if exists
-            if let aggregator = self?.aggregators[name] {
+            if let aggregator = self.aggregators[name] {
                 aggregator.addValue(value)
             }
         }
@@ -73,15 +74,15 @@ public final class MetricsCollector: @unchecked Sendable {
     
     /// Record a system metric
     public func recordSystemMetric(name: String, value: Double) {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.systemMetrics[name] = value
+        Task { @MainActor in
+            self.systemMetrics[name] = value
         }
     }
     
     /// Record a custom metric
     public func recordCustomMetric(name: String, value: Double) {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.customMetrics[name] = value
+        Task { @MainActor in
+            self.customMetrics[name] = value
         }
     }
     
@@ -98,33 +99,32 @@ public final class MetricsCollector: @unchecked Sendable {
     
     /// Add a metric aggregator
     public func addAggregator(for metric: String, type: AggregationType = .average) {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.aggregators[metric] = MetricAggregator(type: type)
+        Task { @MainActor in
+            self.aggregators[metric] = MetricAggregator(type: type)
         }
     }
     
     /// Get current metrics snapshot
+    @MainActor
     public func getCurrentSnapshot() -> MetricsSnapshot {
-        metricsQueue.sync {
-            MetricsSnapshot(
-                timestamp: Date(),
-                performanceMetrics: performanceMetrics,
-                systemMetrics: collectSystemMetrics(),
-                customMetrics: customMetrics,
-                aggregatedMetrics: getAggregatedMetrics()
-            )
-        }
+        MetricsSnapshot(
+            timestamp: Date(),
+            performanceMetrics: performanceMetrics,
+            systemMetrics: collectSystemMetrics(),
+            customMetrics: customMetrics,
+            aggregatedMetrics: getAggregatedMetrics()
+        )
     }
     
     /// Add collection callback
     public func addCollectionCallback(_ callback: @escaping (MetricsSnapshot) -> Void) {
-        metricsQueue.async(flags: .barrier) { [weak self] in
-            self?.collectionCallbacks.append(callback)
+        Task { @MainActor in
+            self.collectionCallbacks.append(callback)
         }
     }
     
     /// Collect memory metrics
-    public func collectMemoryMetrics() -> MemoryMetrics {
+    public func collectMemoryMetrics() -> TelemetryMemoryMetrics {
         var info = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
         
@@ -139,15 +139,15 @@ public final class MetricsCollector: @unchecked Sendable {
         
         let memoryUsage = result == KERN_SUCCESS ? Double(info.resident_size) / 1024.0 / 1024.0 : 0.0
         
-        return MemoryMetrics(
+        return TelemetryMemoryMetrics(
             usedMemory: memoryUsage,
-            availableMemory: Double(ProcessInfo.processInfo.physicalMemory) / 1024.0 / 1024.0,
+            availableMemory: Double(Foundation.ProcessInfo.processInfo.physicalMemory) / 1024.0 / 1024.0,
             memoryPressure: getMemoryPressure()
         )
     }
     
     /// Collect CPU metrics
-    public func collectCPUMetrics() -> CPUMetrics {
+    public func collectCPUMetrics() -> TelemetryCPUMetrics {
         var info = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
         
@@ -162,18 +162,18 @@ public final class MetricsCollector: @unchecked Sendable {
         
         let cpuUsage = getCPUUsage()
         
-        return CPUMetrics(
+        return TelemetryCPUMetrics(
             usage: cpuUsage,
-            systemTime: info.system_time.seconds + Double(info.system_time.microseconds) / 1_000_000,
-            userTime: info.user_time.seconds + Double(info.user_time.microseconds) / 1_000_000,
-            processCount: ProcessInfo.processInfo.activeProcessorCount
+            systemTime: Double(info.system_time.seconds) + Double(info.system_time.microseconds) / 1_000_000,
+            userTime: Double(info.user_time.seconds) + Double(info.user_time.microseconds) / 1_000_000,
+            processCount: Foundation.ProcessInfo.processInfo.activeProcessorCount
         )
     }
     
     /// Collect network metrics
-    public func collectNetworkMetrics() -> NetworkMetrics {
+    public func collectNetworkMetrics() -> TelemetryNetworkMetrics {
         // This would integrate with network monitoring
-        NetworkMetrics(
+        return TelemetryNetworkMetrics(
             bytesReceived: 0,
             bytesSent: 0,
             packetsReceived: 0,
@@ -184,26 +184,29 @@ public final class MetricsCollector: @unchecked Sendable {
     }
     
     /// Collect battery metrics
+    @MainActor
     public func collectBatteryMetrics() -> BatteryMetrics {
+        // Since we're already on MainActor, we can directly access UIDevice
         UIDevice.current.isBatteryMonitoringEnabled = true
+        let batteryLevel = UIDevice.current.batteryLevel
+        let batteryState = UIDevice.current.batteryState
         
         return BatteryMetrics(
-            level: UIDevice.current.batteryLevel,
-            state: UIDevice.current.batteryState,
-            isLowPowerMode: ProcessInfo.processInfo.isLowPowerModeEnabled
+            level: batteryLevel,
+            state: batteryState,
+            isLowPowerMode: Foundation.ProcessInfo.processInfo.isLowPowerModeEnabled
         )
     }
     
     /// Export metrics for external use
+    @MainActor
     public func exportMetrics() -> MetricsExport {
-        metricsQueue.sync {
-            MetricsExport(
-                exportDate: Date(),
-                counters: counters,
-                timers: timers,
-                gauges: gauges
-            )
-        }
+        MetricsExport(
+            exportDate: Date(),
+            counters: [:],  // TODO: Implement counter tracking
+            timers: [:],   // TODO: Implement timer tracking
+            gauges: [:]    // TODO: Implement gauge tracking
+        )
     }
     
     // MARK: - Private Methods
@@ -222,15 +225,18 @@ public final class MetricsCollector: @unchecked Sendable {
         metricsTimer?.invalidate()
         
         metricsTimer = Timer.scheduledTimer(withTimeInterval: collectionInterval, repeats: true) { [weak self] _ in
-            self?.collectAndNotify()
+            Task { @MainActor in
+                self?.collectAndNotify()
+            }
         }
     }
     
+    @MainActor
     private func collectAndNotify() {
         let snapshot = getCurrentSnapshot()
         
-        metricsQueue.async { [weak self] in
-            self?.collectionCallbacks.forEach { $0(snapshot) }
+        for callback in collectionCallbacks {
+            callback(snapshot)
         }
     }
     
@@ -266,7 +272,7 @@ public final class MetricsCollector: @unchecked Sendable {
     
     private func getMemoryPressure() -> Double {
         let memoryUsage = collectMemoryMetrics().usedMemory
-        let totalMemory = Double(ProcessInfo.processInfo.physicalMemory) / 1024.0 / 1024.0
+        let totalMemory = Double(Foundation.ProcessInfo.processInfo.physicalMemory) / 1024.0 / 1024.0
         return (memoryUsage / totalMemory) * 100.0
     }
     
@@ -314,7 +320,7 @@ public struct TimingToken {
 }
 
 /// Metrics snapshot
-public struct MetricsSnapshot {
+public struct MetricsSnapshot: Sendable {
     public let timestamp: Date
     public let performanceMetrics: [String: Double]
     public let systemMetrics: [String: Double]
@@ -322,23 +328,23 @@ public struct MetricsSnapshot {
     public let aggregatedMetrics: [String: AggregatedMetric]
 }
 
-/// Memory metrics
-public struct MemoryMetrics {
+/// Memory metrics for telemetry
+public struct TelemetryMemoryMetrics {
     public let usedMemory: Double // MB
     public let availableMemory: Double // MB
     public let memoryPressure: Double // Percentage
 }
 
-/// CPU metrics
-public struct CPUMetrics {
+/// CPU metrics for telemetry
+public struct TelemetryCPUMetrics {
     public let usage: Double // Percentage
     public let systemTime: Double
     public let userTime: Double
     public let processCount: Int
 }
 
-/// Network metrics
-public struct NetworkMetrics {
+/// Network metrics for telemetry
+public struct TelemetryNetworkMetrics {
     public let bytesReceived: Int64
     public let bytesSent: Int64
     public let packetsReceived: Int64
@@ -355,7 +361,7 @@ public struct BatteryMetrics {
 }
 
 /// Aggregation types
-public enum AggregationType {
+public enum AggregationType: Sendable {
     case average
     case sum
     case min
@@ -424,7 +430,7 @@ public class MetricAggregator {
 }
 
 /// Aggregated metric result
-public struct AggregatedMetric {
+public struct AggregatedMetric: Sendable {
     public let type: AggregationType
     public let value: Double
     public let count: Int

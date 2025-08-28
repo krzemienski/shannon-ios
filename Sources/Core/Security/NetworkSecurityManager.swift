@@ -40,7 +40,7 @@ public final class NetworkSecurityManager: NSObject {
     
     // MARK: - Singleton
     
-    public static let shared = NetworkSecurityManager()
+    nonisolated(unsafe) public static let shared = NetworkSecurityManager()
     
     private override init() {
         self.securityConfiguration = .default
@@ -497,14 +497,14 @@ private class RequestValidator {
 
 // MARK: - Supporting Types
 
-public struct NetworkSecurityConfiguration {
+public struct NetworkSecurityConfiguration: Sendable {
     public let requireSignature: Bool
     public let requireCertificatePinning: Bool
     public let allowInsecureConnections: Bool
     public let maxRetries: Int
     public let timeoutInterval: TimeInterval
     
-    public static let `default` = NetworkSecurityConfiguration(
+    nonisolated(unsafe) public static let `default` = NetworkSecurityConfiguration(
         requireSignature: true,
         requireCertificatePinning: true,
         allowInsecureConnections: false,
@@ -512,7 +512,7 @@ public struct NetworkSecurityConfiguration {
         timeoutInterval: 30
     )
     
-    public static let strict = NetworkSecurityConfiguration(
+    nonisolated(unsafe) public static let strict = NetworkSecurityConfiguration(
         requireSignature: true,
         requireCertificatePinning: true,
         allowInsecureConnections: false,

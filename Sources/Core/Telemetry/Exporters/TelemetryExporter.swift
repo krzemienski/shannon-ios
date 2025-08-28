@@ -361,7 +361,7 @@ public actor ConsoleExporter: TelemetryExporter {
         case let lifecycleEvent as AppLifecycleEvent:
             message += """
             
-            Lifecycle Event: \(lifecycleEvent.lifecycleEvent.rawValue)
+            Lifecycle Event: \(String(describing: lifecycleEvent.lifecycleEvent))
             Current State: \(lifecycleEvent.currentState)
             """
             if let sessionDuration = lifecycleEvent.sessionDuration {

@@ -240,7 +240,7 @@ enum ProjectRoute: Hashable {
 
 // MARK: - Supporting Types
 
-enum ProjectError: LocalizedError {
+enum ProjectsCoordinatorError: LocalizedError {
     case noSSHConfiguration
     case connectionFailed
     case invalidPath

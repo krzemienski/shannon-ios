@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AlertConfigurationView: View {
-    let metricType: MetricType
+    let metricType: AlertMetricType
     @EnvironmentObject var coordinator: MonitorCoordinator
     @State private var isEnabled = true
     @State private var threshold = 80.0
@@ -65,23 +65,7 @@ struct AlertConfigurationView: View {
     }
 }
 
-enum MetricType: String {
-    case cpu = "cpu"
-    case memory = "memory"
-    case network = "network"
-    case disk = "disk"
-    case error = "error"
-    
-    var title: String {
-        switch self {
-        case .cpu: return "CPU"
-        case .memory: return "Memory"
-        case .network: return "Network"
-        case .disk: return "Disk"
-        case .error: return "Error Rate"
-        }
-    }
-}
+// Note: AlertMetricType is now defined in Models/ViewModels.swift
 
 enum NotificationType: CaseIterable {
     case push

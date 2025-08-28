@@ -364,10 +364,8 @@ public final class SecureTokenManager: ObservableObject {
         }
         
         let query: [String: Any] = [
-            kSecClass as String: kSecClassKey,
-            kSecAttrApplicationTag as String: encryptionKeyTag.data(using: .utf8)!,
-            kSecAttrKeyType as String: kSecAttrKeyTypeAES,
-            kSecAttrKeySizeInBits as String: 256,
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: encryptionKeyTag,
             kSecAttrAccessControl as String: access,
             kSecValueData as String: keyData
         ]
@@ -388,9 +386,8 @@ public final class SecureTokenManager: ObservableObject {
     
     private func retrieveEncryptionKey() async -> SymmetricKey? {
         let query: [String: Any] = [
-            kSecClass as String: kSecClassKey,
-            kSecAttrApplicationTag as String: encryptionKeyTag.data(using: .utf8)!,
-            kSecAttrKeyType as String: kSecAttrKeyTypeAES,
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: encryptionKeyTag,
             kSecReturnData as String: true
         ]
         

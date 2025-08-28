@@ -39,12 +39,12 @@ class NetworkMonitor: ObservableObject {
     
     // Error tracking (Tasks 461-465)
     @Published var errorRate: Double = 0
-    @Published var recentErrors: [NetworkError] = []
+    @Published var recentErrors: [NetworkMonitorError] = []
     @Published var errorTrends: ErrorTrends?
     
     // Analytics (Tasks 466-470)
     private var analyticsCollector = NetworkAnalytics()
-    private var metricsHistory: [NetworkMetrics] = []
+    private var metricsHistory: [NetworkMonitorMetrics] = []
     private let maxHistorySize = 1000
     
     // Recovery strategies (Tasks 471-475)
@@ -297,7 +297,7 @@ class NetworkMonitor: ObservableObject {
     // MARK: - Metrics Collection (Tasks 456-460)
     
     private func collectMetrics() async {
-        let metrics = NetworkMetrics(
+        let metrics = NetworkMonitorMetrics(
             timestamp: Date(),
             connectionType: connectionType,
             quality: connectionQuality,
@@ -375,7 +375,7 @@ class NetworkMonitor: ObservableObject {
         logger.warning("Network connection lost, initiating recovery")
         
         // Record error
-        let error = NetworkError(
+        let error = NetworkMonitorError(
             timestamp: Date(),
             type: .connectionLost,
             message: "Network connection lost",
@@ -487,7 +487,7 @@ class NetworkMonitor: ObservableObject {
         return (bandwidthScore + latencyScore) / 2
     }
     
-    private func detectAnomaly(in metrics: NetworkMetrics) -> NetworkAnomaly? {
+    private func detectAnomaly(in metrics: NetworkMonitorMetrics) -> NetworkAnomaly? {
         // Check for sudden changes or threshold violations
         guard let previousMetrics = metricsHistory.suffix(10).average else { return nil }
         
@@ -741,8 +741,8 @@ extension ConnectionQuality {
     }
 }
 
-/// Network metrics structure
-struct NetworkMetrics {
+/// Network metrics structure for monitoring
+struct NetworkMonitorMetrics {
     let timestamp: Date
     let connectionType: ConnectionType
     let quality: ConnectionQuality
@@ -756,7 +756,7 @@ struct NetworkMetrics {
 }
 
 /// Network error structure
-struct NetworkError {
+struct NetworkMonitorError {
     let timestamp: Date
     let type: ErrorType
     let message: String
@@ -776,7 +776,7 @@ struct NetworkError {
 struct ErrorTrends {
     let hourlyRate: Double
     let dailyRate: Double
-    let topErrors: [NetworkError.ErrorType]
+    let topErrors: [NetworkMonitorError.ErrorType]
     let predictions: [NetworkPrediction]
 }
 
@@ -784,7 +784,7 @@ struct ErrorTrends {
 struct NetworkAnomaly {
     let type: AnomalyType
     let severity: Severity
-    let metrics: NetworkMetrics
+    let metrics: NetworkMonitorMetrics
     
     enum AnomalyType {
         case bandwidthDrop
@@ -886,7 +886,7 @@ struct QualityScores {
 struct DetailedNetworkMetrics {
     let summary: NetworkSummary
     let qualityScores: QualityScores
-    let recentMetrics: [NetworkMetrics]
+    let recentMetrics: [NetworkMonitorMetrics]
     let errorTrends: ErrorTrends?
     let predictions: [NetworkPrediction]
 }
@@ -909,7 +909,7 @@ struct AnalyticsReport {
     let errorRate: Double
     let hourlyErrorRate: Double
     let dailyErrorRate: Double
-    let topErrors: [NetworkError.ErrorType]
+    let topErrors: [NetworkMonitorError.ErrorType]
     let bandwidthTrend: Double  // Negative = decreasing
     let errorRateTrend: Double  // Positive = increasing
 }
@@ -954,10 +954,10 @@ class LatencyProbe {
 
 /// Network analytics collector
 class NetworkAnalytics {
-    private var metrics: [NetworkMetrics] = []
+    private var metrics: [NetworkMonitorMetrics] = []
     private var anomalies: [NetworkAnomaly] = []
     
-    func record(_ metric: NetworkMetrics) {
+    func record(_ metric: NetworkMonitorMetrics) {
         metrics.append(metric)
         if metrics.count > 10000 {
             metrics.removeFirst()
@@ -1002,7 +1002,7 @@ class NetworkAnalytics {
         return recent.map { $0.errorRate }.average
     }
     
-    private func calculateTrend<T: BinaryFloatingPoint>(for keyPath: KeyPath<NetworkMetrics, T>) -> Double {
+    private func calculateTrend<T: BinaryFloatingPoint>(for keyPath: KeyPath<NetworkMonitorMetrics, T>) -> Double {
         guard metrics.count > 10 else { return 0 }
         
         let recent = metrics.suffix(10).map { Double($0[keyPath: keyPath]) }
@@ -1019,7 +1019,7 @@ class NetworkAnalytics {
 class NetworkRecoveryManager {
     private var pendingOperations: [() async -> Void] = []
     
-    func determineRecoveryStrategy(for error: NetworkError) -> RecoveryStrategy {
+    func determineRecoveryStrategy(for error: NetworkMonitorError) -> RecoveryStrategy {
         switch error.type {
         case .connectionLost:
             return .exponentialBackoff(attempts: 5)
@@ -1102,7 +1102,7 @@ struct TrendAnalyzer {
         }
     }
     
-    static func analyze(_ metrics: [NetworkMetrics]) -> (all: [Trend], significant: [Trend]) {
+    static func analyze(_ metrics: [NetworkMonitorMetrics]) -> (all: [Trend], significant: [Trend]) {
         // Placeholder implementation
         let trends: [Trend] = []
         let significant = trends.filter { $0.strength > 0.3 }
@@ -1112,7 +1112,7 @@ struct TrendAnalyzer {
 
 /// Failure pattern
 struct FailurePattern {
-    let type: NetworkError.ErrorType
+    let type: NetworkMonitorError.ErrorType
     let frequency: Int
     let timePattern: TimePattern?
     
@@ -1125,7 +1125,7 @@ struct FailurePattern {
 
 // MARK: - Extensions
 
-extension Array where Element == NetworkMetrics {
+extension Array where Element == NetworkMonitorMetrics {
     var connectionChanges: Int {
         var changes = 0
         var lastType: ConnectionType?
@@ -1140,7 +1140,7 @@ extension Array where Element == NetworkMetrics {
         return changes
     }
     
-    var average: NetworkMetrics? {
+    var average: NetworkMonitorMetrics? {
         guard !isEmpty else { return nil }
         
         let bandwidth = map { $0.bandwidth }.average
@@ -1149,7 +1149,7 @@ extension Array where Element == NetworkMetrics {
         let jitter = map { $0.jitter }.average
         let errorRate = map { $0.errorRate }.average
         
-        return NetworkMetrics(
+        return NetworkMonitorMetrics(
             timestamp: Date(),
             connectionType: last?.connectionType ?? .unknown,
             quality: last?.quality ?? .unknown,

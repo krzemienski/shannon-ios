@@ -268,25 +268,6 @@ struct PerformanceMetric {
     }
 }
 
-struct PerformanceReport {
-    let timestamp: Date
-    let fps: Double
-    let memoryUsageMB: Double
-    let cpuUsagePercent: Double
-    let appLaunchTime: TimeInterval
-    let networkLatency: TimeInterval
-    let cacheHitRate: Double
-    let metrics: [PerformanceMetric]
-    
-    var summary: String {
-        """
-        Performance Report (\(timestamp))
-        - FPS: \(String(format: "%.1f", fps))
-        - Memory: \(String(format: "%.1f", memoryUsageMB))MB
-        - CPU: \(String(format: "%.1f", cpuUsagePercent))%
-        - Launch: \(String(format: "%.2f", appLaunchTime))s
-        - Network: \(String(format: "%.3f", networkLatency))s
-        - Cache Hit: \(String(format: "%.1f", cacheHitRate * 100))%
-        """
-    }
-}
+// PerformanceReport is defined in Core/Telemetry/PerformanceMonitor.swift
+// Using the public PerformanceReport from PerformanceMonitor
+typealias PerformanceReport = PerformanceMonitor.PerformanceReport

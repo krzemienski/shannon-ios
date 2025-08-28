@@ -1,0 +1,1637 @@
+==========================================
+Claude Code iOS - Simulator Automation
+iPhone 16 Pro Max (iOS 18.6)
+UUID: A707456B-44DB-472F-9722-C88153CDFFA1
+==========================================
+
+[0;34m[INFO][0m Setting up directories...
+[0;32m[SUCCESS][0m Directories created
+[0;34m[INFO][0m Checking simulator availability...
+[0;32m[SUCCESS][0m Simulator found: A707456B-44DB-472F-9722-C88153CDFFA1
+[0;34m[INFO][0m Simulator status: Booted 
+[0;34m[INFO][0m Starting log capture...
+[0;34m[INFO][0m Log file: /Users/nick/Documents/claude-code-ios-swift2/logs/simulator_20250828_122106.log
+[0;32m[SUCCESS][0m Log capture started (PID: 47005)
+[0;34m[INFO][0m Building app...
+[0;34m[INFO][0m Scheme: ClaudeCodeSwift
+[0;34m[INFO][0m Destination: iPhone 16 Pro Max (iOS 18.6)
+[0;34m[INFO][0m PKG_CONFIG_PATH set for libssh2
+2025-08-28 12:21:06.529 xcodebuild[47007:924440]  DVTDeviceOperation: Encountered a build number "" that is incompatible with DVTBuildVersion.
+2025-08-28 12:21:06.566 xcodebuild[47007:924158] [MT] DVTDeviceOperation: Encountered a build number "" that is incompatible with DVTBuildVersion.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:A707456B-44DB-472F-9722-C88153CDFFA1, OS:18.6, name:iPhone 16 Pro Max }
+{ platform:iOS Simulator, arch:x86_64, id:A707456B-44DB-472F-9722-C88153CDFFA1, OS:18.6, name:iPhone 16 Pro Max }
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:A707456B-44DB-472F-9722-C88153CDFFA1, OS:18.6, name:iPhone 16 Pro Max }
+{ platform:iOS Simulator, arch:x86_64, id:A707456B-44DB-472F-9722-C88153CDFFA1, OS:18.6, name:iPhone 16 Pro Max }
+
+----- xcbeautify -----
+Version: 2.30.1
+----------------------
+
+[36;1mResolving Package Graph[0m
+[32;1mResolved source packages[0m
+[36;1mswift-collections[0m - [1mhttps://github.com/apple/swift-collections.git[0m @ [32m1.2.1[0m
+[36;1mKeychainAccess[0m - [1mhttps://github.com/kishikawakatsumi/KeychainAccess[0m @ [32m4.2.2[0m
+[36;1mswift-system[0m - [1mhttps://github.com/apple/swift-system.git[0m @ [32m1.6.2[0m
+[36;1mswift-log[0m - [1mhttps://github.com/apple/swift-log[0m @ [32m1.6.4[0m
+[36;1mswift-nio[0m - [1mhttps://github.com/apple/swift-nio.git[0m @ [32m2.86.0[0m
+[36;1mswift-atomics[0m - [1mhttps://github.com/apple/swift-atomics.git[0m @ [32m1.3.0[0m
+[36;1mswift-crypto[0m - [1mhttps://github.com/apple/swift-crypto.git[0m @ [32m3.14.0[0m
+[36;1mswift-nio-ssh[0m - [1mhttps://github.com/Joannis/swift-nio-ssh.git[0m @ [32m0.3.4[0m
+[36;1mBigInt[0m - [1mhttps://github.com/attaswift/BigInt.git[0m @ [32m5.7.0[0m
+[36;1mCitadel[0m - [1mhttps://github.com/orlandos-nl/Citadel[0m @ [32m0.11.1[0m
+[36;1mswift-asn1[0m - [1mhttps://github.com/apple/swift-asn1.git[0m @ [32m1.4.0[0m
+[32;1mClean Succeeded[0m
+[36;1mnote: [0mBuilding targets in dependency order
+[36;1mnote: [0mTarget dependency graph (50 targets)
+[[36mswift-crypto__CryptoExtras[0m] [1mWrite Auxiliary File[0m empty-swift-crypto__CryptoExtras.plist
+[[36mswift-crypto_Crypto[0m] [1mWrite Auxiliary File[0m swift-crypto_Crypto.DependencyMetadataFileList
+[[36mswift-crypto__CryptoExtras[0m] [1mWrite Auxiliary File[0m swift-crypto__CryptoExtras.DependencyStaticMetadataFileList
+[[36mswift-crypto__CryptoExtras[0m] [1mWrite Auxiliary File[0m swift-crypto__CryptoExtras.DependencyMetadataFileList
+[[36mswift-crypto_Crypto[0m] [1mWrite Auxiliary File[0m empty-swift-crypto_Crypto.plist
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m swift-crypto_CryptoBoringWrapper.DependencyStaticMetadataFileList
+[[36mswift-crypto_Crypto[0m] [1mWrite Auxiliary File[0m swift-crypto_Crypto.DependencyStaticMetadataFileList
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m swift-crypto_CryptoBoringWrapper.DependencyMetadataFileList
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m swift-crypto_CCryptoBoringSSLShims.DependencyMetadataFileList
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m swift-crypto_CCryptoBoringSSLShims.DependencyStaticMetadataFileList
+[[36mswift-nio_NIOPosix[0m] [1mWrite Auxiliary File[0m swift-nio_NIOPosix.DependencyStaticMetadataFileList
+[[36mswift-nio_NIOPosix[0m] [1mWrite Auxiliary File[0m empty-swift-nio_NIOPosix.plist
+[[36mswift-nio_NIOPosix[0m] [1mWrite Auxiliary File[0m swift-nio_NIOPosix.DependencyMetadataFileList
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m empty-swift-crypto_CryptoBoringWrapper.plist
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m empty-swift-crypto_CCryptoBoringSSLShims.plist
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m swift-crypto_CCryptoBoringSSL.DependencyMetadataFileList
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m swift-crypto_CCryptoBoringSSL.DependencyStaticMetadataFileList
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m empty-swift-crypto_CCryptoBoringSSL.plist
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures.modulemap
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures.DependencyStaticMetadataFileList
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures.DependencyMetadataFileList
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures.SwiftFileList
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures_const_extract_protocols.json
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures.SwiftConstValuesFileList
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures.LinkFileList
+[[36m_NIODataStructures[0m] [1mWrite Auxiliary File[0m _NIODataStructures-OutputFileMap.json
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64.modulemap
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64.DependencyStaticMetadataFileList
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64.DependencyMetadataFileList
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64_const_extract_protocols.json
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64.SwiftFileList
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64.SwiftConstValuesFileList
+[[36m_NIODataStructures[0m] [1mCopy[0m _NIODataStructures.modulemap -> _NIODataStructures.modulemap
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64.LinkFileList
+[[36m_NIOBase64[0m] [1mWrite Auxiliary File[0m _NIOBase64-OutputFileMap.json
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras.modulemap
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras.DependencyStaticMetadataFileList
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras.DependencyMetadataFileList
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras_const_extract_protocols.json
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras.SwiftFileList
+[[36m_NIOBase64[0m] [1mCopy[0m _NIOBase64.modulemap -> _NIOBase64.modulemap
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras.SwiftConstValuesFileList
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras.LinkFileList
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m _CryptoExtras-OutputFileMap.json
+[[36m_CryptoExtras[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.swift
+[[36m_AtomicsShims[0m] [1mWrite Auxiliary File[0m _AtomicsShims.DependencyStaticMetadataFileList
+[[36m_AtomicsShims[0m] [1mWrite Auxiliary File[0m _AtomicsShims.DependencyMetadataFileList
+[[36m_CryptoExtras[0m] [1mCopy[0m _CryptoExtras.modulemap -> _CryptoExtras.modulemap
+[[36m_AtomicsShims[0m] [1mWrite Auxiliary File[0m _AtomicsShims.LinkFileList
+[[36m_AtomicsShims[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1.modulemap
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1.DependencyStaticMetadataFileList
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1.DependencyMetadataFileList
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1_const_extract_protocols.json
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1.SwiftFileList
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1.SwiftConstValuesFileList
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1.LinkFileList
+[[36mSwiftASN1[0m] [1mWrite Auxiliary File[0m SwiftASN1-OutputFileMap.json
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH.SwiftFileList
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH.SwiftConstValuesFileList
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH_const_extract_protocols.json
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH.LinkFileList
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH-OutputFileMap.json
+[[36mSwiftASN1[0m] [1mCopy[0m SwiftASN1.modulemap -> SwiftASN1.modulemap
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH.modulemap
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH.DependencyStaticMetadataFileList
+[[36mNIOSSH[0m] [1mWrite Auxiliary File[0m NIOSSH.DependencyMetadataFileList
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix.SwiftFileList
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix_const_extract_protocols.json
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix.SwiftConstValuesFileList
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix.LinkFileList
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix-OutputFileMap.json
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix.modulemap
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix.DependencyStaticMetadataFileList
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m NIOPosix.DependencyMetadataFileList
+[[36mNIOPosix[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.swift
+[[36mNIOSSH[0m] [1mCopy[0m NIOSSH.modulemap -> NIOSSH.modulemap
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat.SwiftFileList
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat_const_extract_protocols.json
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat.SwiftConstValuesFileList
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat-OutputFileMap.json
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat.LinkFileList
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat.modulemap
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat.DependencyStaticMetadataFileList
+[[36mNIOFoundationCompat[0m] [1mWrite Auxiliary File[0m NIOFoundationCompat.DependencyMetadataFileList
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded_const_extract_protocols.json
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded.SwiftFileList
+[[36mNIOPosix[0m] [1mCopy[0m NIOPosix.modulemap -> NIOPosix.modulemap
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded.SwiftConstValuesFileList
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded.LinkFileList
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded-OutputFileMap.json
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded.modulemap
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded.DependencyStaticMetadataFileList
+[[36mNIOEmbedded[0m] [1mWrite Auxiliary File[0m NIOEmbedded.DependencyMetadataFileList
+[[36mNIOFoundationCompat[0m] [1mCopy[0m NIOFoundationCompat.modulemap -> NIOFoundationCompat.modulemap
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore.SwiftFileList
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore_const_extract_protocols.json
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore.SwiftConstValuesFileList
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore.LinkFileList
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore-OutputFileMap.json
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore.modulemap
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore.DependencyStaticMetadataFileList
+[[36mNIOCore[0m] [1mWrite Auxiliary File[0m NIOCore.DependencyMetadataFileList
+[[36mNIOEmbedded[0m] [1mCopy[0m NIOEmbedded.modulemap -> NIOEmbedded.modulemap
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers.SwiftFileList
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers_const_extract_protocols.json
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers.SwiftConstValuesFileList
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers.LinkFileList
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers-OutputFileMap.json
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers.modulemap
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers.DependencyStaticMetadataFileList
+[[36mNIOConcurrencyHelpers[0m] [1mWrite Auxiliary File[0m NIOConcurrencyHelpers.DependencyMetadataFileList
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO_const_extract_protocols.json
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO.SwiftFileList
+[[36mNIOCore[0m] [1mCopy[0m NIOCore.modulemap -> NIOCore.modulemap
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO.SwiftConstValuesFileList
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO.LinkFileList
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO-OutputFileMap.json
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO.modulemap
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO.DependencyStaticMetadataFileList
+[[36mNIO[0m] [1mWrite Auxiliary File[0m NIO.DependencyMetadataFileList
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging.SwiftFileList
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging_const_extract_protocols.json
+[[36mNIOConcurrencyHelpers[0m] [1mCopy[0m NIOConcurrencyHelpers.modulemap -> NIOConcurrencyHelpers.modulemap
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging.SwiftConstValuesFileList
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging.LinkFileList
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging-OutputFileMap.json
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging.modulemap
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging.DependencyStaticMetadataFileList
+[[36mLogging[0m] [1mWrite Auxiliary File[0m Logging.DependencyMetadataFileList
+[[36mNIO[0m] [1mCopy[0m NIO.modulemap -> NIO.modulemap
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess_const_extract_protocols.json
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess.SwiftFileList
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess.SwiftConstValuesFileList
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess.LinkFileList
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess-OutputFileMap.json
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess.modulemap
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess.DependencyStaticMetadataFileList
+[[36mKeychainAccess[0m] [1mWrite Auxiliary File[0m KeychainAccess.DependencyMetadataFileList
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities_const_extract_protocols.json
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities.SwiftFileList
+[[36mLogging[0m] [1mCopy[0m Logging.modulemap -> Logging.modulemap
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities.SwiftConstValuesFileList
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities.LinkFileList
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities-OutputFileMap.json
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities.modulemap
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities.DependencyStaticMetadataFileList
+[[36mInternalCollectionsUtilities[0m] [1mWrite Auxiliary File[0m InternalCollectionsUtilities.DependencyMetadataFileList
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule_const_extract_protocols.json
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule.SwiftFileList
+[[36mKeychainAccess[0m] [1mCopy[0m KeychainAccess.modulemap -> KeychainAccess.modulemap
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule.SwiftConstValuesFileList
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule.LinkFileList
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule-OutputFileMap.json
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule.modulemap
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule.DependencyStaticMetadataFileList
+[[36mDequeModule[0m] [1mWrite Auxiliary File[0m DequeModule.DependencyMetadataFileList
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper_const_extract_protocols.json
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper.SwiftFileList
+[[36mInternalCollectionsUtilities[0m] [1mCopy[0m InternalCollectionsUtilities.modulemap -> InternalCollectionsUtilities.modulemap
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper.SwiftConstValuesFileList
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper.LinkFileList
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper-OutputFileMap.json
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.swift
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper.modulemap
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper.DependencyStaticMetadataFileList
+[[36mCryptoBoringWrapper[0m] [1mWrite Auxiliary File[0m CryptoBoringWrapper.DependencyMetadataFileList
+[[36mDequeModule[0m] [1mCopy[0m DequeModule.modulemap -> DequeModule.modulemap
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto_const_extract_protocols.json
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto.SwiftFileList
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto.SwiftConstValuesFileList
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto.LinkFileList
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto-OutputFileMap.json
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.swift
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto.modulemap
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto.DependencyStaticMetadataFileList
+[[36mCrypto[0m] [1mWrite Auxiliary File[0m Crypto.DependencyMetadataFileList
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m dfe6ceaf94ab54f0d7c5c4579631f1b0.sb
+[[36mCryptoBoringWrapper[0m] [1mCopy[0m CryptoBoringWrapper.modulemap -> CryptoBoringWrapper.modulemap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m a4cd37e97988c93db00b34c161818954.sb
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m Script-5883CBA8F5B677F6C8DADEC8.sh
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m Script-4E226556394E6CD7E7018C7A.sh
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m Script-4D797939E5A5EB0DBDBB98D5.sh
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift_const_extract_protocols.json
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift.SwiftFileList
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift.SwiftConstValuesFileList
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift.LinkFileList
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-OutputFileMap.json
+[[36mCrypto[0m] [1mCopy[0m Crypto.modulemap -> Crypto.modulemap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift_vers.c
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift.hmap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift.DependencyStaticMetadataFileList
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift.DependencyMetadataFileList
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-project-headers.hmap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-own-target-headers.hmap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-generated-files.hmap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-all-target-headers.hmap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-all-non-framework-target-headers.hmap
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-DebugDylibPath-normal-arm64.txt
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m ClaudeCodeSwift-DebugDylibInstallName-normal-arm64.txt
+[[36mClaudeCodeSwift[0m] [1mWrite Auxiliary File[0m 260d0b773a29e70252fe89667946f5fd.sb
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel.SwiftFileList
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel_const_extract_protocols.json
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel.SwiftConstValuesFileList
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel.LinkFileList
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel-OutputFileMap.json
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel.modulemap
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel.DependencyStaticMetadataFileList
+[[36mCitadel[0m] [1mWrite Auxiliary File[0m Citadel.DependencyMetadataFileList
+[[36mCNIOWindows[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCNIOWindows[0m] [1mWrite Auxiliary File[0m CNIOWindows.LinkFileList
+[[36mCNIOWindows[0m] [1mWrite Auxiliary File[0m CNIOWindows.DependencyStaticMetadataFileList
+[[36mCNIOWindows[0m] [1mWrite Auxiliary File[0m CNIOWindows.DependencyMetadataFileList
+[[36mCNIOWASI[0m] [1mWrite Auxiliary File[0m CNIOWASI.LinkFileList
+[[36mCNIOWASI[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCNIOWASI[0m] [1mWrite Auxiliary File[0m CNIOWASI.modulemap
+[[36mCNIOWASI[0m] [1mWrite Auxiliary File[0m CNIOWASI.DependencyStaticMetadataFileList
+[[36mCNIOWASI[0m] [1mWrite Auxiliary File[0m CNIOWASI.DependencyMetadataFileList
+[[36mCNIOPosix[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCNIOPosix[0m] [1mWrite Auxiliary File[0m CNIOPosix.LinkFileList
+[[36mCitadel[0m] [1mCopy[0m Citadel.modulemap -> Citadel.modulemap
+[[36mCNIOPosix[0m] [1mWrite Auxiliary File[0m CNIOPosix.modulemap
+[[36mCNIOPosix[0m] [1mWrite Auxiliary File[0m CNIOPosix.DependencyStaticMetadataFileList
+[[36mCNIOPosix[0m] [1mWrite Auxiliary File[0m CNIOPosix.DependencyMetadataFileList
+[[36mCNIOLinux[0m] [1mWrite Auxiliary File[0m CNIOLinux.LinkFileList
+[[36mCNIOLinux[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCNIOLinux[0m] [1mWrite Auxiliary File[0m CNIOLinux.modulemap
+[[36mCNIOLinux[0m] [1mWrite Auxiliary File[0m CNIOLinux.DependencyStaticMetadataFileList
+[[36mCNIOLinux[0m] [1mWrite Auxiliary File[0m CNIOLinux.DependencyMetadataFileList
+[[36mCNIOWASI[0m] [1mCopy[0m CNIOWASI.modulemap -> CNIOWASI.modulemap
+[[36mCNIODarwin[0m] [1mWrite Auxiliary File[0m CNIODarwin.LinkFileList
+[[36mCNIODarwin[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCNIODarwin[0m] [1mWrite Auxiliary File[0m CNIODarwin.modulemap
+[[36mCNIODarwin[0m] [1mWrite Auxiliary File[0m CNIODarwin.DependencyStaticMetadataFileList
+[[36mCNIOPosix[0m] [1mCopy[0m CNIOPosix.modulemap -> CNIOPosix.modulemap
+[[36mCNIODarwin[0m] [1mWrite Auxiliary File[0m CNIODarwin.DependencyMetadataFileList
+[[36mCNIOAtomics[0m] [1mWrite Auxiliary File[0m CNIOAtomics.LinkFileList
+[[36mCNIOAtomics[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCNIOAtomics[0m] [1mWrite Auxiliary File[0m CNIOAtomics.modulemap
+[[36mCNIOAtomics[0m] [1mWrite Auxiliary File[0m CNIOAtomics.DependencyStaticMetadataFileList
+[[36mCNIOLinux[0m] [1mCopy[0m CNIOLinux.modulemap -> CNIOLinux.modulemap
+[[36mCNIOAtomics[0m] [1mWrite Auxiliary File[0m CNIOAtomics.DependencyMetadataFileList
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m CCryptoBoringSSLShims.LinkFileList
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m e6072d4f65d7061329687fe24e3d63a7-common-args.resp
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.h
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.m
+[[36mCNIODarwin[0m] [1mCopy[0m CNIODarwin.modulemap -> CNIODarwin.modulemap
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m CCryptoBoringSSLShims.DependencyStaticMetadataFileList
+[[36mCCryptoBoringSSLShims[0m] [1mWrite Auxiliary File[0m CCryptoBoringSSLShims.DependencyMetadataFileList
+[[36mCNIOAtomics[0m] [1mCopy[0m CNIOAtomics.modulemap -> CNIOAtomics.modulemap
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m CCryptoBoringSSL.LinkFileList
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m e6072d4f65d7061329687fe24e3d63a7-common-args.resp
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m 82b82416624d2658e5098eb0a28c15c5-common-args.resp
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m 533656923a283fa776881f304837ed9e-common-args.resp
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.m
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m resource_bundle_accessor.h
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m CCryptoBoringSSL.DependencyStaticMetadataFileList
+[[36mCCryptoBoringSSL[0m] [1mWrite Auxiliary File[0m CCryptoBoringSSL.DependencyMetadataFileList
+[[36mCCitadelBcrypt[0m] [1mWrite Auxiliary File[0m CCitadelBcrypt.LinkFileList
+[[36mCCitadelBcrypt[0m] [1mWrite Auxiliary File[0m 7187679823f38a2a940e0043cdf9d637-common-args.resp
+[[36mCCitadelBcrypt[0m] [1mWrite Auxiliary File[0m CCitadelBcrypt.DependencyStaticMetadataFileList
+[[36mCCitadelBcrypt[0m] [1mWrite Auxiliary File[0m CCitadelBcrypt.DependencyMetadataFileList
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt.SwiftFileList
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt_const_extract_protocols.json
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt.LinkFileList
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt.SwiftConstValuesFileList
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt-OutputFileMap.json
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt.modulemap
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt.DependencyStaticMetadataFileList
+[[36mBigInt[0m] [1mWrite Auxiliary File[0m BigInt.DependencyMetadataFileList
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics_const_extract_protocols.json
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics.SwiftFileList
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics.SwiftConstValuesFileList
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics.LinkFileList
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics-OutputFileMap.json
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics.modulemap
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics.DependencyStaticMetadataFileList
+[[36mAtomics[0m] [1mWrite Auxiliary File[0m Atomics.DependencyMetadataFileList
+[[36mBigInt[0m] [1mCopy[0m BigInt.modulemap -> BigInt.modulemap
+[[36mAtomics[0m] [1mCopy[0m Atomics.modulemap -> Atomics.modulemap
+[[36mswift-crypto__CryptoExtras[0m] [1mCopying[0m PrivacyInfo.xcprivacy
+[[36mswift-crypto__CryptoExtras[0m] [1mProcessing[0m empty-swift-crypto__CryptoExtras.plist
+[[36mswift-nio_NIOPosix[0m] [1mProcessing[0m empty-swift-nio_NIOPosix.plist
+[[36mswift-nio_NIOPosix[0m] [1mCopying[0m PrivacyInfo.xcprivacy
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mProcessing[0m empty-swift-crypto_CryptoBoringWrapper.plist
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mCopying[0m PrivacyInfo.xcprivacy
+[[36mswift-crypto_Crypto[0m] [1mProcessing[0m empty-swift-crypto_Crypto.plist
+[[36mswift-crypto_Crypto[0m] [1mCopying[0m PrivacyInfo.xcprivacy
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mProcessing[0m empty-swift-crypto_CCryptoBoringSSL.plist
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mCopying[0m PrivacyInfo.xcprivacy
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mProcessing[0m empty-swift-crypto_CCryptoBoringSSLShims.plist
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mCopying[0m PrivacyInfo.xcprivacy
+[1mSigning[0m swift-crypto__CryptoExtras.bundle (in target 'swift-crypto__CryptoExtras' from project 'swift-crypto')
+[1mSigning[0m swift-nio_NIOPosix.bundle (in target 'swift-nio_NIOPosix' from project 'swift-nio')
+[1mSigning[0m swift-crypto_CryptoBoringWrapper.bundle (in target 'swift-crypto_CryptoBoringWrapper' from project 'swift-crypto')
+[1mSigning[0m swift-crypto_Crypto.bundle (in target 'swift-crypto_Crypto' from project 'swift-crypto')
+[1mSigning[0m swift-crypto_CCryptoBoringSSL.bundle (in target 'swift-crypto_CCryptoBoringSSL' from project 'swift-crypto')
+[1mSigning[0m swift-crypto_CCryptoBoringSSLShims.bundle (in target 'swift-crypto_CCryptoBoringSSLShims' from project 'swift-crypto')
+[[36mswift-crypto__CryptoExtras[0m] [1mRegisterExecutionPolicyException[0m swift-crypto__CryptoExtras.bundle
+[[36mswift-nio_NIOPosix[0m] [1mRegisterExecutionPolicyException[0m swift-nio_NIOPosix.bundle
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mRegisterExecutionPolicyException[0m swift-crypto_CCryptoBoringSSL.bundle
+[[36mswift-crypto__CryptoExtras[0m] [1mTouching[0m swift-crypto__CryptoExtras.bundle
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mRegisterExecutionPolicyException[0m swift-crypto_CCryptoBoringSSLShims.bundle
+[[36mswift-crypto_Crypto[0m] [1mRegisterExecutionPolicyException[0m swift-crypto_Crypto.bundle
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mRegisterExecutionPolicyException[0m swift-crypto_CryptoBoringWrapper.bundle
+[[36mswift-nio_NIOPosix[0m] [1mTouching[0m swift-nio_NIOPosix.bundle
+[[36mswift-crypto_CCryptoBoringSSL[0m] [1mTouching[0m swift-crypto_CCryptoBoringSSL.bundle
+[[36mswift-crypto_CCryptoBoringSSLShims[0m] [1mTouching[0m swift-crypto_CCryptoBoringSSLShims.bundle
+[[36mswift-crypto_Crypto[0m] [1mTouching[0m swift-crypto_Crypto.bundle
+[[36mswift-crypto_CryptoBoringWrapper[0m] [1mTouching[0m swift-crypto_CryptoBoringWrapper.bundle
+[[36mCNIOWindows[0m] [1mCompiling[0m shim.c
+[[36mCNIOWindows[0m] [1mCompiling[0m WSAStartup.c
+[[36mCNIOWASI[0m] [1mCompiling[0m CNIOWASI.c
+[[36mCNIOLinux[0m] [1mCompiling[0m shim.c
+[[36mCNIOWindows[0m] [1mLinking[0m CNIOWindows.o
+[[36mCNIOWASI[0m] [1mLinking[0m CNIOWASI.o
+[[36mCNIOLinux[0m] [1mCompiling[0m liburing_shims.c
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m xwing.cc
+[[36mCNIOLinux[0m] [1mLinking[0m CNIOLinux.o
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_x509a.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_x509.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_val.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_spki.cc
+[[36m_NIOBase64[0m] [1mCompiling[0m Base64.swift
+[[36mKeychainAccess[0m] [1mCompiling[0m Keychain.swift
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_sig.cc
+[[36m_NIOBase64[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> _NIOBase64.swiftmodule
+[[36m_NIOBase64[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> _NIOBase64.swiftdoc
+[[36m_NIOBase64[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> _NIOBase64.abi.json
+[[36m_NIOBase64[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> _NIOBase64.swiftsourceinfo
+[[36mLogging[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> Logging.swiftmodule
+[[36mLogging[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> Logging.swiftdoc
+[[36mLogging[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> Logging.abi.json
+[[36mLogging[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> Logging.swiftsourceinfo
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_req.cc
+[[36m_NIODataStructures[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> _NIODataStructures.swiftmodule
+[[36m_NIODataStructures[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> _NIODataStructures.swiftdoc
+[[36m_NIODataStructures[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> _NIODataStructures.abi.json
+[[36m_NIODataStructures[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> _NIODataStructures.swiftsourceinfo
+[[36mNIOConcurrencyHelpers[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIOConcurrencyHelpers.swiftmodule
+[[36mNIOConcurrencyHelpers[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIOConcurrencyHelpers.swiftdoc
+[[36mNIOConcurrencyHelpers[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIOConcurrencyHelpers.abi.json
+[[36mNIOConcurrencyHelpers[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIOConcurrencyHelpers.swiftsourceinfo
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_pubkey.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_name.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_exten.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_crl.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_attrib.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_all.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x_algor.cc
+[[36mInternalCollectionsUtilities[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> InternalCollectionsUtilities.swiftmodule
+[[36mInternalCollectionsUtilities[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> InternalCollectionsUtilities.swiftdoc
+[[36mInternalCollectionsUtilities[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> InternalCollectionsUtilities.abi.json
+[[36mInternalCollectionsUtilities[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> InternalCollectionsUtilities.swiftsourceinfo
+[[36mKeychainAccess[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> KeychainAccess.swiftmodule
+[[36mKeychainAccess[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> KeychainAccess.swiftdoc
+[[36mKeychainAccess[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> KeychainAccess.abi.json
+[[36mKeychainAccess[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> KeychainAccess.swiftsourceinfo
+[[36mCryptoBoringWrapper[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> CryptoBoringWrapper.swiftmodule
+[[36mCryptoBoringWrapper[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> CryptoBoringWrapper.swiftdoc
+[[36mCryptoBoringWrapper[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> CryptoBoringWrapper.abi.json
+[[36mCryptoBoringWrapper[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> CryptoBoringWrapper.swiftsourceinfo
+[[36mCrypto[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> Crypto.swiftmodule
+[[36mCrypto[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> Crypto.swiftdoc
+[[36mCrypto[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> Crypto.abi.json
+[[36mCrypto[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> Crypto.swiftsourceinfo
+[[36mBigInt[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> BigInt.swiftmodule
+[[36mBigInt[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> BigInt.swiftdoc
+[[36mBigInt[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> BigInt.abi.json
+[[36mBigInt[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> BigInt.swiftsourceinfo
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509spki.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509rset.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509name.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509cset.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_vpm.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_vfy.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_v3.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_txt.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_trs.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_set.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_req.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_obj.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_lu.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_ext.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_def.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_d2.cc
+[[36mAtomics[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> Atomics.swiftmodule
+[[36mAtomics[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> Atomics.swiftdoc
+[[36mAtomics[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> Atomics.abi.json
+[[36mAtomics[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> Atomics.swiftsourceinfo
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_cmp.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509_att.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m x509.cc
+[[36mSwiftASN1[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> SwiftASN1.swiftmodule
+[[36mSwiftASN1[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> SwiftASN1.swiftdoc
+[[36mSwiftASN1[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> SwiftASN1.abi.json
+[[36mSwiftASN1[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> SwiftASN1.swiftsourceinfo
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m windows.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m voprf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_utl.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_skey.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_purp.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_prn.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_pmaps.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_pcons.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_ocsp.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_ncons.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_lib.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_int.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_info.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_ia5.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_genn.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_extku.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_enum.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_crld.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_cpols.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_conf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_bitst.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_bcons.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_alt.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_akeya.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m v3_akey.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m urandom.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m unicode.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m trusty.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m trust_token.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tls_cbc.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m thread_win.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m thread_pthread.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m thread_none.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m thread.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tasn_utl.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tasn_typ.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tasn_new.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tasn_fre.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tasn_enc.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m tasn_dec.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m t_x509a.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m t_x509.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m t_req.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m t_crl.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m stack.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m sqrt.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m spake2plus.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m spake25519.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m slhdsa.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m siphash.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m sign.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m sha512.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m sha256.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m sha1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m scrypt.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rsa_pss.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rsa_print.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rsa_extra.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rsa_crypt.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rsa_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m refcount.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rc4.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m rand.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m printf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m print.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m posix_time.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pool.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m poly1305_vec.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m poly1305_arm.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m poly1305.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m policy.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pmbtoken.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pkcs8_x509.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pkcs8.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pkcs7_x509.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pkcs7.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_xaux.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_x509.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_pkey.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_pk8.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_oth.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_lib.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_info.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pem_all.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pbkdf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m passive.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m params.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m pair.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_x25519_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_x25519.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_rsa_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_rsa.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_hkdf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_ed25519_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_ed25519.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_ec_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_ec.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_dsa_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_dh_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p_dh.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m p5_pbev2.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m obj_xref.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m obj.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m name_print.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m mlkem.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m mldsa.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m mem.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m md5.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m md4.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m lhash.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m kyber.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ios.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m i2d_pr.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m hrss.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m hpke.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m hexdump.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m hash_to_curve.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m getentropy.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m get_cipher.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m fuzzer_mode.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m forkunsafe.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m fork_detect.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m fips_shared_support.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m file.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m fd.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m f_string.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m f_int.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m exponentiation.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ex_data.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m evp_ctx.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m evp_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m evp.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m errno.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m err_data.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m err.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m engine.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ecdsa_p1363.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ecdsa_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ecdh.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ec_derive.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ec_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_tls.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_rc4.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_rc2.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_null.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_des.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_chacha20poly1305.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_aesgcmsiv.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_aeseax.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m e_aesctrhmac.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m dsa_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m dsa.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m div.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m digest_extra.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m dh_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m deterministic.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m des.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m derive_key.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m curve25519_64_adx.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m curve25519.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m crypto.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_intel.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_arm_linux.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_arm_freebsd.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_aarch64_win.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_aarch64_sysreg.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_aarch64_openbsd.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_aarch64_linux.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_aarch64_fuchsia.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cpu_aarch64_apple.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m convert.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m conf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cms.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m chacha.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cbs.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m cbb.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m by_file.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m by_dir.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m buf.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m bn_asn1.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m blake2.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m bio_mem.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m bio.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m ber.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m bcm.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m base64.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m asn_pack.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m asn1_par.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m asn1_lib.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m asn1_gen.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m asn1_compat.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m algorithm.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m aes.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_verify.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_utctm.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_type.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_time.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_strnid.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_strex.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_sign.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_octet.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_object.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_mbstr.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_int.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_i2d_fp.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_gentm.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_dup.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_digest.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_d2i_fp.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_bool.cc
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m a_bitstr.cc
+[[36m_NIODataStructures[0m] [1mCompiling[0m _TinyArray.swift
+[[36m_NIODataStructures[0m] [1mCompiling[0m Heap.swift
+[[36m_NIODataStructures[0m] [1mCompiling[0m PriorityQueue.swift
+[[36m_NIOBase64[0m] [1mCompiling[0m Base64.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m PEMDocument.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1Strings.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m TimeUtilities.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ObjectIdentifier.swift
+[[36m_AtomicsShims[0m] [1mCompiling[0m _AtomicsShims.c
+[[36m_AtomicsShims[0m] [1mLinking[0m _AtomicsShims.o
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1Any.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1BitString.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1Integer.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1Null.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m BER.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m DER.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ArraySliceBigint.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1OctetString.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m GeneralizedTime.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m Errors.swift
+[[36mCNIOPosix[0m] [1mCompiling[0m event_loop_id.c
+[[36mCNIOPosix[0m] [1mLinking[0m CNIOPosix.o
+[[36mSwiftASN1[0m] [1mCompiling[0m UTCTime.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1Boolean.swift
+[[36mSwiftASN1[0m] [1mCompiling[0m ASN1Identifier.swift
+[[36mCNIOAtomics[0m] [1mCompiling[0m c-nioatomics.c
+[[36mCNIOAtomics[0m] [1mCompiling[0m c-atomics.c
+[[36mNIOConcurrencyHelpers[0m] [1mCompiling[0m NIOLockedValueBox.swift
+[[36mNIOConcurrencyHelpers[0m] [1mCompiling[0m NIOAtomic.swift
+[[36mCCryptoBoringSSLShims[0m] [1mCompiling[0m shims.c
+[[36mNIOConcurrencyHelpers[0m] [1mCompiling[0m lock.swift
+[[36mNIOConcurrencyHelpers[0m] [1mCompiling[0m atomics.swift
+[[36mNIOConcurrencyHelpers[0m] [1mCompiling[0m NIOLock.swift
+[[36mLogging[0m] [1mCompiling[0m Locks.swift
+[[36mLogging[0m] [1mCompiling[0m MetadataProvider.swift
+[[36mLogging[0m] [1mCompiling[0m LogHandler.swift
+[[36mLogging[0m] [1mCompiling[0m Logging.swift
+[[36mKeychainAccess[0m] [1mCompiling[0m Keychain.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m Descriptions.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m Debugging.swift
+[[36mCNIODarwin[0m] [1mCompiling[0m shim.c
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m RandomAccessCollection+Offsets.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m _UniqueCollection.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m _UnsafeBitSet+Index.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m UnsafeBufferPointer+Extras.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m UInt+first\ and\ last\ set\ bit.swift
+[[36mCNIODarwin[0m] [1mLinking[0m CNIODarwin.o
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m _UnsafeBitSet+_Word.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m UInt+reversed.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m FixedWidthInteger+roundUpToPowerOfTwo.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m _SortedCollection.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m UnsafeMutableBufferPointer+Extras.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m _UnsafeBitSet.swift
+[[36mInternalCollectionsUtilities[0m] [1mCompiling[0m Integer\ rank.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m ArbitraryPrecisionInteger.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m CryptoKitErrors_boring.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m RandomBytes.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m EllipticCurvePoint.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m EllipticCurve.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m FiniteFieldArithmeticContext.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m BoringSSLAEAD.swift
+[[36mCryptoBoringWrapper[0m] [1mCompiling[0m resource_bundle_accessor.swift
+[[36mCrypto[0m] [1mCompiling[0m AES.swift
+[[36mCrypto[0m] [1mCompiling[0m ECDSASignature_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m ECDSA_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m EdDSA_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m ECDSA.swift
+[[36mCrypto[0m] [1mCompiling[0m AESWrap_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m Ed25519_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m NISTCurvesKeys_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m X25519Keys_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m Curve25519.swift
+[[36mCrypto[0m] [1mCompiling[0m Ed25519Keys.swift
+[[36mCrypto[0m] [1mCompiling[0m Zeroization_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m PrettyBytes.swift
+[[36mCrypto[0m] [1mCompiling[0m SafeCompare.swift
+[[36mCrypto[0m] [1mCompiling[0m SecureBytes.swift
+[[36mCrypto[0m] [1mCompiling[0m Zeroization.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-Context.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-KeySchedule.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-Modes.swift
+[[36mCrypto[0m] [1mCompiling[0m Insecure.swift
+[[36mCrypto[0m] [1mCompiling[0m Insecure_HashFunctions.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-Utils.swift
+[[36mCrypto[0m] [1mCompiling[0m DHKEM.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-KEM-Curve25519.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-NIST-EC-KEMs.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-KEM.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-Errors.swift
+[[36mCrypto[0m] [1mCompiling[0m KEM.swift
+[[36mCrypto[0m] [1mCompiling[0m ECDH_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m DH.swift
+[[36mCrypto[0m] [1mCompiling[0m ECDH.swift
+[[36mCrypto[0m] [1mCompiling[0m HKDF.swift
+[[36mCrypto[0m] [1mCompiling[0m AESWrap.swift
+[[36mCrypto[0m] [1mCompiling[0m HashFunctions_SHA2.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-AEAD.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-Ciphersuite.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-KDF.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-KexKeyDerivation.swift
+[[36mCrypto[0m] [1mCompiling[0m HPKE-LabeledExtract.swift
+[[36mCrypto[0m] [1mCompiling[0m resource_bundle_accessor.swift
+[[36mCrypto[0m] [1mCompiling[0m AES-GCM.swift
+[[36mCrypto[0m] [1mCompiling[0m AES-GCM_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m ChaChaPoly_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m ChaChaPoly.swift
+[[36mCrypto[0m] [1mCompiling[0m Cipher.swift
+[[36mCrypto[0m] [1mCompiling[0m Nonces.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1Any.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1BitString.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1Boolean.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1Identifier.swift
+[[36mCrypto[0m] [1mCompiling[0m CryptoError_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m CryptoKitErrors.swift
+[[36mCrypto[0m] [1mCompiling[0m Digest_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m Digest.swift
+[[36mCrypto[0m] [1mCompiling[0m Digests.swift
+[[36mCrypto[0m] [1mCompiling[0m HashFunctions.swift
+[[36mCrypto[0m] [1mCompiling[0m NISTCurvesKeys.swift
+[[36mCrypto[0m] [1mCompiling[0m X25519Keys.swift
+[[36mCrypto[0m] [1mCompiling[0m SymmetricKeys.swift
+[[36mCrypto[0m] [1mCompiling[0m HMAC.swift
+[[36mCrypto[0m] [1mCompiling[0m MACFunctions.swift
+[[36mCrypto[0m] [1mCompiling[0m MessageAuthenticationCode.swift
+[[36mCrypto[0m] [1mCompiling[0m Ed25519.swift
+[[36mCrypto[0m] [1mCompiling[0m Signature.swift
+[[36mCrypto[0m] [1mCompiling[0m CryptoKitErrors_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m RNG_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m SafeCompare_boring.swift
+[[36mCrypto[0m] [1mCompiling[0m ObjectIdentifier.swift
+[[36mCrypto[0m] [1mCompiling[0m ECDSASignature.swift
+[[36mCrypto[0m] [1mCompiling[0m PEMDocument.swift
+[[36mCrypto[0m] [1mCompiling[0m PKCS8PrivateKey.swift
+[[36mCrypto[0m] [1mCompiling[0m SEC1PrivateKey.swift
+[[36mCrypto[0m] [1mCompiling[0m SubjectPublicKeyInfo.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1Integer.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1Null.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1OctetString.swift
+[[36mCrypto[0m] [1mCompiling[0m ASN1Strings.swift
+[[36mCrypto[0m] [1mCompiling[0m ArraySliceBigint.swift
+[[36mCrypto[0m] [1mCompiling[0m GeneralizedTime.swift
+[[36mBigInt[0m] [1mCompiling[0m BigUInt.swift
+[[36mBigInt[0m] [1mCompiling[0m Bitwise\ Ops.swift
+[[36mBigInt[0m] [1mCompiling[0m Addition.swift
+[[36mBigInt[0m] [1mCompiling[0m BigInt.swift
+[[36mBigInt[0m] [1mCompiling[0m Subtraction.swift
+[[36mBigInt[0m] [1mCompiling[0m Strideable.swift
+[[36mBigInt[0m] [1mCompiling[0m Codable.swift
+[[36mBigInt[0m] [1mCompiling[0m Comparable.swift
+[[36mBigInt[0m] [1mCompiling[0m GCD.swift
+[[36mBigInt[0m] [1mCompiling[0m Hashable.swift
+[[36mBigInt[0m] [1mCompiling[0m Prime\ Test.swift
+[[36mBigInt[0m] [1mCompiling[0m Random.swift
+[[36mBigInt[0m] [1mCompiling[0m Shifts.swift
+[[36mBigInt[0m] [1mCompiling[0m String\ Conversion.swift
+[[36mBigInt[0m] [1mCompiling[0m Square\ Root.swift
+[[36mBigInt[0m] [1mCompiling[0m Data\ Conversion.swift
+[[36mBigInt[0m] [1mCompiling[0m Division.swift
+[[36mBigInt[0m] [1mCompiling[0m Words\ and\ Bits.swift
+[[36mCNIOAtomics[0m] [1mLinking[0m CNIOAtomics.o
+[[36mBigInt[0m] [1mCompiling[0m Integer\ Conversion.swift
+[[36mBigInt[0m] [1mCompiling[0m Multiplication.swift
+[[36mBigInt[0m] [1mCompiling[0m Exponentiation.swift
+[[36mBigInt[0m] [1mCompiling[0m Floating\ Point\ Conversion.swift
+[[36mAtomics[0m] [1mCompiling[0m AtomicReference.swift
+[[36mAtomics[0m] [1mCompiling[0m AtomicStorage.swift
+[[36mAtomics[0m] [1mCompiling[0m PointerConformances.swift
+[[36mAtomics[0m] [1mCompiling[0m Primitives.native.swift
+[[36mAtomics[0m] [1mCompiling[0m ManagedAtomicLazyReference.swift
+[[36mAtomics[0m] [1mCompiling[0m UnsafeAtomicLazyReference.swift
+[[36mAtomics[0m] [1mCompiling[0m ManagedAtomic.swift
+[[36mAtomics[0m] [1mCompiling[0m AtomicMemoryOrderings.swift
+[[36mAtomics[0m] [1mCompiling[0m DoubleWord.swift
+[[36mAtomics[0m] [1mCompiling[0m OptionalRawRepresentable.swift
+[[36mAtomics[0m] [1mCompiling[0m RawRepresentable.swift
+[[36mCCitadelBcrypt[0m] [1mCompiling[0m blf.c
+[[36mAtomics[0m] [1mCompiling[0m AtomicValue.swift
+[[36mAtomics[0m] [1mCompiling[0m IntegerOperations.swift
+[[36mAtomics[0m] [1mCompiling[0m Unmanaged\ extensions.swift
+[[36mAtomics[0m] [1mCompiling[0m AtomicBool.swift
+[[36mAtomics[0m] [1mCompiling[0m IntegerConformances.swift
+[[36mAtomics[0m] [1mCompiling[0m AtomicInteger.swift
+[[36mAtomics[0m] [1mCompiling[0m AtomicOptionalWrappable.swift
+[[36mAtomics[0m] [1mCompiling[0m UnsafeAtomic.swift
+[[36m_NIODataStructures[0m] [1mLinking[0m _NIODataStructures.o
+[[36m_NIOBase64[0m] [1mLinking[0m _NIOBase64.o
+[[36mSwiftASN1[0m] [1mLinking[0m SwiftASN1.o
+[[36mLogging[0m] [1mLinking[0m Logging.o
+[[36mKeychainAccess[0m] [1mLinking[0m KeychainAccess.o
+[[36mInternalCollectionsUtilities[0m] [1mLinking[0m InternalCollectionsUtilities.o
+[[36mCrypto[0m] [1mLinking[0m Crypto.o
+[[36mCCitadelBcrypt[0m] [1mCompiling[0m bcrypt.c
+[[36mCCitadelBcrypt[0m] [1mCompiling[0m bcrypt-kdf.c
+[[36m_NIODataStructures[0m] [1mExtract App Intents Metadata[0m
+[[36m_NIOBase64[0m] [1mExtract App Intents Metadata[0m
+[[36mSwiftASN1[0m] [1mExtract App Intents Metadata[0m
+[[36mLogging[0m] [1mExtract App Intents Metadata[0m
+[[36mKeychainAccess[0m] [1mExtract App Intents Metadata[0m
+[[36mCCitadelBcrypt[0m] [1mLinking[0m CCitadelBcrypt.o
+[[36mInternalCollectionsUtilities[0m] [1mExtract App Intents Metadata[0m
+[[36mCrypto[0m] [1mExtract App Intents Metadata[0m
+[[36m_AtomicsShims[0m] [1mRegisterExecutionPolicyException[0m _AtomicsShims.o
+[[36mCNIOWindows[0m] [1mRegisterExecutionPolicyException[0m CNIOWindows.o
+[[36mCNIOWASI[0m] [1mRegisterExecutionPolicyException[0m CNIOWASI.o
+[[36mBigInt[0m] [1mLinking[0m BigInt.o
+[[36mCNIOPosix[0m] [1mRegisterExecutionPolicyException[0m CNIOPosix.o
+[[36mCNIOLinux[0m] [1mRegisterExecutionPolicyException[0m CNIOLinux.o
+[[36mCNIODarwin[0m] [1mRegisterExecutionPolicyException[0m CNIODarwin.o
+[[36mCNIOAtomics[0m] [1mRegisterExecutionPolicyException[0m CNIOAtomics.o
+[[36mCCitadelBcrypt[0m] [1mRegisterExecutionPolicyException[0m CCitadelBcrypt.o
+[[36m_NIOBase64[0m] [1mRegisterExecutionPolicyException[0m _NIOBase64.o
+[[36mSwiftASN1[0m] [1mRegisterExecutionPolicyException[0m SwiftASN1.o
+[[36mLogging[0m] [1mRegisterExecutionPolicyException[0m Logging.o
+[[36mKeychainAccess[0m] [1mRegisterExecutionPolicyException[0m KeychainAccess.o
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Testing.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+CustomReflectable.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Descriptions.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque._Storage.swift
+[[36mDequeModule[0m] [1mCompiling[0m _DequeSlot.swift
+[[36mDequeModule[0m] [1mCompiling[0m _DequeBuffer.swift
+[[36mDequeModule[0m] [1mCompiling[0m _UnsafeWrappedBuffer.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque._UnsafeHandle.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCEncoding.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCPrecredential.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCPresentation.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCRequest.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m resource_bundle_accessor.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_CBC.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_CFB.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_CTR.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_GCM_SIV.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCResponse.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCServer.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ChaCha20CTR_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ChaCha20CTR.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ObjectIdentifier.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PKCS8DERRepresentation.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PKCS8PrivateKey.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m RFC8410AlgorithmIdentifier.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m VOPRF+API.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m VOPRFClient.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m VOPRFServer.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m RSA+BlindSigning.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ECToolbox_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ECToolbox.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m HashToField.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m KDF.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Data+Extensions.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m DigestType.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Error.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m I2OSP.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m RSA.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m RSA_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m BoringSSLHelpers.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m CryptoKitErrors_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Block\ Function.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_CFB_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_CTR_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m AES_GCM_SIV_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Scrypt.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m OPRF.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m OPRFClient.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m OPRFServer.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m DLEQ.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Prover.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Verifier.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ZKPToolbox.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m IntegerEncoding.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PEMDocument.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PrettyBytes.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m SubjectPublicKeyInfo.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PBKDF2_boring.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PBKDF2_commoncrypto.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m PBKDF2.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m Scrypt_boring.swift
+[[36mDequeModule[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> DequeModule.swiftmodule
+[[36mDequeModule[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> DequeModule.swiftdoc
+[[36mDequeModule[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> DequeModule.abi.json
+[[36mDequeModule[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> DequeModule.swiftsourceinfo
+[[36m_CryptoExtras[0m] [1mCompiling[0m CMAC.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARC+API.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARC.swift
+[[36m_CryptoExtras[0m] [1mCompiling[0m ARCCredential.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Extras.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Equatable.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+ExpressibleByArrayLiteral.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Hashable.swift
+[[36m_CryptoExtras[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> _CryptoExtras.swiftmodule
+[[36m_CryptoExtras[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> _CryptoExtras.swiftdoc
+[[36m_CryptoExtras[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> _CryptoExtras.abi.json
+[[36m_CryptoExtras[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> _CryptoExtras.swiftsourceinfo
+[[36mDequeModule[0m] [1mCompiling[0m _DequeBufferHeader.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Codable.swift
+[[36mDequeModule[0m] [1mCompiling[0m Deque+Collection.swift
+[[36mAtomics[0m] [1mLinking[0m Atomics.o
+[[36mBigInt[0m] [1mExtract App Intents Metadata[0m
+[[36mNIOConcurrencyHelpers[0m] [1mLinking[0m NIOConcurrencyHelpers.o
+[[36m_NIODataStructures[0m] [1mRegisterExecutionPolicyException[0m _NIODataStructures.o
+[[36mAtomics[0m] [1mExtract App Intents Metadata[0m
+[[36mInternalCollectionsUtilities[0m] [1mRegisterExecutionPolicyException[0m InternalCollectionsUtilities.o
+[[36mCrypto[0m] [1mRegisterExecutionPolicyException[0m Crypto.o
+[[36mNIOConcurrencyHelpers[0m] [1mExtract App Intents Metadata[0m
+[[36mBigInt[0m] [1mRegisterExecutionPolicyException[0m BigInt.o
+[[36mNIOCore[0m] [1mCompiling[0m AddressedEnvelope.swift
+[[36mNIOCore[0m] [1mCompiling[0m AsyncAwaitSupport.swift
+[[36mNIOCore[0m] [1mCompiling[0m AsyncChannel.swift
+[[36mNIOCore[0m] [1mCompiling[0m AsyncChannelHandler.swift
+[[36mNIOCore[0m] [1mCompiling[0m AsyncChannelInboundStream.swift
+[[36mNIOCore[0m] [1mCompiling[0m ChannelOption.swift
+[[36mNIOCore[0m] [1mCompiling[0m ChannelPipeline.swift
+[[36mNIOCore[0m] [1mCompiling[0m CircularBuffer.swift
+[[36mNIOCore[0m] [1mCompiling[0m Codec.swift
+[[36mNIOCore[0m] [1mCompiling[0m ConvenienceOptionSupport.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-hex.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-int.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-lengthPrefix.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-multi-int.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-quicBinaryEncodingStrategy.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-views.swift
+[[36mNIOCore[0m] [1mCompiling[0m Channel.swift
+[[36mNIOCore[0m] [1mCompiling[0m ChannelHandler.swift
+[[36mNIOCore[0m] [1mCompiling[0m ChannelHandlers.swift
+[[36mNIOCore[0m] [1mCompiling[0m ChannelInvoker.swift
+[[36mNIOCore[0m] [1mCompiling[0m BSDSocketAPI.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-aux.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-binaryEncodedLengthPrefix.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-conversions.swift
+[[36mNIOCore[0m] [1mCompiling[0m ByteBuffer-core.swift
+[[36mNIOCore[0m] [1mCompiling[0m AsyncChannelOutboundWriter.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOAsyncSequenceProducer.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOAsyncSequenceProducerStrategies.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOAsyncWriter.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOThrowingAsyncSequenceProducer.swift
+[[36mNIOCore[0m] [1mCompiling[0m IPProtocol.swift
+[[36mNIOCore[0m] [1mCompiling[0m IntegerBitPacking.swift
+[[36mNIOCore[0m] [1mCompiling[0m IntegerTypes.swift
+[[36mNIOCore[0m] [1mCompiling[0m Interfaces.swift
+[[36mNIOCore[0m] [1mCompiling[0m Linux.swift
+[[36mCCryptoBoringSSLShims[0m] [1mCompiling[0m resource_bundle_accessor.m
+[[36mCCryptoBoringSSL[0m] [1mCompiling[0m resource_bundle_accessor.m
+[[36mNIOCore[0m] [1mCompiling[0m TimeAmount+Duration.swift
+[[36mNIOCore[0m] [1mCompiling[0m TypeAssistedChannelHandler.swift
+[[36mNIOCore[0m] [1mCompiling[0m UniversalBootstrapSupport.swift
+[[36mNIOCore[0m] [1mCompiling[0m Utilities.swift
+[[36mNIOCore[0m] [1mCompiling[0m FileHandle.swift
+[[36mNIOCore[0m] [1mCompiling[0m FileRegion.swift
+[[36mNIOCore[0m] [1mCompiling[0m GlobalSingletons.swift
+[[36mNIOCore[0m] [1mCompiling[0m IO.swift
+[[36mNIOCore[0m] [1mCompiling[0m IOData.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoopFuture+AssumeIsolated.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoopFuture+Deprecated.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoopFuture+WithEventLoop.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoopFuture.swift
+[[36mNIOCore[0m] [1mCompiling[0m FileDescriptor.swift
+[[36mCCryptoBoringSSL[0m] [1mLinking[0m CCryptoBoringSSL.o
+[[36mNIOCore[0m] [1mCompiling[0m MarkedCircularBuffer.swift
+[[36mNIOCore[0m] [1mCompiling[0m MulticastChannel.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOAny.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOCloseOnErrorHandler.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOCoreSendableMetatype.swift
+[[36mNIOCore[0m] [1mCompiling[0m DeadChannel.swift
+[[36mNIOCore[0m] [1mCompiling[0m DispatchQueue+WithFuture.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoop+Deprecated.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoop+SerialExecutor.swift
+[[36mNIOCore[0m] [1mCompiling[0m EventLoop.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOLoopBound.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOPooledRecvBufferAllocator.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOScheduledCallback.swift
+[[36mNIOCore[0m] [1mCompiling[0m NIOSendable.swift
+[[36mNIOCore[0m] [1mCompiling[0m RecvByteBufferAllocator.swift
+[[36mNIOCore[0m] [1mCompiling[0m SingleStepByteToMessageDecoder.swift
+[[36mNIOCore[0m] [1mCompiling[0m SocketAddresses.swift
+[[36mNIOCore[0m] [1mCompiling[0m SocketOptionProvider.swift
+[[36mNIOCore[0m] [1mCompiling[0m SystemCallHelpers.swift
+[[36mDequeModule[0m] [1mLinking[0m DequeModule.o
+[[36mNIOConcurrencyHelpers[0m] [1mRegisterExecutionPolicyException[0m NIOConcurrencyHelpers.o
+[[36mAtomics[0m] [1mRegisterExecutionPolicyException[0m Atomics.o
+[[36mCCryptoBoringSSL[0m] [1mRegisterExecutionPolicyException[0m CCryptoBoringSSL.o
+[[36mCCryptoBoringSSLShims[0m] [1mLinking[0m CCryptoBoringSSLShims.o
+[[36mDequeModule[0m] [1mExtract App Intents Metadata[0m
+[[36mCCryptoBoringSSLShims[0m] [1mRegisterExecutionPolicyException[0m CCryptoBoringSSLShims.o
+[[36mCryptoBoringWrapper[0m] [1mLinking[0m CryptoBoringWrapper.o
+[[36mCryptoBoringWrapper[0m] [1mExtract App Intents Metadata[0m
+[[36mDequeModule[0m] [1mRegisterExecutionPolicyException[0m DequeModule.o
+[[36mCryptoBoringWrapper[0m] [1mRegisterExecutionPolicyException[0m CryptoBoringWrapper.o
+[[36m_CryptoExtras[0m] [1mLinking[0m _CryptoExtras.o
+[[36m_CryptoExtras[0m] [1mExtract App Intents Metadata[0m
+[[36m_CryptoExtras[0m] [1mRegisterExecutionPolicyException[0m _CryptoExtras.o
+[[36mNIOCore[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIOCore.abi.json
+[[36mNIOCore[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIOCore.swiftdoc
+[[36mNIOCore[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIOCore.swiftmodule
+[[36mNIOCore[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIOCore.swiftsourceinfo
+[[36mNIOCore[0m] [1mLinking[0m NIOCore.o
+[[36mNIOEmbedded[0m] [1mCompiling[0m AsyncTestingEventLoop.swift
+[[36mNIOEmbedded[0m] [1mCompiling[0m Embedded.swift
+[[36mNIOEmbedded[0m] [1mCompiling[0m AsyncTestingChannel.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BaseSocket.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BaseSocketChannel+SocketOptionProvider.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BaseSocketChannel.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BaseStreamSocketChannel.swift
+[[36mNIOPosix[0m] [1mCompiling[0m FileDescriptor.swift
+[[36mNIOPosix[0m] [1mCompiling[0m GetaddrinfoResolver.swift
+[[36mNIOPosix[0m] [1mCompiling[0m HappyEyeballs.swift
+[[36mNIOPosix[0m] [1mCompiling[0m IO.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SelectableEventLoop.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SelectorEpoll.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SelectorGeneric.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SelectorKqueue.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SelectorUring.swift
+[[36mNIOPosix[0m] [1mCompiling[0m ServerSocket.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Socket.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SocketChannel.swift
+[[36mNIOPosix[0m] [1mCompiling[0m ThreadPosix.swift
+[[36mNIOPosix[0m] [1mCompiling[0m ThreadWindows.swift
+[[36mNIOPosix[0m] [1mCompiling[0m UnsafeTransfer.swift
+[[36mNIOPosix[0m] [1mCompiling[0m RawSocketBootstrap.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Resolver.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Selectable.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SelectableChannel.swift
+[[36mNIOPosix[0m] [1mCompiling[0m LinuxUring.swift
+[[36mNIOPosix[0m] [1mCompiling[0m MultiThreadedEventLoopGroup.swift
+[[36mNIOPosix[0m] [1mCompiling[0m NIOPosixSendableMetatype.swift
+[[36mNIOPosix[0m] [1mCompiling[0m NIOThreadPool.swift
+[[36mNIOPosix[0m] [1mCompiling[0m resource_bundle_accessor.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BSDSocketAPICommon.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BSDSocketAPIPosix.swift
+[[36mNIOPosix[0m] [1mCompiling[0m BSDSocketAPIWindows.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Bootstrap.swift
+[[36mNIOPosix[0m] [1mCompiling[0m ControlMessage.swift
+[[36mNIOPosix[0m] [1mCompiling[0m DatagramVectorReadManager.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Errors+Any.swift
+[[36mNIOPosix[0m] [1mCompiling[0m SocketProtocols.swift
+[[36mNIOPosix[0m] [1mCompiling[0m StructuredConcurrencyHelpers.swift
+[[36mNIOPosix[0m] [1mCompiling[0m System.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Thread.swift
+[[36mNIOPosix[0m] [1mCompiling[0m IntegerBitPacking.swift
+[[36mNIOPosix[0m] [1mCompiling[0m IntegerTypes.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Linux.swift
+[[36mNIOPosix[0m] [1mCompiling[0m LinuxCPUSet.swift
+[[36mNIOPosix[0m] [1mCompiling[0m PipePair.swift
+[[36mNIOPosix[0m] [1mCompiling[0m Pool.swift
+[[36mNIOPosix[0m] [1mCompiling[0m PosixSingletons+ConcurrencyTakeOver.swift
+[[36mNIOPosix[0m] [1mCompiling[0m PosixSingletons.swift
+[[36mNIOEmbedded[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIOEmbedded.swiftdoc
+[[36mNIOEmbedded[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIOEmbedded.swiftmodule
+[[36mNIOEmbedded[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIOEmbedded.abi.json
+[[36mNIOEmbedded[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIOEmbedded.swiftsourceinfo
+[[36mNIOPosix[0m] [1mCompiling[0m Utilities.swift
+[[36mNIOPosix[0m] [1mCompiling[0m VsockAddress.swift
+[[36mNIOPosix[0m] [1mCompiling[0m VsockChannelEvents.swift
+[[36mNIOPosix[0m] [1mCompiling[0m NonBlockingFileIO.swift
+[[36mNIOPosix[0m] [1mCompiling[0m PendingDatagramWritesManager.swift
+[[36mNIOPosix[0m] [1mCompiling[0m PendingWritesManager.swift
+[[36mNIOPosix[0m] [1mCompiling[0m PipeChannel.swift
+[[36mNIOCore[0m] [1mExtract App Intents Metadata[0m
+[[36mNIOCore[0m] [1mRegisterExecutionPolicyException[0m NIOCore.o
+[[36mNIOEmbedded[0m] [1mLinking[0m NIOEmbedded.o
+[[36mNIOEmbedded[0m] [1mExtract App Intents Metadata[0m
+[[36mNIOEmbedded[0m] [1mRegisterExecutionPolicyException[0m NIOEmbedded.o
+[[36mNIOPosix[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIOPosix.swiftmodule
+[[36mNIOPosix[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIOPosix.abi.json
+[[36mNIOPosix[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIOPosix.swiftdoc
+[[36mNIOPosix[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIOPosix.swiftsourceinfo
+[[36mNIO[0m] [1mCompiling[0m Exports.swift
+[[36mNIO[0m] [1mCompiling[0m Exports.swift
+[[36mNIO[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIO.swiftdoc
+[[36mNIO[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIO.abi.json
+[[36mNIO[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIO.swiftmodule
+[[36mNIO[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIO.swiftsourceinfo
+[[36mNIOFoundationCompat[0m] [1mCompiling[0m Codable+ByteBuffer.swift
+[[36mNIOFoundationCompat[0m] [1mCompiling[0m ByteBuffer-foundation.swift
+[[36mNIOFoundationCompat[0m] [1mCompiling[0m WaitSpinningRunLoop.swift
+[[36mNIOFoundationCompat[0m] [1mCompiling[0m JSONSerialization+ByteBuffer.swift
+[[36mNIOFoundationCompat[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIOFoundationCompat.swiftdoc
+[[36mNIOFoundationCompat[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIOFoundationCompat.abi.json
+[[36mNIOFoundationCompat[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIOFoundationCompat.swiftmodule
+[[36mNIOFoundationCompat[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIOFoundationCompat.swiftsourceinfo
+[[36mNIOSSH[0m] [1mCompiling[0m ByteBuffer+SSH.swift
+[[36mNIOSSH[0m] [1mCompiling[0m CSPRNG.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ChildChannelOptions.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ChildChannelStateMachine.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ChildChannelUserEvents.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SentNewKeysState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SentVersionState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m UserAuthenticationState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m Constants.swift
+[[36mNIOSSH[0m] [1mCompiling[0m GlobalRequestDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ChildChannelWindowManager.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ChildChannelWritabilityManager.swift
+[[36mNIOSSH[0m] [1mCompiling[0m OutboundFlowController.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHChannelData.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHChannelIdentifier.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHChannelMultiplexer.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHChannelType.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHChildChannel.swift
+[[36mNIOSSH[0m] [1mCompiling[0m AcceptsChannelMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m AcceptsKeyExchangeMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHConnectionStateMachine.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ActiveState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m IdleState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m KeyExchangeState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ReceivedKexInitWhenActiveState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ReceivedNewKeysState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m RekeyingReceivedNewKeysState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m RekeyingSentNewKeysState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m RekeyingState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SentKexInitWhenActiveState.swift
+[[36mNIOSSH[0m] [1mCompiling[0m AcceptsUserAuthMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m AcceptsVersionMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SendsChannelMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SendsKeyExchangeMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SendsUserAuthMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ECDHCompatibleKey.swift
+[[36mNIOSSH[0m] [1mCompiling[0m EllipticCurveKeyExchange.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHKeyExchangeResult.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHKeyExchangeStateMachine.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ClientServerAuthenticationDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m UserAuthDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m UserAuthSignablePayload.swift
+[[36mNIOSSH[0m] [1mCompiling[0m UserAuthenticationMethod.swift
+[[36mNIOSSH[0m] [1mCompiling[0m UserAuthenticationStateMachine.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHError.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHHandler.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHSendable.swift
+[[36mNIOSSH[0m] [1mCompiling[0m Role.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHClientConfiguration.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHServerConfiguration.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHTerminalModes.swift
+[[36mNIOSSH[0m] [1mCompiling[0m AESGCM.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHTransportProtection.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHEncryptablePacketPayload.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHMessages.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHPacketParser.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SSHPacketSerializer.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ClientUserAuthenticationDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m DenyAllServerAuthDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m ServerUserAuthenticationDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m SimplePasswordDelegate.swift
+[[36mNIOSSH[0m] [1mCompiling[0m CustomKeys.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHCertifiedPublicKey.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHPrivateKey.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHPublicKey.swift
+[[36mNIOSSH[0m] [1mCompiling[0m NIOSSHSignature.swift
+[[36mNIOPosix[0m] [1mLinking[0m NIOPosix.o
+[[36mNIOPosix[0m] [1mExtract App Intents Metadata[0m
+[[36mNIOSSH[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> NIOSSH.swiftmodule
+[[36mNIOSSH[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> NIOSSH.swiftdoc
+[[36mNIOSSH[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> NIOSSH.abi.json
+[[36mNIOSSH[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> NIOSSH.swiftsourceinfo
+[[36mNIOPosix[0m] [1mRegisterExecutionPolicyException[0m NIOPosix.o
+[[36mNIO[0m] [1mLinking[0m NIO.o
+[[36mCitadel[0m] [1mCompiling[0m SFTPBasicEnums.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPFileFlags.swift
+[[36mCitadel[0m] [1mCompiling[0m ShellDelegate.swift
+[[36mCitadel[0m] [1mCompiling[0m TTY.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPSerializer.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPServer.swift
+[[36mCitadel[0m] [1mCompiling[0m ByteBufferHelpers.swift
+[[36mCitadel[0m] [1mCompiling[0m ChannelUnwrapper.swift
+[[36mCitadel[0m] [1mCompiling[0m Client.swift
+[[36mCitadel[0m] [1mCompiling[0m DiffieHellmanGroup14Sha256.swift
+[[36mCitadel[0m] [1mCompiling[0m RSA.swift
+[[36mCitadel[0m] [1mCompiling[0m BCrypt.swift
+[[36mCitadel[0m] [1mCompiling[0m SSHCert.swift
+[[36mCitadel[0m] [1mCompiling[0m SSHConnectionPoolSettings.swift
+[[36mCitadel[0m] [1mCompiling[0m AES.swift
+[[36mCitadel[0m] [1mCompiling[0m DH-Helpers.swift
+[[36mCitadel[0m] [1mCompiling[0m DiffieHellmanGroup14Sha1.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPClient.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPClientInboundHandler.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPFile.swift
+[[36mCitadel[0m] [1mCompiling[0m ExecHandler.swift
+[[36mCitadel[0m] [1mCompiling[0m NIOGlueHandler.swift
+[[36mCitadel[0m] [1mCompiling[0m OpenSSHKey.swift
+[[36mCitadel[0m] [1mCompiling[0m Errors.swift
+[[36mCitadel[0m] [1mCompiling[0m ExecClient.swift
+[[36mCitadel[0m] [1mCompiling[0m ExecDelegate.swift
+[[36mCitadel[0m] [1mCompiling[0m SSHKeyTypeDetection.swift
+[[36mCitadel[0m] [1mCompiling[0m Server.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPMessage.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPMessageParser.swift
+[[36mCitadel[0m] [1mCompiling[0m SFTPServerInboundHandler.swift
+[[36mCitadel[0m] [1mCompiling[0m SSHAuthenticationMethod.swift
+[[36mCitadel[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftmodule -> Citadel.swiftmodule
+[[36mCitadel[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftdoc -> Citadel.swiftdoc
+[[36mCitadel[0m] [1mCopy[0m arm64-apple-ios-simulator.abi.json -> Citadel.abi.json
+[[36mCitadel[0m] [1mCopy[0m arm64-apple-ios-simulator.swiftsourceinfo -> Citadel.swiftsourceinfo
+[[36mCitadel[0m] [1mCompiling[0m ClientSession.swift
+[[36mCitadel[0m] [1mCompiling[0m DirectTCPIP+Client.swift
+[[36mCitadel[0m] [1mCompiling[0m DirectTCPIP+Server.swift
+[[36mNIO[0m] [1mExtract App Intents Metadata[0m
+[[36mClaudeCodeSwift[0m] [1mRunning script[0m SwiftLint
+[[36mNIO[0m] [1mRegisterExecutionPolicyException[0m NIO.o
+[[36mNIOFoundationCompat[0m] [1mLinking[0m NIOFoundationCompat.o
+[[36mNIOFoundationCompat[0m] [1mExtract App Intents Metadata[0m
+[[36mNIOFoundationCompat[0m] [1mRegisterExecutionPolicyException[0m NIOFoundationCompat.o
+[[36mClaudeCodeSwift[0m] [1mRunning script[0m Build Info
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileIconProvider.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileManagementModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileOperationsService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FilePickerView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FilePreviewView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileTransferService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileTreeNode.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileTreeView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileTreeViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m GestureHandlers.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m HSLColor.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Icons.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ImageCache.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ImportDataView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m InputComponents.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m InputSanitizer.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m JailbreakDetector.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m KeyboardHandling.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m KeychainManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m LRUCache.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m LicensesView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ListComponents.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m LoadingStates.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m LoadingView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MCPModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MainTabView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MainView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MessagePaginator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MessageView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MetricsCollector.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ModelExtensions.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ModelFactories.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ModelSelectorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ModelTestUtilities.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ModelValidation.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorCoordinator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorDetailView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorExportView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorStore.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitorViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitoringDashboardView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m MonitoringModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m NavigationCoordinator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m NetworkModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectStore.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectsCoordinator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectsViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m RASPManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m RemoteConfigService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m RequestPrioritizer.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSEClient.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHConfigurationView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHCredentialManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHGlobalConfigView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHKeyManagementView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AppModules.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AppState.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AppearanceSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AuthenticationView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m BiometricAuthManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ButtonStyles.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Card.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CardView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CertificatePinningManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatConsole.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatCoordinator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatInputView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatListView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatListViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatSearchView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatStore.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ChatViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ClaudeCodeApp.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CodeCompletionEngine.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CodeEditorCore.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CodeEditorSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CodeEditorToolbar.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CodeEditorView+Voice.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CodeEditorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Color+HSL.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Colors.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CommonComponents.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ComponentShowcase.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ContentView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkToggle.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m DataEncryptionManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m DataManagementView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Debouncer.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m DependencyContainer.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m EnhancedKeychainManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m EnhancedOnboardingView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m EnhancedTerminalView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m EnhancedTerminalViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m EnvironmentVariablesView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ErrorTracker.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ErrorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ExportDataView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FeatureFlagService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileContextMenuView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m FileEditorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHMonitor.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHMonitoringSection.swift
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:587:40: [31mcannot find type 'SSHAlertLevel' in scope[0m
+    private func iconForLevel(_ level: SSHAlertLevel) -> String {
+[36m                                       ^~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:599:8: [31minvalid redeclaration of 'ShareSheet'[0m
+struct ShareSheet: UIViewControllerRepresentable {
+[36m       ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:611:11: [31mcannot find type 'RelativeDateFormatter' in scope[0m
+extension RelativeDateFormatter {
+[36m          ^~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:57:25: [31mincorrect argument label in call (have 'title:value:trend:color:', expected 'title:value:icon:color:')[0m
+                StatCard(
+[36m                        ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:60:28: [31m'nil' is not compatible with expected argument type 'String'[0m
+                    trend: nil,
+[36m                           ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:258:61: [31mcannot convert value of type 'Array<SSHOperation>.SubSequence' (aka 'ArraySlice<SSHOperation>') to expected argument type 'Binding<C>'[0m
+                        ForEach(sshMonitor.recentOperations.suffix(10), id: \.startTime) { operation in
+[36m                                                            ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:258:25: [31mgeneric parameter 'C' could not be inferred[0m
+                        ForEach(sshMonitor.recentOperations.suffix(10), id: \.startTime) { operation in
+[36m                        ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:258:77: [31mcannot infer key path type from context; consider explicitly specifying a root type[0m
+                        ForEach(sshMonitor.recentOperations.suffix(10), id: \.startTime) { operation in
+[36m                                                                            ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:259:54: [31mcannot convert value of type 'Binding<C.Element>' to expected argument type 'SSHOperationMetrics'[0m
+                            OperationCard(operation: operation)
+[36m                                                     ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:270:27: [31mincorrect argument label in call (have 'items:', expected 'activityItems:')[0m
+                ShareSheet(items: [data])
+[36m                          ^~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:303:43: [31mcannot call value of non-function type 'Binding<Subject>'[0m
+            exportedData = try sshMonitor.exportToJSON()
+[36m                                          ^           ~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:303:43: [31mvalue of type 'SSHMonitor' has no dynamic member 'exportToJSON' using key path from root type 'SSHMonitor'[0m
+            exportedData = try sshMonitor.exportToJSON()
+[36m                               ~~~~~~~~~~ ^~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:303:32: [31mreferencing subscript 'subscript(dynamicMember:)' requires wrapper 'ObservedObject<SSHMonitor>.Wrapper'[0m
+            exportedData = try sshMonitor.exportToJSON()
+[36m                               ^[0m
+⚠️  /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:305:11: [33m'catch' block is unreachable because no errors are thrown in 'do' block[0m
+        } catch {
+[32m          ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:375:32: [31mvalue of type 'SSHOperationMetrics' has no member 'operationType'[0m
+                Text(operation.operationType.rawValue.capitalized)
+[36m                     ~~~~~~~~~ ^~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:409:40: [31mvalue of type 'SSHConnectionStats' has no member 'activeConnections'[0m
+                        Label("\(stats.activeConnections)", systemImage: "circle.fill")
+[36m                                 ~~~~~ ^~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:457:61: [31mcannot find 'RelativeDateFormatter' in scope[0m
+                DetailItem(label: "Last Connection", value: RelativeDateFormatter.shared.string(from: lastConnection))
+[36m                                                            ^~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:439:61: [31mvalue of type 'SSHConnectionStats' has no member 'failedConnections'[0m
+                DetailItem(label: "Failed", value: "\(stats.failedConnections)")
+[36m                                                      ~~~~~ ^~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:521:19: [31mvalue of type 'SSHOperationMetrics' has no member 'success'[0m
+        operation.success ? .green : .red
+[36m        ~~~~~~~~~ ^~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:531:32: [31mvalue of type 'SSHOperationMetrics' has no member 'operationType'[0m
+                Text(operation.operationType.rawValue.capitalized)
+[36m                     ~~~~~~~~~ ^~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:558:22: [31mvalue of type 'SSHAlert' has no member 'level'[0m
+        switch alert.level {
+[36m               ~~~~~ ^~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:577:22: [31mcannot find 'RelativeDateFormatter' in scope[0m
+                Text(RelativeDateFormatter.shared.string(from: alert.timestamp))
+[36m                     ^~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:568:50: [31mvalue of type 'SSHAlert' has no member 'level'[0m
+            Image(systemName: iconForLevel(alert.level))
+[36m                                           ~~~~~ ^~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift:612:24: [31mcannot find type 'RelativeDateFormatter' in scope[0m
+    static let shared: RelativeDateFormatter = {
+[36m                       ^~~~~~~~~~~~~~~~~~~~~[0m
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHSessionManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SSHTerminal.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SecondaryButton.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SecureTokenManager.swift
+⚠️  /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Security/SecureTokenManager.swift:227:17: [33minitialization of immutable value 'refreshToken' was never used; consider replacing with assignment to '_' or removing it[0m
+            let refreshToken = try await retrieveRefreshToken()
+[32m            ~~~~^~~~~~~~~~~~[0m
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SettingsCoordinator.swift
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:117:41: [31mcannot find type 'SSHConfiguration' in scope[0m
+    func updateSSHConfiguration(config: SSHConfiguration) {
+[36m                                        ^~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:90:53: [31mvalue of type 'SettingsStore' has no member 'updateAPIConfiguration'[0m
+            await dependencyContainer.settingsStore.updateAPIConfiguration(
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:108:60: [31mvalue of type 'APIClient' has no member 'testConnection'[0m
+            return try await dependencyContainer.apiClient.testConnection()
+[36m                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:119:53: [31mvalue of type 'SettingsStore' has no member 'updateSSHConfiguration'[0m
+            await dependencyContainer.settingsStore.updateSSHConfiguration(config)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:127:62: [31mvalue of type 'SettingsStore' has no member 'sshConfiguration'[0m
+        guard let config = dependencyContainer.settingsStore.sshConfiguration else {
+[36m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/DependencyContainer.swift:36:22: [31mcannot find 'SSHManager' in scope[0m
+    let sshManager = SSHManager()
+[36m                     ^~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:138:53: [31mvalue of type 'SettingsStore' has no member 'updateTheme'[0m
+            await dependencyContainer.settingsStore.updateTheme(theme)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:144:53: [31mvalue of type 'SettingsStore' has no member 'updateFontSize'[0m
+            await dependencyContainer.settingsStore.updateFontSize(size)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:150:53: [31mvalue of type 'SettingsStore' has no member 'toggleReduceMotion'[0m
+            await dependencyContainer.settingsStore.toggleReduceMotion(enabled)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:157:53: [31mvalue of type 'SettingsStore' has no member 'exportSettings'[0m
+        try await dependencyContainer.settingsStore.exportSettings()
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:161:53: [31mvalue of type 'SettingsStore' has no member 'importSettings'[0m
+        try await dependencyContainer.settingsStore.importSettings(from: url)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/DependencyContainer.swift:27:31: [31mmissing argument for parameter 'apiClient' in call[0m
+    let chatStore = ChatStore()
+[36m                              ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:194:48: [31mvalue of type 'ProjectStore' has no member 'clearAll'[0m
+        await dependencyContainer.projectStore.clearAll()
+[36m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:195:45: [31mvalue of type 'ToolStore' has no member 'clearAll'[0m
+        await dependencyContainer.toolStore.clearAll()
+[36m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/State/MonitorStore.swift:49:22: [31mcannot find type 'SSHManager' in scope[0m
+    init(sshManager: SSHManager) {
+[36m                     ^~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:200:44: [31mvalue of type 'AppState' has no member 'reset'[0m
+        await dependencyContainer.appState.reset()
+[36m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:217:45: [31mvalue of type 'APIClient' has no member 'clearCache'[0m
+        await dependencyContainer.apiClient.clearCache()
+[36m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:218:45: [31mvalue of type 'ToolStore' has no member 'clearCache'[0m
+        await dependencyContainer.toolStore.clearCache()
+[36m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:237:53: [31mvalue of type 'SettingsStore' has no member 'updateNotificationSettings'[0m
+            await dependencyContainer.settingsStore.updateNotificationSettings(settings)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:242:44: [31mvalue of type 'AppState' has no member 'requestNotificationPermission'[0m
+        await dependencyContainer.appState.requestNotificationPermission()
+[36m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:249:53: [31mvalue of type 'SettingsStore' has no member 'updatePrivacySettings'[0m
+            await dependencyContainer.settingsStore.updatePrivacySettings(settings)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift:255:53: [31mvalue of type 'SettingsStore' has no member 'toggleAnalytics'[0m
+            await dependencyContainer.settingsStore.toggleAnalytics(enabled)
+[36m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~~~~[0m
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SettingsModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SettingsSectionView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SettingsStore.swift
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/State/SettingsStore.swift:382:9: [31mswitch must be exhaustive[0m
+        switch theme {
+[36m        ^[0m
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SettingsViewModel.swift
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/ViewModels/SettingsViewModel.swift:212:54: [31mcannot infer contextual base in reference to member 'connected'[0m
+            success = sshManager.connectionState == .connected
+[36m                                                    ~^~~~~~~~~[0m
+⚠️  /Users/nick/Documents/claude-code-ios-swift2/Sources/ViewModels/SettingsViewModel.swift:223:11: [33m'catch' block is unreachable because no errors are thrown in 'do' block[0m
+        } catch {
+[32m          ^[0m
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Spacing.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SplitViews.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m StreamingIndicator.swift
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/Chat/StreamingIndicator.swift:92:17: [31mmain actor-isolated property 'animatingDots' can not be mutated from a nonisolated context[0m
+                animatingDots = (animatingDots + 1) % dotCount
+[36m                ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/Chat/StreamingIndicator.swift:92:34: [31mmain actor-isolated property 'animatingDots' can not be referenced from a nonisolated context[0m
+                animatingDots = (animatingDots + 1) % dotCount
+[36m                                 ^[0m
+❌ /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/Chat/StreamingIndicator.swift:216:52: [31mambiguous use of operator '*'[0m
+                    let sine = sin(relativeX * .pi * 2 + phase)
+[36m                                                   ^[0m
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m SyntaxHighlighter.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TelemetryConfiguration.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TelemetryEvent.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TelemetryExporter.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TelemetryManager+Convenience.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TelemetryManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TelemetryStorage.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalEmulatorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalInputView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalOutputView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalSessionView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalTabsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TerminalViewModel.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ABTestingService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APIClient+Streaming.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APIClient.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APIConfig.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APIConfigurationView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APIModels.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APIResponses.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m APISettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AlertConfigurationView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AnalyticsService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AnimationUtilities.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Animations.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AnyCodable.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AppCoordinator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AppDelegate.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m AppError.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TextField+Styled.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Theme.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeColors.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeExtensions.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeRadius.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeSelectorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeShadows.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeSpacing.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ThemeTypography.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m TimelineComponents.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ToolCategoryView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ToolDetailView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ToolDetailsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ToolExecutionView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ConversationSettingsView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Coordinator.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CoordinatorView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CoreDataStack.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CrashReporter.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CustomTextField.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkAlert.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m Cybe** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ SSHMonitor.swift,\ SSHMonitoringSection.swift,\ SSHSessionManager.swift,\ SSHTerminal.swift,\ SecondaryButton.swift,\ SecureTokenManager.swift,\ SettingsCoordinator.swift,\ SettingsModels.swift,\ SettingsSectionView.swift,\ SettingsStore.swift,\ SettingsView.swift,\ SettingsViewModel.swift,\ Spacing.swift,\ SplitViews.swift,\ StreamingIndicator.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Services/SSH/SSHMonitor.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Services/SSH/SSHSessionManager.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Services/SSH/SSHTerminal.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/Components/Button/SecondaryButton.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Security/SecureTokenManager.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Models/SettingsModels.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Settings/SettingsSectionView.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/State/SettingsStore.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Settings/SettingsView.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/ViewModels/SettingsViewModel.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/DesignSystem/Spacing.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/Features/Terminal/Views/SplitViews.swift /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/Chat/StreamingIndicator.swift (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+	SwiftCompile normal arm64 /Users/nick/Documents/claude-code-ios-swift2/Sources/Views/Monitor/SSHMonitoringSection.swift (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+	SwiftCompile normal arm64 /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/Coordinators/SettingsCoordinator.swift (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+	SwiftCompile normal arm64 /Users/nick/Documents/claude-code-ios-swift2/Sources/Core/State/SettingsStore.swift (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+	SwiftCompile normal arm64 /Users/nick/Documents/claude-code-ios-swift2/Sources/ViewModels/SettingsViewModel.swift (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+	SwiftCompile normal arm64 /Users/nick/Documents/claude-code-ios-swift2/Sources/UI/Chat/StreamingIndicator.swift (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+	Building project ClaudeCodeSwift with scheme ClaudeCodeSwift
+(7 failures)
+rpunkBadge.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkButton.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkCard.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkListItem.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkProgress.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkSegmentedControl.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkSlider.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkTabBar.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m CyberpunkTextField.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m NetworkMonitor.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m NetworkSecurityManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m NewConversationView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m NewProjectView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m OfflineQueueManager.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m OnboardingService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m OnboardingView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m PDFViewerView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m PerformanceMonitor.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m PerformanceProfiler.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m PerformanceSection.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m PersonalizationService.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m PrimaryButton.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectDetailView.swift
+[[36mClaudeCodeSwift[0m] [1mCompiling[0m ProjectFilesView.swift
+[36;1mnote: [0mRun script build phase 'SwiftLint' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+[36;1mnote: [0mRun script build phase 'Build Notification' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+[36;1mnote: [0mRun script build phase 'Build Info' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ClaudeCodeSwift' from project 'ClaudeCodeSwift')
+[0;32m[SUCCESS][0m Build completed successfully
+[0;34m[INFO][0m Cleaning up...
+[0;34m[INFO][0m Stopping log capture (PID: 47005)...
+[0;32m[SUCCESS][0m Log capture stopped

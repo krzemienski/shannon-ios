@@ -14,7 +14,7 @@ struct MonitorDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text(monitorType.title)
+                Text(monitorType.rawValue)  // Use rawValue since MonitorType is defined in MonitorCoordinator
                     .font(Theme.title)
                     .foregroundColor(Theme.foreground)
                 
@@ -35,25 +35,7 @@ struct MonitorDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(monitorType.title)
+        .navigationTitle(monitorType.rawValue)
         .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-enum MonitorType: String {
-    case cpu = "cpu"
-    case memory = "memory"
-    case network = "network"
-    case disk = "disk"
-    case ssh = "ssh"
-    
-    var title: String {
-        switch self {
-        case .cpu: return "CPU Usage"
-        case .memory: return "Memory Usage"
-        case .network: return "Network Activity"
-        case .disk: return "Disk Usage"
-        case .ssh: return "SSH Connections"
-        }
     }
 }

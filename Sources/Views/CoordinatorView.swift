@@ -59,10 +59,10 @@ struct CoordinatorView: View {
     private func sheetContent(for sheetType: SheetType) -> some View {
         switch sheetType {
         case .newProject:
-            NewProjectView(onSave: { project in
+            NewProjectView { project in
                 // Handle project creation - implementation to be added
                 print("New project created: \(project.name)")
-            })
+            }
         case .projectSettings(let id):
             ProjectSettingsView(
                 projectId: id,
@@ -183,7 +183,6 @@ struct ChatNavigationView: View {
             // Create a temporary ChatSession for the given ID
             // In production, this should fetch from state/store
             ChatView(session: ChatSession(
-                id: id,
                 title: "Conversation",
                 lastMessage: "",
                 timestamp: Date(),
@@ -202,7 +201,7 @@ struct ChatNavigationView: View {
         case .toolExecution(let toolId, let conversationId):
             ToolExecutionView(
                 toolId: toolId,
-                conversationId: conversationId
+                executionId: conversationId  // Using conversationId as executionId
             )
             .environmentObject(coordinator)
         }
@@ -231,8 +230,17 @@ struct ProjectsNavigationView: View {
             ProjectDetailView(projectId: id, projectName: "Project")
                 .environmentObject(coordinator)
         case .sshConfig(let id):
-            SSHConfigurationView(projectId: id)
-                .environmentObject(coordinator)
+            SSHConfigurationView(
+                onConnect: { config in
+                    // Handle SSH connection
+                    print("SSH config for project \(id): \(config)")
+                },
+                onSave: { config in
+                    // Handle SSH config save
+                    print("Save SSH config for project \(id): \(config)")
+                }
+            )
+            .environmentObject(coordinator)
         case .environmentVariables(let id):
             EnvironmentVariablesView(projectId: id)
                 .environmentObject(coordinator)
@@ -264,13 +272,13 @@ struct ToolsNavigationView: View {
     private func toolDestination(for route: ToolRoute) -> some View {
         switch route {
         case .category(let category):
-            ToolCategoryView(category: category)
+            ToolCategoryView(category: category.rawValue)
                 .environmentObject(coordinator)
         case .detail(let id):
             ToolDetailView(toolId: id)
                 .environmentObject(coordinator)
-        case .execution(let id, let parameters):
-            ToolExecutionView(toolId: id, parameters: parameters)
+        case .execution(let id, _):  // Ignore parameters, use a default executionId
+            ToolExecutionView(toolId: id, executionId: "exec-\(UUID().uuidString)")
                 .environmentObject(coordinator)
         }
     }
@@ -327,7 +335,7 @@ struct SettingsNavigationView: View {
     private func settingsDestination(for route: SettingsRoute) -> some View {
         switch route {
         case .section(let section):
-            SettingsSectionView(section: section)
+            SettingsSectionView(section: SettingsSectionType(rawValue: section.rawValue) ?? .general)
                 .environmentObject(coordinator)
         case .apiConfig:
             APIConfigurationView()

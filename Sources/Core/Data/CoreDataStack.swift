@@ -4,11 +4,11 @@ import OSLog
 import Combine
 
 /// Core Data stack for offline data persistence
-@MainActor
 public class CoreDataStack: ObservableObject {
     
     // MARK: - Properties
     
+    @MainActor
     static let shared = CoreDataStack()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "CoreData")
     
@@ -35,13 +35,13 @@ public class CoreDataStack: ObservableObject {
         
         container.persistentStoreDescriptions = [storeDescription]
         
-        container.loadPersistentStores { storeDescription, error in
+        container.loadPersistentStores { [weak self] storeDescription, error in
             if let error = error as NSError? {
-                self.logger.error("Core Data failed to load: \(error.localizedDescription)")
+                self?.logger.error("Core Data failed to load: \(error.localizedDescription)")
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
             
-            self.logger.info("Core Data loaded successfully at: \(storeDescription.url?.absoluteString ?? "unknown")")
+            self?.logger.info("Core Data loaded successfully at: \(storeDescription.url?.absoluteString ?? "unknown")")
         }
         
         // Enable automatic merging of changes

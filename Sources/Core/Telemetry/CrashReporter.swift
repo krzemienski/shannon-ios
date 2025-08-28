@@ -74,7 +74,6 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     /// Manually report an error as a crash
-    @MainActor
     public func reportError(_ error: Error, fatal: Bool = false) {
         let crashReport = CrashReport(
             id: UUID(),
@@ -97,7 +96,6 @@ public final class CrashReporter: @unchecked Sendable {
     }
     
     /// Report a custom crash
-    @MainActor
     public func reportCustomCrash(reason: String, details: [String: String]? = nil) {
         let crashReport = CrashReport(
             id: UUID(),
@@ -211,7 +209,6 @@ public final class CrashReporter: @unchecked Sendable {
         CrashReporter.shared.handleSignal(signal)
     }
     
-    @MainActor
     private func handleException(_ exception: NSException) {
         let crashReport = CrashReport(
             id: UUID(),
@@ -236,7 +233,6 @@ public final class CrashReporter: @unchecked Sendable {
         previousExceptionHandler?(exception)
     }
     
-    @MainActor
     private func handleSignal(_ signal: Int32) {
         let signalName = getSignalName(signal)
         
@@ -275,7 +271,6 @@ public final class CrashReporter: @unchecked Sendable {
         }
     }
     
-    @MainActor
     @objc private func applicationWillTerminate() {
         // Save session end information
         let sessionEnd = CrashReport(
@@ -364,7 +359,6 @@ public final class CrashReporter: @unchecked Sendable {
         )
     }
     
-    @MainActor
     private func captureSystemInfo() -> SystemInfo {
         let processInfo = Foundation.ProcessInfo.processInfo
         

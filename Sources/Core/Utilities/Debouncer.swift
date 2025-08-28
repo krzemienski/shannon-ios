@@ -45,25 +45,15 @@ final class Debouncer {
     }
     
     deinit {
-        cancel()
+        // Note: cancel() is MainActor-isolated, so we can't call it directly in deinit
+        // The work item will be cancelled when the object is deallocated
+        workItem?.cancel()
     }
 }
 
-/// Publisher-based debouncer for Combine integration
-extension Publisher where Failure == Never {
-    /// Debounce publisher events
-    /// - Parameters:
-    ///   - duration: The duration to wait before publishing
-    ///   - scheduler: The scheduler to use for timing
-    /// - Returns: A publisher that delays events
-    func debounce<S: Scheduler>(
-        for duration: S.SchedulerTimeType.Stride,
-        scheduler: S
-    ) -> AnyPublisher<Output, Never> {
-        self.debounce(for: duration, scheduler: scheduler)
-            .eraseToAnyPublisher()
-    }
-}
+// Note: Combine already provides a debounce operator, so no extension is needed
+// Use the native Combine debounce operator directly:
+// publisher.debounce(for: .seconds(0.5), scheduler: RunLoop.main)
 
 /// Throttle utility for rate limiting
 @MainActor
@@ -105,6 +95,8 @@ final class Throttler {
     }
     
     deinit {
-        cancel()
+        // Note: cancel() is MainActor-isolated, so we can't call it directly in deinit
+        // The work item will be cancelled when the object is deallocated
+        workItem?.cancel()
     }
 }

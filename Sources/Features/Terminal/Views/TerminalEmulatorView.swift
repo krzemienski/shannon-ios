@@ -19,8 +19,8 @@ public struct TerminalEmulatorView: View {
     @State private var fontSize: CGFloat = 13
     @State private var cellSize: CGSize = .zero
     @State private var viewSize: CGSize = .zero
-    @State private var selection: TerminalSelection?
-    @State private var hoveredPosition: TerminalPosition?
+    @State private var selection: EmulatorSelection?
+    @State private var hoveredPosition: EmulatorPosition?
     
     @AppStorage("terminal_font_size") private var storedFontSize: Double = 13
     @AppStorage("terminal_cursor_blink") private var cursorBlink: Bool = true
@@ -35,7 +35,7 @@ public struct TerminalEmulatorView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         // Terminal content
                         ForEach(Array(terminal.getVisibleLines().enumerated()), id: \.offset) { index, line in
-                            TerminalLineView(
+                            EmulatorLineView(
                                 line: line,
                                 lineNumber: index,
                                 fontSize: fontSize,
@@ -52,7 +52,7 @@ public struct TerminalEmulatorView: View {
                         
                         // Cursor on empty line
                         if terminal.cursorPosition.row >= terminal.terminalBuffer.lines.count {
-                            TerminalCursorView(
+                            EmulatorCursorView(
                                 position: terminal.cursorPosition,
                                 fontSize: fontSize,
                                 blink: cursorBlink
@@ -261,7 +261,7 @@ public struct TerminalEmulatorView: View {
         let column = Int(location.x / cellSize.width)
         let row = Int(location.y / cellSize.height)
         
-        let position = TerminalPosition(row: row, column: column)
+        let position = EmulatorPosition(row: row, column: column)
         
         // Update cursor position if in input mode
         if terminal.terminalMode == .normal {
@@ -275,9 +275,9 @@ public struct TerminalEmulatorView: View {
         let endColumn = Int(value.location.x / cellSize.width)
         let endRow = Int(value.location.y / cellSize.height)
         
-        selection = TerminalSelection(
-            start: TerminalPosition(row: startRow, column: startColumn),
-            end: TerminalPosition(row: endRow, column: endColumn)
+        selection = EmulatorSelection(
+            start: EmulatorPosition(row: startRow, column: startColumn),
+            end: EmulatorPosition(row: endRow, column: endColumn)
         )
     }
     
@@ -286,7 +286,7 @@ public struct TerminalEmulatorView: View {
         if let sel = selection {
             if sel.end.row < sel.start.row ||
                (sel.end.row == sel.start.row && sel.end.column < sel.start.column) {
-                selection = TerminalSelection(start: sel.end, end: sel.start)
+                selection = EmulatorSelection(start: sel.end, end: sel.start)
             }
         }
     }
@@ -329,9 +329,9 @@ public struct TerminalEmulatorView: View {
         guard !lines.isEmpty else { return }
         
         let lastLine = lines[lines.count - 1]
-        selection = TerminalSelection(
-            start: TerminalPosition(row: 0, column: 0),
-            end: TerminalPosition(row: lines.count - 1, column: lastLine.characters.count - 1)
+        selection = EmulatorSelection(
+            start: EmulatorPosition(row: 0, column: 0),
+            end: EmulatorPosition(row: lines.count - 1, column: lastLine.characters.count - 1)
         )
     }
     
@@ -355,22 +355,22 @@ public struct TerminalEmulatorView: View {
 }
 
 /// Terminal line view
-struct TerminalLineView: View {
+struct EmulatorLineView: View {
     let line: TerminalLine
     let lineNumber: Int
     let fontSize: CGFloat
     let fontName: String
     let cursorPosition: CursorPosition
-    let selection: TerminalSelection?
+    let selection: EmulatorSelection?
     let searchText: String
-    let onHover: (TerminalPosition?) -> Void
+    let onHover: (EmulatorPosition?) -> Void
     
     var body: some View {
         HStack(spacing: 0) {
             ForEach(Array(line.characters.enumerated()), id: \.offset) { column, character in
-                TerminalCharacterView(
+                EmulatorCharacterView(
                     character: character,
-                    position: TerminalPosition(row: lineNumber, column: column),
+                    position: EmulatorPosition(row: lineNumber, column: column),
                     fontSize: fontSize,
                     fontName: fontName,
                     isSelected: isSelected(row: lineNumber, column: column),
@@ -378,7 +378,7 @@ struct TerminalLineView: View {
                     hasCursor: cursorPosition.row == lineNumber && cursorPosition.column == column
                 )
                 .onHover { hovering in
-                    onHover(hovering ? TerminalPosition(row: lineNumber, column: column) : nil)
+                    onHover(hovering ? EmulatorPosition(row: lineNumber, column: column) : nil)
                 }
             }
             
@@ -412,9 +412,9 @@ struct TerminalLineView: View {
 }
 
 /// Terminal character view
-struct TerminalCharacterView: View {
+struct EmulatorCharacterView: View {
     let character: TerminalCharacter
-    let position: TerminalPosition
+    let position: EmulatorPosition
     let fontSize: CGFloat
     let fontName: String
     let isSelected: Bool
@@ -437,7 +437,7 @@ struct TerminalCharacterView: View {
             
             // Cursor overlay
             if hasCursor {
-                TerminalCursorView(
+                EmulatorCursorView(
                     position: CursorPosition(column: position.column, row: position.row),
                     fontSize: fontSize,
                     blink: true
@@ -478,7 +478,7 @@ struct TerminalCharacterView: View {
 }
 
 /// Terminal cursor view
-struct TerminalCursorView: View {
+struct EmulatorCursorView: View {
     let position: CursorPosition
     let fontSize: CGFloat
     let blink: Bool
@@ -549,15 +549,15 @@ struct TerminalSizeIndicator: View {
 // MARK: - Supporting Types
 
 /// Terminal position
-struct TerminalPosition: Equatable {
+struct EmulatorPosition: Equatable {
     let row: Int
     let column: Int
 }
 
 /// Terminal selection
-struct TerminalSelection: Equatable {
-    let start: TerminalPosition
-    let end: TerminalPosition
+struct EmulatorSelection: Equatable {
+    let start: EmulatorPosition
+    let end: EmulatorPosition
 }
 
 // MARK: - Preview

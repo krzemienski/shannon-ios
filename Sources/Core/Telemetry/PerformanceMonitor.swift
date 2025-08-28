@@ -332,6 +332,17 @@ public class PerformanceTracker: ObservableObject {
     public var error: Error?
     public let metadata: [String: Any]?
     
+    // Additional properties for PerformanceSection
+    @Published public var overallScore: Double = 85.0
+    @Published public var responseTime: Double = 0.150
+    @Published public var throughput: Double = 45.0
+    @Published public var errorRate: Double = 0.5
+    @Published public var cpuUsage: Double = 35.0
+    @Published public var memoryUsage: Double = 512.0
+    @Published public var activeSpans: [PerformanceSpan] = []
+    @Published public var bottlenecks: [PerformanceBottleneck] = []
+    @Published public var measurements: [PerformanceMeasurement] = []
+    
     public var duration: TimeInterval? {
         guard let endTime = endTime else { return nil }
         return endTime.timeIntervalSince(startTime) * 1000 // Convert to milliseconds
@@ -348,6 +359,9 @@ public class PerformanceTracker: ObservableObject {
         self.metadata = metadata
     }
 }
+
+// Performance types (PerformanceSpan, PerformanceBottleneck, PerformanceMeasurement) 
+// are defined in Sources/Models/ViewModels.swift
 
 /// Frame rate monitor
 class FrameRateMonitor {

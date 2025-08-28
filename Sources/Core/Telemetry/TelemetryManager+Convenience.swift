@@ -16,14 +16,21 @@ extension TelemetryManager {
         properties: [String: String] = [:],
         measurements: [String: Double] = [:]
     ) {
-        let metadata = properties.reduce(into: [String: String]()) { result, item in
-            result[item.key] = item.value
+        // Convert string properties to AnyCodable
+        let data = properties.reduce(into: [String: AnyCodable]()) { result, item in
+            result[item.key] = AnyCodable(item.value)
+        }
+        
+        // Add measurements to data
+        let fullData = measurements.reduce(into: data) { result, item in
+            result[item.key] = AnyCodable(item.value)
         }
         
         let event = CustomEvent(
+            sessionId: self.sessionId,
             name: name,
             category: category.rawValue,
-            metadata: metadata
+            data: fullData
         )
         
         logEvent(event)

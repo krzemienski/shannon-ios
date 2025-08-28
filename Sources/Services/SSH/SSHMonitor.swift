@@ -280,6 +280,7 @@ public struct SSHConnectionStats: Codable {
     public var successRate: Double
     public var successCount: Int = 0
     public var failedCommands: Int = 0
+    public var failedConnections: Int = 0  // Added for compilation
     public var averageConnectionTime: TimeInterval = 0
     public var isActive: Bool
 }

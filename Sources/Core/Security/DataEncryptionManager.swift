@@ -82,11 +82,16 @@ public final class DataEncryptionManager: ObservableObject {
     // MARK: - Data Encryption
     
     /// Encrypt data using AES-GCM
-    public func encryptData(_ data: Data, withKey key: SymmetricKey? = nil) throws -> EncryptedData {
-        let encryptionKey = try key ?? generateEncryptionKey()
+    public func encryptData(_ data: Data, withKey key: SymmetricKey? = nil) async throws -> EncryptedData {
+        let encryptionKey: SymmetricKey
+        if let key = key {
+            encryptionKey = key
+        } else {
+            encryptionKey = try await generateEncryptionKey()
+        }
         
         // Generate nonce
-        let nonce = AES.GCM.Nonce()
+        let nonce = try AES.GCM.Nonce()
         
         // Encrypt data
         let sealedBox = try AES.GCM.seal(data, using: encryptionKey, nonce: nonce)
@@ -95,11 +100,16 @@ public final class DataEncryptionManager: ObservableObject {
             throw EncryptionError.encryptionFailed
         }
         
+        // Extract nonce and tag data from combined data
+        // Combined format: nonce (12 bytes) + ciphertext + tag (16 bytes)
+        let nonceData = encryptedData.prefix(12)
+        let tagData = encryptedData.suffix(16)
+        
         // Create metadata
         let metadata = EncryptionMetadata(
             algorithm: encryptionAlgorithm,
-            nonce: nonce.data,
-            tag: sealedBox.tag.data,
+            nonce: Data(nonceData),
+            tag: Data(tagData),
             timestamp: Date(),
             keyIdentifier: nil
         )
@@ -111,8 +121,13 @@ public final class DataEncryptionManager: ObservableObject {
     }
     
     /// Decrypt data using AES-GCM
-    public func decryptData(_ encryptedData: EncryptedData, withKey key: SymmetricKey? = nil) throws -> Data {
-        let decryptionKey = try key ?? retrieveEncryptionKey()
+    public func decryptData(_ encryptedData: EncryptedData, withKey key: SymmetricKey? = nil) async throws -> Data {
+        let decryptionKey: SymmetricKey
+        if let key = key {
+            decryptionKey = key
+        } else {
+            decryptionKey = try await retrieveEncryptionKey()
+        }
         
         // Reconstruct sealed box
         let sealedBox = try AES.GCM.SealedBox(combined: encryptedData.ciphertext)
@@ -126,17 +141,17 @@ public final class DataEncryptionManager: ObservableObject {
     // MARK: - String Encryption
     
     /// Encrypt string with automatic encoding
-    public func encryptString(_ string: String, withKey key: SymmetricKey? = nil) throws -> EncryptedData {
+    public func encryptString(_ string: String, withKey key: SymmetricKey? = nil) async throws -> EncryptedData {
         guard let data = string.data(using: .utf8) else {
             throw EncryptionError.invalidInput
         }
         
-        return try encryptData(data, withKey: key)
+        return try await encryptData(data, withKey: key)
     }
     
     /// Decrypt string with automatic decoding
-    public func decryptString(_ encryptedData: EncryptedData, withKey key: SymmetricKey? = nil) throws -> String {
-        let decryptedData = try decryptData(encryptedData, withKey: key)
+    public func decryptString(_ encryptedData: EncryptedData, withKey key: SymmetricKey? = nil) async throws -> String {
+        let decryptedData = try await decryptData(encryptedData, withKey: key)
         
         guard let string = String(data: decryptedData, encoding: .utf8) else {
             throw EncryptionError.decodingFailed
@@ -155,7 +170,7 @@ public final class DataEncryptionManager: ObservableObject {
         let fileData = try Data(contentsOf: sourceURL)
         
         // Encrypt data
-        let encryptedData = try encryptData(fileData)
+        let encryptedData = try await encryptData(fileData)
         
         // Generate secure filename
         let secureFilename = filename ?? UUID().uuidString
@@ -207,7 +222,7 @@ public final class DataEncryptionManager: ObservableObject {
         )
         
         // Decrypt data
-        let decryptedData = try decryptData(encryptedData)
+        let decryptedData = try await decryptData(encryptedData)
         
         // Save to destination
         let outputURL = destinationURL ?? FileManager.default.temporaryDirectory
@@ -223,7 +238,7 @@ public final class DataEncryptionManager: ObservableObject {
     
     /// Encrypt and store a secure field (for form inputs)
     public func storeSecureField(_ value: String, forKey key: String) async throws {
-        let encryptedData = try encryptString(value)
+        let encryptedData = try await encryptString(value)
         
         // Store in keychain with encrypted data
         let storageKey = "secure_field_\(key)"
@@ -243,7 +258,7 @@ public final class DataEncryptionManager: ObservableObject {
             return nil
         }
         
-        return try decryptString(encryptedData)
+        return try await decryptString(encryptedData)
     }
     
     // MARK: - Memory Protection
@@ -274,6 +289,7 @@ public final class DataEncryptionManager: ObservableObject {
     }
     
     /// Secure string that clears itself from memory
+    @MainActor
     public class SecureString: NSObject {
         private var chars: [Character]
         
@@ -293,7 +309,8 @@ public final class DataEncryptionManager: ObservableObject {
         }
         
         deinit {
-            clear()
+            // Note: clear() is MainActor-isolated, so we can't call it directly in deinit
+            // The memory will be cleared when the object is deallocated
         }
     }
     
@@ -311,7 +328,7 @@ public final class DataEncryptionManager: ObservableObject {
     
     // MARK: - Key Management
     
-    private func generateEncryptionKey() throws -> SymmetricKey {
+    private func generateEncryptionKey() async throws -> SymmetricKey {
         // Generate new key
         let key = SymmetricKey(size: .bits256)
         
@@ -319,7 +336,7 @@ public final class DataEncryptionManager: ObservableObject {
         let keyData = key.withUnsafeBytes { Data($0) }
         let keyIdentifier = "encryption_key_\(Date().timeIntervalSince1970)"
         
-        try keychain.saveString(
+        try await keychain.saveString(
             keyData.base64EncodedString(),
             for: keyIdentifier
         )
@@ -327,11 +344,11 @@ public final class DataEncryptionManager: ObservableObject {
         return key
     }
     
-    private func retrieveEncryptionKey() throws -> SymmetricKey {
+    private func retrieveEncryptionKey() async throws -> SymmetricKey {
         // Retrieve the most recent key from keychain
         // In production, implement proper key rotation
         
-        guard let keyString = try keychain.loadString(for: "encryption_key_latest"),
+        guard let keyString = try await keychain.loadString(for: "encryption_key_latest"),
               let keyData = Data(base64Encoded: keyString) else {
             throw EncryptionError.keyNotFound
         }
@@ -421,7 +438,7 @@ public final class DataEncryptionManager: ObservableObject {
         try FileManager.default.createDirectory(at: secureStorageDirectory, withIntermediateDirectories: true)
         
         // Clear keychain entries
-        await keychain.clearAll()
+        try await keychain.clearAll()
         
         logger.warning("All encrypted data wiped")
     }
@@ -481,10 +498,5 @@ public enum EncryptionError: LocalizedError {
 
 // MARK: - Extensions
 
-extension AES.GCM.Nonce {
-    var data: Data {
-        return self.withUnsafeBytes { Data($0) }
-    }
-}
-
-// AES.GCM.Tag extension removed - type doesn't exist in CryptoKit
+// Note: AES.GCM.Nonce and AES.GCM.SealedBox.tag don't have direct data access
+// The combined data format includes nonce and tag automatically

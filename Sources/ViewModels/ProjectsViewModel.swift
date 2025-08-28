@@ -244,7 +244,7 @@ final class ProjectsViewModel: ObservableObject {
         }
     }
     
-    private func handleAPIError(_ apiError: APIConfig.APIError) {
+    private func handleAPIError(_ apiError: APIError) {
         switch apiError {
         case .backendNotRunning:
             logger.error("Backend server is not running")

@@ -360,6 +360,87 @@ struct QueuedRequest: Codable, Identifiable {
     var nextRetryAt: Date?
     var status: QueueStatus = .pending
     var error: String?
+    
+    // Custom encoding/decoding for URLRequest
+    enum CodingKeys: String, CodingKey {
+        case id, priority, metadata, queuedAt, retryCount
+        case lastAttempt, nextRetryAt, status, error
+        case requestURL, requestMethod, requestHeaders, requestBody
+    }
+    
+    init(id: UUID = UUID(),
+         request: URLRequest,
+         priority: RequestPriority,
+         metadata: RequestMetadata,
+         queuedAt: Date = Date(),
+         retryCount: Int = 0,
+         lastAttempt: Date? = nil,
+         nextRetryAt: Date? = nil,
+         status: QueueStatus = .pending,
+         error: String? = nil) {
+        self.id = id
+        self.request = request
+        self.priority = priority
+        self.metadata = metadata
+        self.queuedAt = queuedAt
+        self.retryCount = retryCount
+        self.lastAttempt = lastAttempt
+        self.nextRetryAt = nextRetryAt
+        self.status = status
+        self.error = error
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(UUID.self, forKey: .id)
+        priority = try container.decode(RequestPriority.self, forKey: .priority)
+        metadata = try container.decode(RequestMetadata.self, forKey: .metadata)
+        queuedAt = try container.decode(Date.self, forKey: .queuedAt)
+        retryCount = try container.decode(Int.self, forKey: .retryCount)
+        lastAttempt = try container.decodeIfPresent(Date.self, forKey: .lastAttempt)
+        nextRetryAt = try container.decodeIfPresent(Date.self, forKey: .nextRetryAt)
+        status = try container.decode(QueueStatus.self, forKey: .status)
+        error = try container.decodeIfPresent(String.self, forKey: .error)
+        
+        // Decode URLRequest
+        let url = try container.decode(URL.self, forKey: .requestURL)
+        var reconstructedRequest = URLRequest(url: url)
+        
+        if let method = try container.decodeIfPresent(String.self, forKey: .requestMethod) {
+            reconstructedRequest.httpMethod = method
+        }
+        
+        if let headers = try container.decodeIfPresent([String: String].self, forKey: .requestHeaders) {
+            reconstructedRequest.allHTTPHeaderFields = headers
+        }
+        
+        if let body = try container.decodeIfPresent(Data.self, forKey: .requestBody) {
+            reconstructedRequest.httpBody = body
+        }
+        
+        self.request = reconstructedRequest
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(id, forKey: .id)
+        try container.encode(priority, forKey: .priority)
+        try container.encode(metadata, forKey: .metadata)
+        try container.encode(queuedAt, forKey: .queuedAt)
+        try container.encode(retryCount, forKey: .retryCount)
+        try container.encodeIfPresent(lastAttempt, forKey: .lastAttempt)
+        try container.encodeIfPresent(nextRetryAt, forKey: .nextRetryAt)
+        try container.encode(status, forKey: .status)
+        try container.encodeIfPresent(error, forKey: .error)
+        
+        // Encode URLRequest
+        try container.encodeIfPresent(request.url, forKey: .requestURL)
+        try container.encodeIfPresent(request.httpMethod, forKey: .requestMethod)
+        try container.encodeIfPresent(request.allHTTPHeaderFields, forKey: .requestHeaders)
+        try container.encodeIfPresent(request.httpBody, forKey: .requestBody)
+    }
 }
 
 /// Request metadata

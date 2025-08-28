@@ -172,6 +172,24 @@ public extension SSHCredential {
 
 // Type alias for compatibility
 public typealias SSHConfiguration = AppSSHConfig
+public typealias SSHAuthMethod = AppSSHAuthMethod
+
+// MARK: - SSH Alert Level
+public enum SSHAlertLevel: String, Codable, CaseIterable {
+    case info = "info"
+    case warning = "warning" 
+    case error = "error"
+    case critical = "critical"
+    
+    public var displayName: String {
+        switch self {
+        case .info: return "Info"
+        case .warning: return "Warning"
+        case .error: return "Error"
+        case .critical: return "Critical"
+        }
+    }
+}
 
 // MARK: - Monitoring Types
 

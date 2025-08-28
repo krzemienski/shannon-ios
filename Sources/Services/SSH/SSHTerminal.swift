@@ -7,36 +7,63 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
-class SSHTerminal: ObservableObject {
-    @Published var output: String = ""
-    @Published var isConnected: Bool = false
-    @Published var currentDirectory: String = "~"
+public class SSHTerminal: ObservableObject {
+    @Published public var output: String = ""
+    @Published public var isConnected: Bool = false
+    @Published public var currentDirectory: String = "~"
+    public var inputStream = PassthroughSubject<String, Never>()
     
     private var size: TerminalSize = TerminalSize(columns: 80, rows: 24)
+    private var lines: [TerminalLine] = []
     
-    init() {}
+    public init() {}
     
-    func send(_ command: String) {
+    public func send(_ command: String) {
         // Process command
         output += "\n$ \(command)\n"
     }
     
-    func resize(to size: TerminalSize) {
+    public func resize(to size: TerminalSize) {
         self.size = size
     }
     
-    func clear() {
-        output = ""
+    public func resize(columns: Int, rows: Int) {
+        self.size = TerminalSize(columns: columns, rows: rows)
     }
     
-    func connect() {
+    public func clear() {
+        output = ""
+        lines.removeAll()
+    }
+    
+    public func clearScreen() {
+        clear()
+    }
+    
+    public func connect() {
         isConnected = true
     }
     
-    func disconnect() {
+    public func disconnect() {
         isConnected = false
+    }
+    
+    public func processInput(_ input: String) {
+        inputStream.send(input)
+        output += input
+    }
+    
+    public func processOutput(_ data: Data) {
+        if let string = String(data: data, encoding: .utf8) {
+            output += string
+        }
+    }
+    
+    public func getVisibleLines() -> [TerminalLine] {
+        return lines
     }
 }
 

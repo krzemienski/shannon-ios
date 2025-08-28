@@ -52,6 +52,10 @@ final class DependencyContainer {
     // MARK: - Factory Methods
     
     func makeSettingsViewModel() -> SettingsViewModel {
-        return SettingsViewModel(container: self)
+        return SettingsViewModel(
+            settingsStore: settingsStore,
+            keychainManager: KeychainManager.shared,
+            appState: appState
+        )
     }
 }

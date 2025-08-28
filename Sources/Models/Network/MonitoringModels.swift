@@ -131,7 +131,7 @@ public struct TraceContext: Codable, Equatable {
 
 // MARK: - Task 190: ExportFormat Enum
 /// Export format options
-public enum ExportFormat: String, Codable, CaseIterable {
+public enum ExportFormat: String, Codable, CaseIterable, Sendable {
     case json
     case csv
     case markdown

@@ -405,8 +405,8 @@ struct GitView: View {
 
 // MARK: - Toolbar Content
 
-struct ToolbarContent: ToolbarContent {
-    var body: some ToolbarContent {
+struct ProjectToolbarContent: View {
+    var body: some View {
         ToolbarItemGroup(placement: .primaryAction) {
             Button(action: {}) {
                 Image(systemName: "play.fill")

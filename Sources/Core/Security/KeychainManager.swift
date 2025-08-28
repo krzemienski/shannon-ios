@@ -237,4 +237,16 @@ extension KeychainManager {
         static let sshPrivateKey = "ssh_private_key"
         static let sshPassphrase = "ssh_passphrase"
     }
+    
+    // MARK: - API Key Management
+    
+    /// Save API key to keychain
+    func saveAPIKey(_ apiKey: String) async throws {
+        try await saveString(apiKey, for: Keys.apiKey)
+    }
+    
+    /// Get API key from keychain
+    func getAPIKey() async throws -> String? {
+        return try await loadString(for: Keys.apiKey)
+    }
 }

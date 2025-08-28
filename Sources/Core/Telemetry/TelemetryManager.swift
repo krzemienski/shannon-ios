@@ -13,8 +13,8 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
     
     // MARK: - Properties
     
-    private let logger = Logger(label: "com.claudecode.telemetry.manager")
-    private let osLogger = OSLog.Logger(subsystem: "com.claudecode.telemetry", category: "Manager")
+    private let logger = Logging.Logger(label: "com.claudecode.telemetry.manager")
+    private let osLogger = OSLog(subsystem: "com.claudecode.telemetry", category: "Manager")
     private let telemetryQueue = DispatchQueue(label: "com.claudecode.telemetry.manager", attributes: .concurrent)
     
     /// Shared instance
@@ -28,7 +28,7 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
     private let crashReporter = CrashReporter.shared
     
     // Session management
-    private let sessionId = UUID()
+    public let sessionId = UUID()
     private let sessionStartTime = Date()
     private var userId: String?
     
@@ -72,19 +72,24 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
             startUploadTimer()
             
             // Log initialization
-            logEvent(.appLifecycle(.launch))
+            let lifecycleEvent = AppLifecycleEvent(
+                sessionId: sessionId,
+                lifecycleEvent: .launch,
+                currentState: "active"
+            )
+            logEvent(lifecycleEvent)
             
-            osLogger.info("Telemetry system initialized")
+            os_log(.info, log: osLogger, "Telemetry system initialized")
         } catch {
-            osLogger.error("Failed to initialize telemetry: \(error)")
+            os_log(.error, log: osLogger, "Failed to initialize telemetry: %{public}@", error.localizedDescription)
         }
     }
     
     /// Set user identifier
     public func setUserId(_ id: String?) {
-        telemetryQueue.async(flags: .barrier) { [weak self] in
-            self?.userId = id
-            self?.osLogger.info("User ID set: \(id ?? "nil")")
+        Task { @MainActor in
+            self.userId = id
+            os_log(.info, log: self.osLogger, "User ID set: %{public}@", id ?? "nil")
         }
     }
     
@@ -219,15 +224,15 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
     
     /// Add event processor
     public func addEventProcessor(_ processor: @escaping (any TelemetryEvent) -> (any TelemetryEvent)?) {
-        telemetryQueue.async(flags: .barrier) { [weak self] in
-            self?.eventProcessors.append(processor)
+        Task { @MainActor in
+            eventProcessors.append(processor)
         }
     }
     
     /// Add export handler
     public func addExportHandler(_ handler: TelemetryExportHandler) {
-        telemetryQueue.async(flags: .barrier) { [weak self] in
-            self?.exportHandlers.append(handler)
+        Task { @MainActor in
+            exportHandlers.append(handler)
         }
     }
     
@@ -263,7 +268,7 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
     public func clearAllData() async {
         try? await storage?.clearAll()
         crashReporter.clearCrashReports()
-        osLogger.info("Cleared all telemetry data")
+        os_log(.info, log: osLogger, "Cleared all telemetry data")
     }
     
     // MARK: - Private Methods
@@ -290,11 +295,15 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
         performanceMonitor.addObserver { [weak self] report in
             // Log performance issues
             if report.currentFrameRate < 30 {
-                self?.osLogger.warning("Low frame rate detected: \(report.currentFrameRate) FPS")
+                if let self = self {
+                    os_log(.default, log: self.osLogger, "Low frame rate detected: %{public}.1f FPS", report.currentFrameRate)
+                }
             }
             
             if report.memoryUsage > 500 {
-                self?.osLogger.warning("High memory usage: \(report.memoryUsage) MB")
+                if let self = self {
+                    os_log(.default, log: self.osLogger, "High memory usage: %{public}.1f MB", report.memoryUsage)
+                }
             }
         }
     }
@@ -305,21 +314,28 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
         
         // Add crash handler
         crashReporter.addCrashHandler { [weak self] crashReport in
-            // Convert to telemetry event
-            let event = ErrorEvent(
-                sessionId: self?.sessionId ?? UUID(),
-                userId: self?.userId,
+            guard let self = self else { return }
+            
+            Task { @MainActor in
+                let currentUserId = self.userId
+                let currentSessionId = self.sessionId
+                
+                // Convert to telemetry event
+                let event = ErrorEvent(
+                    sessionId: currentSessionId,
+                    userId: currentUserId,
                 errorType: "Crash",
                 errorMessage: crashReport.reason,
                 stackTrace: crashReport.stackTrace,
                 severity: .fatal,
-                context: [
-                    "crash_type": crashReport.type.rawValue,
-                    "session_duration": String(crashReport.sessionDuration)
-                ]
-            )
-            
-            self?.logEvent(event)
+                    context: [
+                        "crash_type": crashReport.type.rawValue,
+                        "session_duration": String(crashReport.sessionDuration)
+                    ]
+                )
+                
+                self.logEvent(event)
+            }
         }
     }
     
@@ -354,9 +370,9 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
         // Store event
         do {
             try await storage?.store(processedEvent)
-            osLogger.debug("Stored telemetry event: \(processedEvent.eventType.rawValue)")
+            os_log(.debug, log: osLogger, "Stored telemetry event: %{public}@", processedEvent.eventType.rawValue)
         } catch {
-            osLogger.error("Failed to store telemetry event: \(error)")
+            os_log(.error, log: osLogger, "Failed to store telemetry event: %{public}@", error.localizedDescription)
         }
         
         // Export to handlers
@@ -389,16 +405,16 @@ public final class TelemetryManager: ObservableObject, @unchecked Sendable {
             
             guard !events.isEmpty else { return }
             
-            osLogger.info("Uploading \(events.count) telemetry events")
+            os_log(.info, log: osLogger, "Uploading %{public}d telemetry events", events.count)
             
             // TODO: Implement actual upload logic
             // For now, just mark as uploaded
             let eventIds = events.map { $0.id }
             try await storage?.deleteEvents(ids: eventIds)
             
-            osLogger.info("Successfully uploaded \(events.count) events")
+            os_log(.info, log: osLogger, "Successfully uploaded %{public}d events", events.count)
         } catch {
-            osLogger.error("Failed to upload telemetry events: \(error)")
+            os_log(.error, log: osLogger, "Failed to upload telemetry events: %{public}@", error.localizedDescription)
         }
     }
 }
@@ -445,18 +461,24 @@ public class FileExportHandler: TelemetryExportHandler {
     }
     
     public func export(_ event: any TelemetryEvent) {
+        // Capture values before Task to avoid capture issues
+        let url = self.fileURL
+        let encoderCopy = JSONEncoder()
+        encoderCopy.dateEncodingStrategy = .iso8601
+        encoderCopy.outputFormatting = .prettyPrinted
+        
         // Write to file in background
         Task {
             do {
-                let data = try encoder.encode(event)
-                if FileManager.default.fileExists(atPath: fileURL.path) {
-                    let handle = try FileHandle(forWritingTo: fileURL)
+                let data = try encoderCopy.encode(event)
+                if FileManager.default.fileExists(atPath: url.path) {
+                    let handle = try FileHandle(forWritingTo: url)
                     handle.seekToEndOfFile()
                     handle.write(data)
                     handle.write(",\n".data(using: .utf8)!)
                     handle.closeFile()
                 } else {
-                    try data.write(to: fileURL)
+                    try data.write(to: url)
                 }
             } catch {
                 print("Failed to export event to file: \(error)")
@@ -507,11 +529,4 @@ extension TelemetryManager {
 
 // MARK: - App Lifecycle Event Extensions
 
-extension AppLifecycleEvent.LifecycleEventType {
-    public static let launch = AppLifecycleEvent.LifecycleEventType.launch
-    public static let foreground = AppLifecycleEvent.LifecycleEventType.foreground
-    public static let background = AppLifecycleEvent.LifecycleEventType.background
-    public static let terminate = AppLifecycleEvent.LifecycleEventType.terminate
-    public static let memoryWarning = AppLifecycleEvent.LifecycleEventType.memoryWarning
-    public static let crash = AppLifecycleEvent.LifecycleEventType.crash
-}
+// The LifecycleEventType enum cases are already available directly, no need for static properties

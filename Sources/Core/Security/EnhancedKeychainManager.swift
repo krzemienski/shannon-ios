@@ -39,7 +39,7 @@ public final class EnhancedKeychainManager {
     }
     
     // Item categories
-    public enum ItemCategory {
+    public enum ItemCategory: String {
         case apiKey
         case authToken
         case refreshToken
@@ -159,7 +159,7 @@ public final class EnhancedKeychainManager {
         
         // Encrypt if high security
         if category.accessLevel == .highSecurity && encryptBeforeStorage {
-            let encryptedData = try dataEncryption.encryptData(data)
+            let encryptedData = try await dataEncryption.encryptData(data)
             data = try JSONEncoder().encode(encryptedData)
         }
         
@@ -287,8 +287,9 @@ public final class EnhancedKeychainManager {
         
         // Decrypt if high security
         if category.accessLevel == .highSecurity && encryptBeforeStorage {
+            // EncryptedData is defined in DataEncryptionManager
             let encryptedData = try JSONDecoder().decode(EncryptedData.self, from: data)
-            data = try dataEncryption.decryptData(encryptedData)
+            data = try await dataEncryption.decryptData(encryptedData)
         }
         
         // Update metadata
@@ -333,11 +334,11 @@ public final class EnhancedKeychainManager {
     
     /// Clear all items in a category
     public func clearCategory(_ category: ItemCategory) async throws {
-        logger.warning("Clearing all items in category: \(category)")
+        logger.warning("Clearing all items in category: \(String(describing: category))")
         
         // Require biometric for bulk deletion
         let authResult = await biometricAuth.authenticate(
-            reason: "Authenticate to clear all \(category) items"
+            reason: "Authenticate to clear all \(String(describing: category)) items"
         )
         
         guard case .success = authResult else {
@@ -471,7 +472,7 @@ public final class EnhancedKeychainManager {
     }
     
     private func logDeletion(key: String, category: ItemCategory) {
-        logger.info("Audit: Deleted item \(key) from category \(category)")
+        logger.info("Audit: Deleted item \(key) from category \(String(describing: category))")
         // In production, this would write to a secure audit log
     }
 }

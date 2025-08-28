@@ -382,19 +382,19 @@ struct ToolDetailView: View {
                                     .foregroundColor(Theme.foreground)
                                 
                                 HStack(spacing: ThemeSpacing.md) {
-                                    StatCard(
+                                    ToolStatCard(
                                         title: "Total Uses",
                                         value: "42",
                                         icon: "number"
                                     )
                                     
-                                    StatCard(
+                                    ToolStatCard(
                                         title: "Avg Time",
                                         value: "127ms",
                                         icon: "timer"
                                     )
                                     
-                                    StatCard(
+                                    ToolStatCard(
                                         title: "Success Rate",
                                         value: "98%",
                                         icon: "checkmark.circle"
@@ -459,7 +459,7 @@ struct CodeBlock: View {
 
 // MARK: - Stat Card
 
-struct StatCard: View {
+struct ToolStatCard: View {
     let title: String
     let value: String
     let icon: String

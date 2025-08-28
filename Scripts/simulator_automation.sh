@@ -10,7 +10,7 @@ set -e  # Exit on error
 # ============================================================================
 
 # Persistent Simulator UUID for iPhone 16 Pro Max (iOS 18.6)
-readonly SIMULATOR_UUID="A707456B-44DB-472F-9722-C88153CDFFA1"
+readonly SIMULATOR_UUID="50523130-57AA-48B0-ABD0-4D59CE455F14"
 readonly APP_BUNDLE_ID="com.claudecodeswift.ios"
 readonly SCHEME_NAME="ClaudeCodeSwift"
 readonly PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

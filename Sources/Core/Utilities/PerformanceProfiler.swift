@@ -205,8 +205,19 @@ final class PerformanceProfiler: ObservableObject {
     
     // MARK: - Performance Reports
     
-    func generatePerformanceReport() -> PerformanceReport {
-        PerformanceReport(
+    struct ProfileResult {
+        let timestamp: Date
+        let fps: Double
+        let memoryUsageMB: Double
+        let cpuUsagePercent: Double
+        let appLaunchTime: TimeInterval
+        let networkLatency: TimeInterval
+        let cacheHitRate: Double
+        let metrics: [PerformanceMetric]
+    }
+    
+    func generatePerformanceReport() -> ProfileResult {
+        ProfileResult(
             timestamp: Date(),
             fps: currentFPS,
             memoryUsageMB: memoryUsageMB,
@@ -269,5 +280,5 @@ struct PerformanceMetric {
 }
 
 // PerformanceReport is defined in Core/Telemetry/PerformanceMonitor.swift
-// Using the public PerformanceReport from PerformanceMonitor
-typealias PerformanceReport = PerformanceMonitor.PerformanceReport
+// Using the public PerformanceReport from PerformanceMonitor module
+// No typealias needed as it's a top-level struct

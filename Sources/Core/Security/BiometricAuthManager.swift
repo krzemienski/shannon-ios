@@ -35,6 +35,30 @@ public final class BiometricAuthManager: ObservableObject {
     
     // MARK: - Public Methods
     
+    /// Request biometric authentication permission
+    public func requestBiometricAuthentication() async -> Bool {
+        // Biometric doesn't need explicit permission request like other permissions
+        // It will prompt when first used via authenticate()
+        checkBiometricAvailability()
+        if isBiometricAuthAvailable {
+            // Try to authenticate to trigger permission if needed
+            let result = await authenticate(reason: "Enable biometric authentication")
+            switch result {
+            case .success(let authorized):
+                return authorized
+            case .failure:
+                return false
+            }
+        }
+        return false
+    }
+    
+    /// Check if biometric authentication is available
+    public func isBiometricAuthenticationAvailable() -> Bool {
+        checkBiometricAvailability()
+        return isBiometricAuthAvailable
+    }
+    
     /// Check if biometric authentication is available
     public func checkBiometricAvailability() {
         var error: NSError?

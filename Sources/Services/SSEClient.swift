@@ -1,8 +1,35 @@
 import Foundation
 import OSLog
 
+// MARK: - SSE Configuration
+
+/// Configuration for SSE client
+public struct SSEConfiguration: Sendable {
+    public let timeoutInterval: TimeInterval
+    public let reconnectEnabled: Bool
+    public let maxReconnectAttempts: Int
+    public let compressionEnabled: Bool
+    public let bufferSize: Int
+    
+    public init(
+        timeoutInterval: TimeInterval = 60,
+        reconnectEnabled: Bool = true,
+        maxReconnectAttempts: Int = 5,
+        compressionEnabled: Bool = false,
+        bufferSize: Int = 1024 * 1024
+    ) {
+        self.timeoutInterval = timeoutInterval
+        self.reconnectEnabled = reconnectEnabled
+        self.maxReconnectAttempts = maxReconnectAttempts
+        self.compressionEnabled = compressionEnabled
+        self.bufferSize = bufferSize
+    }
+    
+    public static let `default` = SSEConfiguration()
+}
+
 /// Enhanced Server-Sent Events client for streaming API responses (Tasks 351-400)
-class SSEClient: NSObject {
+class SSEClient: NSObject, @unchecked Sendable {
     // MARK: - Properties
     
     private var urlSession: URLSession?

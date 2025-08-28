@@ -165,12 +165,12 @@ public struct TelemetryConfiguration: Codable, Sendable {
         TelemetryConfiguration(
             isEnabled: true,
             collectInDebug: false,
+            wifiOnlyUpload: true,
             performanceSamplingRate: 0.1,
             userActionSamplingRate: 0.5,
             sshSamplingRate: 0.2,
             anonymizeUserIds: true,
-            redactSensitiveInfo: true,
-            wifiOnlyUpload: true
+            redactSensitiveInfo: true
         )
     }
     

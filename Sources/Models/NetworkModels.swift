@@ -518,12 +518,8 @@ public struct SSHSessionRequest: Codable {
     }
 }
 
-/// SSH authentication method
-public enum SSHAuthMethod: String, Codable {
-    case password
-    case publicKey = "public_key"
-    case keyboardInteractive = "keyboard_interactive"
-}
+// SSHAuthMethod is already defined in SSHModels.swift as AppSSHAuthMethod with a typealias
+// Using the existing SSHAuthMethod from SSHModels.swift instead
 
 /// SSH command request
 public struct SSHCommandRequest: Codable {

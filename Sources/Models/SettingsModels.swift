@@ -279,22 +279,10 @@ public struct SSHConnection: Identifiable, Codable {
     public var host: String
     public var port: Int
     public var username: String
-    public var authMethod: SSHAuthMethod
+    public var authMethod: SSHAuthMethod  // Uses SSHAuthMethod from NetworkModels
     public var privateKeyPath: String?
     public var useKeychain: Bool
     public var lastUsed: Date?
-    
-    public enum SSHAuthMethod: String, Codable, CaseIterable {
-        case password
-        case publicKey
-        
-        public var displayName: String {
-            switch self {
-            case .password: return "Password"
-            case .publicKey: return "Public Key"
-            }
-        }
-    }
     
     public init(
         id: String = UUID().uuidString,

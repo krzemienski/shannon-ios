@@ -9,6 +9,93 @@ import SwiftUI
 import Speech
 import AVFoundation
 
+// MARK: - Voice Input Configuration
+struct VoiceInputConfiguration {
+    var language: String = "en-US"
+    var requireOnDeviceRecognition: Bool = false
+    var punctuation: Bool = true
+}
+
+// MARK: - Voice Waveform View
+struct VoiceWaveformView: View {
+    let audioLevel: Double
+    let isRecording: Bool
+    
+    @State private var wavePhase: Double = 0
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Background
+                RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
+                    .fill(Theme.card)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
+                            .stroke(Theme.border, lineWidth: 1)
+                    )
+                
+                // Waveform
+                if isRecording {
+                    WaveShape(phase: wavePhase, amplitude: audioLevel)
+                        .stroke(
+                            LinearGradient(
+                                colors: [Theme.primary, Theme.accent],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            lineWidth: 2
+                        )
+                        .animation(.linear(duration: 0.1), value: audioLevel)
+                        .onAppear {
+                            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                                wavePhase = .pi * 2
+                            }
+                        }
+                } else {
+                    // Static line when not recording
+                    Path { path in
+                        path.move(to: CGPoint(x: 0, y: geometry.size.height / 2))
+                        path.addLine(to: CGPoint(x: geometry.size.width, y: geometry.size.height / 2))
+                    }
+                    .stroke(Theme.border, lineWidth: 1)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Wave Shape
+struct WaveShape: Shape {
+    var phase: Double
+    var amplitude: Double
+    
+    var animatableData: AnimatablePair<Double, Double> {
+        get { AnimatablePair(phase, amplitude) }
+        set {
+            phase = newValue.first
+            amplitude = newValue.second
+        }
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            let width = rect.width
+            let height = rect.height
+            let midHeight = height / 2
+            let wavelength = width / 4
+            
+            path.move(to: CGPoint(x: 0, y: midHeight))
+            
+            for x in stride(from: 0, through: width, by: 1) {
+                let relativeX = x / wavelength
+                let sine = sin(relativeX * .pi * 2 + phase)
+                let y = midHeight + sine * midHeight * amplitude * 0.5
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+    }
+}
+
 // TODO: Implement proper VoiceInputService
 class VoiceInputService: NSObject, ObservableObject, @unchecked Sendable {
     nonisolated(unsafe) static let shared = VoiceInputService()
@@ -16,13 +103,41 @@ class VoiceInputService: NSObject, ObservableObject, @unchecked Sendable {
     @Published var isRecording = false
     @Published var transcriptionResult = ""
     @Published var error: Error?
+    @Published var audioLevel: Double = 0.0
+    
+    // Callbacks for transcription updates
+    var onTranscriptionUpdate: ((String) -> Void)?
+    var onFinalTranscription: ((String) -> Void)?
     
     func startRecording() {
         isRecording = true
+        // Simulate audio level changes for demo
+        simulateAudioLevel()
     }
     
     func stopRecording() {
         isRecording = false
+        audioLevel = 0.0
+    }
+    
+    func updateConfiguration(_ config: VoiceInputConfiguration) {
+        // Update configuration settings
+        // This would configure the speech recognizer in a real implementation
+    }
+    
+    private func simulateAudioLevel() {
+        guard isRecording else { return }
+        
+        Task { @MainActor in
+            // Simulate random audio levels
+            audioLevel = Double.random(in: 0.1...0.8)
+            
+            // Continue simulating while recording
+            if isRecording {
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+                simulateAudioLevel()
+            }
+        }
     }
 }
 
@@ -388,6 +503,7 @@ struct CodeVoiceInputView: View {
     }
     
     private func setupVoiceService() {
+        // Set up callbacks
         voiceService.onTranscriptionUpdate = { text in
             handleTranscription(text, isFinal: false)
         }

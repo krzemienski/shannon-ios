@@ -11,9 +11,9 @@
 ## Simulator Configuration
 
 ### iPhone 16 Pro Max (iOS 18.6)
-- **Simulator UUID**: `A707456B-44DB-472F-9722-C88153CDFFA1`
+- **Simulator UUID**: `50523130-57AA-48B0-ABD0-4D59CE455F14`
 - **Logs Path**: `logs/simulator_*.log`
-- **Build Destination**: `platform=iOS Simulator,id=A707456B-44DB-472F-9722-C88153CDFFA1`
+- **Build Destination**: `platform=iOS Simulator,id=50523130-57AA-48B0-ABD0-4D59CE455F14`
 
 ### REQUIRED: Use Simulator Automation Script
 **CRITICAL - MANDATORY**: You MUST ALWAYS use the `Scripts/simulator_automation.sh` script for ALL building, testing, and launching operations. NEVER use manual xcodebuild or xcrun commands directly. This script handles all the complexity of simulator management, logging, and build configuration.
@@ -45,7 +45,7 @@
 ### Manual Build & Launch (Fallback Only)
 ```bash
 # Only use if automation script fails
-export SIMULATOR_UUID="A707456B-44DB-472F-9722-C88153CDFFA1"
+export SIMULATOR_UUID="50523130-57AA-48B0-ABD0-4D59CE455F14"
 export APP_BUNDLE_ID="com.claudecode.ios"
 
 # 1. Start log capture (background)
@@ -64,15 +64,33 @@ xcrun simctl launch $SIMULATOR_UUID $APP_BUNDLE_ID
 
 ## Project Status
 
-**Current Stage**: Pre-MVP - Build Broken (5 compilation errors)
-**Build Status**: ❌ FAILED - Must fix CoordinatorView.swift errors before any testing
+**Current Stage**: Pre-MVP - Multiple Compilation Errors
+**Build Status**: ❌ FAILED - Requires targeted fixes for launch
 
-### Critical Issues (MUST FIX FIRST)
-1. **CoordinatorView.swift:62** - `NewProjectView` initialization ambiguity
-2. **CoordinatorView.swift:183** - `ChatView` expects `ChatSession`, not `String`
-3. **CoordinatorView.swift:194, 263** - Missing `ToolExecutionView` implementation
-4. **CoordinatorView.swift:257** - Missing `ToolCategoryView` implementation  
-5. **CoordinatorView.swift:221** - `ProjectDetailView` missing `projectName` parameter
+### Build Progress Summary
+
+#### ✅ Fixed Issues (Completed)
+- Navigation parameter mismatches in CoordinatorView
+- Tool view implementations (ToolExecutionView, ToolCategoryView)
+- Voice input structure (VoiceWaveformView, VoiceInputConfiguration)
+- SSHAuthMethod duplicate definition resolved
+- Performance types added (PerformanceBottleneck, PerformanceMeasurement, PerformanceSpan)
+- SSEConfiguration Sendable conformance
+- APIError reference corrected
+
+#### ❌ Remaining Critical Issues (20+ errors)
+1. **Terminal Module** - Missing types: TerminalLine, TerminalCharacter, CursorPosition
+2. **Protocol Conformance** - QueuedRequest doesn't conform to Codable
+3. **Concurrency Issues** - Multiple singletons need @unchecked Sendable
+4. **SwiftUI Issues** - ToolbarContent protocol problems in ProjectDetailView
+5. **Actor Isolation** - Conflicts in RASPManager, RequestPrioritizer
+
+### Recommended Path to MVP
+1. Comment out Terminal module (most errors)
+2. Add stub implementations for missing types
+3. Fix Sendable conformance issues
+4. Simplify toolbar implementations
+5. Focus on core chat/API features only
 
 ### DO Care About
 

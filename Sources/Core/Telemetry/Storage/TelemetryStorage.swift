@@ -54,13 +54,22 @@ public actor TelemetryFileStorage: TelemetryStorageProtocol {
         encoder.dateEncodingStrategy = .iso8601
         decoder.dateDecodingStrategy = .iso8601
         
-        // Find current file index
-        currentFileIndex = try findLatestFileIndex()
+        // Find current file index - will be initialized asynchronously
+        currentFileIndex = 0
     }
     
     // MARK: - TelemetryStorageProtocol
     
+    private var isInitialized = false
+    
+    private func ensureInitialized() async throws {
+        guard !isInitialized else { return }
+        currentFileIndex = try findLatestFileIndex()
+        isInitialized = true
+    }
+    
     public func store<T: TelemetryEvent>(_ event: T) async throws {
+        try await ensureInitialized()
         let data = try encoder.encode(event)
         try await writeEventData(data)
         

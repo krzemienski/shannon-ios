@@ -3,6 +3,9 @@
 // This file defines the core telemetry event structures
 
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 
 /// Base protocol for all telemetry events
 public protocol TelemetryEvent: Codable, Sendable {
@@ -86,16 +89,20 @@ public struct DeviceInfo: Codable, Sendable {
         self.networkType = networkType
     }
     
+    /// Creates a default device info placeholder
+    public static func placeholder() -> DeviceInfo {
+        return DeviceInfo()
+    }
+    
     /// Creates device info from current device
+    @MainActor
     public static func current() -> DeviceInfo {
         #if os(iOS)
-        import UIKit
-        
         let device = UIDevice.current
         let screen = UIScreen.main
         let locale = Locale.current
         let timezone = TimeZone.current
-        let processInfo = ProcessInfo.processInfo
+        let processInfo = Foundation.ProcessInfo.processInfo
         
         // Get app version and build
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
@@ -161,7 +168,7 @@ public struct PerformanceEvent: TelemetryEvent {
         timestamp: Date = Date(),
         sessionId: UUID,
         userId: String? = nil,
-        deviceInfo: DeviceInfo = .current(),
+        deviceInfo: DeviceInfo? = nil,
         metadata: [String: AnyCodable]? = nil,
         metricName: String,
         value: Double,
@@ -172,7 +179,7 @@ public struct PerformanceEvent: TelemetryEvent {
         self.timestamp = timestamp
         self.sessionId = sessionId
         self.userId = userId
-        self.deviceInfo = deviceInfo
+        self.deviceInfo = deviceInfo ?? DeviceInfo()
         self.metadata = metadata
         self.metricName = metricName
         self.value = value
@@ -212,7 +219,7 @@ public struct ErrorEvent: TelemetryEvent {
         timestamp: Date = Date(),
         sessionId: UUID,
         userId: String? = nil,
-        deviceInfo: DeviceInfo = .current(),
+        deviceInfo: DeviceInfo? = nil,
         metadata: [String: AnyCodable]? = nil,
         errorType: String,
         errorMessage: String,
@@ -224,7 +231,7 @@ public struct ErrorEvent: TelemetryEvent {
         self.timestamp = timestamp
         self.sessionId = sessionId
         self.userId = userId
-        self.deviceInfo = deviceInfo
+        self.deviceInfo = deviceInfo ?? DeviceInfo()
         self.metadata = metadata
         self.errorType = errorType
         self.errorMessage = errorMessage
@@ -257,7 +264,7 @@ public struct UserActionEvent: TelemetryEvent {
         timestamp: Date = Date(),
         sessionId: UUID,
         userId: String? = nil,
-        deviceInfo: DeviceInfo = .current(),
+        deviceInfo: DeviceInfo? = nil,
         metadata: [String: AnyCodable]? = nil,
         actionName: String,
         category: String,
@@ -270,7 +277,7 @@ public struct UserActionEvent: TelemetryEvent {
         self.timestamp = timestamp
         self.sessionId = sessionId
         self.userId = userId
-        self.deviceInfo = deviceInfo
+        self.deviceInfo = deviceInfo ?? DeviceInfo()
         self.metadata = metadata
         self.actionName = actionName
         self.category = category
@@ -313,7 +320,7 @@ public struct SSHConnectionEvent: TelemetryEvent {
         timestamp: Date = Date(),
         sessionId: UUID,
         userId: String? = nil,
-        deviceInfo: DeviceInfo = .current(),
+        deviceInfo: DeviceInfo? = nil,
         metadata: [String: AnyCodable]? = nil,
         connectionId: UUID,
         host: String,
@@ -327,7 +334,7 @@ public struct SSHConnectionEvent: TelemetryEvent {
         self.timestamp = timestamp
         self.sessionId = sessionId
         self.userId = userId
-        self.deviceInfo = deviceInfo
+        self.deviceInfo = deviceInfo ?? DeviceInfo()
         self.metadata = metadata
         self.connectionId = connectionId
         self.host = host
@@ -369,7 +376,7 @@ public struct AppLifecycleEvent: TelemetryEvent {
         timestamp: Date = Date(),
         sessionId: UUID,
         userId: String? = nil,
-        deviceInfo: DeviceInfo = .current(),
+        deviceInfo: DeviceInfo? = nil,
         metadata: [String: AnyCodable]? = nil,
         lifecycleEvent: LifecycleEventType,
         previousState: String? = nil,
@@ -380,7 +387,7 @@ public struct AppLifecycleEvent: TelemetryEvent {
         self.timestamp = timestamp
         self.sessionId = sessionId
         self.userId = userId
-        self.deviceInfo = deviceInfo
+        self.deviceInfo = deviceInfo ?? DeviceInfo()
         self.metadata = metadata
         self.lifecycleEvent = lifecycleEvent
         self.previousState = previousState
@@ -409,7 +416,7 @@ public struct CustomEvent: TelemetryEvent {
         timestamp: Date = Date(),
         sessionId: UUID,
         userId: String? = nil,
-        deviceInfo: DeviceInfo = .current(),
+        deviceInfo: DeviceInfo? = nil,
         metadata: [String: AnyCodable]? = nil,
         name: String,
         category: String? = nil,
@@ -419,7 +426,7 @@ public struct CustomEvent: TelemetryEvent {
         self.timestamp = timestamp
         self.sessionId = sessionId
         self.userId = userId
-        self.deviceInfo = deviceInfo
+        self.deviceInfo = deviceInfo ?? DeviceInfo()
         self.metadata = metadata
         self.name = name
         self.category = category

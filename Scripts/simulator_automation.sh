@@ -127,11 +127,15 @@ build_app() {
     fi
     
     # Build with xcodebuild (with PKG_CONFIG_PATH for libssh2)
+    # Use specific derived data path
+    local derived_data="${PROJECT_ROOT}/build/DerivedData"
+    
     if command -v xcbeautify &> /dev/null; then
         PKG_CONFIG_PATH="$PKG_CONFIG_PATH" xcodebuild \
             -project "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" \
             -scheme "$SCHEME_NAME" \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
+            -derivedDataPath "$derived_data" \
             clean build \
             | xcbeautify || {
                 log_error "Build failed"
@@ -142,6 +146,7 @@ build_app() {
             -project "${PROJECT_ROOT}/ClaudeCodeSwift.xcodeproj" \
             -scheme "$SCHEME_NAME" \
             -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
+            -derivedDataPath "$derived_data" \
             clean build || {
                 log_error "Build failed"
                 exit 1
@@ -155,8 +160,9 @@ build_app() {
 install_and_launch() {
     log_info "Installing app on simulator..."
     
-    # Find the app bundle in DerivedData
-    local app_path=$(find ~/Library/Developer/Xcode/DerivedData/ClaudeCodeSwift-*/Build/Products/Debug-iphonesimulator -name "ClaudeCodeSwift.app" -type d 2>/dev/null | head -n 1)
+    # Find the app bundle in our specific derived data location
+    local derived_data="${PROJECT_ROOT}/build/DerivedData"
+    local app_path=$(find "$derived_data"/Build/Products/Debug-iphonesimulator -name "ClaudeCodeSwift.app" -type d 2>/dev/null | head -n 1)
     
     if [ -z "$app_path" ]; then
         log_error "App bundle not found in DerivedData"

@@ -114,11 +114,6 @@ targets:
         excludes:
           - "App/MinimalApp.swift"  # Exclude the temporary minimal app
         compilerFlags: -enable-actor-data-race-checks
-      - path: Resources
-        type: folder
-        buildPhase: resources
-        excludes:
-          - "**/.DS_Store"
     resources:
       - path: Resources
         excludes:

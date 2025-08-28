@@ -329,6 +329,9 @@ class PageTransitionManager: ObservableObject {
 
 // MARK: - Preview
 
+// Commented out preview due to font ambiguity issue
+// TODO: Re-enable once resolved
+/*
 #Preview {
     VStack(spacing: 40) {
         // Loading animations
@@ -339,15 +342,19 @@ class PageTransitionManager: ObservableObject {
         }
         
         // Text animations
-        Text("Cyberpunk UI")
-            .font(SwiftUI.Font.largeTitle)
-            .foregroundStyle(Color.green)
-            .pulse()
+        Group {
+            Text("Cyberpunk UI")
+                .font(.system(size: 34, weight: .regular))
+                .foregroundStyle(Color.green)
+                .pulse()
+        }
         
-        Text("Loading...")
-            .font(SwiftUI.Font.body)
-            .foregroundStyle(Color.primary)
-            .shimmer()
+        Group {
+            Text("Loading...")
+                .font(.system(.body))
+                .foregroundStyle(Color.primary)
+                .shimmer()
+        }
         
         // Button with animation
         Button {
@@ -364,3 +371,4 @@ class PageTransitionManager: ObservableObject {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.black)
 }
+*/

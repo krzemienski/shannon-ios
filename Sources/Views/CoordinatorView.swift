@@ -59,7 +59,10 @@ struct CoordinatorView: View {
     private func sheetContent(for sheetType: SheetType) -> some View {
         switch sheetType {
         case .newProject:
-            NewProjectView(coordinator: coordinator.projectsCoordinator)
+            NewProjectView(onSave: { project in
+                // Handle project creation - implementation to be added
+                print("New project created: \(project.name)")
+            })
         case .projectSettings(let id):
             ProjectSettingsView(
                 projectId: id,
@@ -98,7 +101,12 @@ struct CoordinatorView: View {
         case .pdfViewer(let url):
             PDFViewerView(url: url)
         case .codeEditor(let path):
-            CodeEditorView(filePath: path)
+            // Create bindings for the code editor
+            CodeEditorView(
+                text: .constant("// File: \(path)\n// Code content would be loaded here"),
+                language: .constant(.swift),
+                fileName: path
+            )
         }
     }
 }
@@ -144,7 +152,7 @@ struct MainNavigationView: View {
                     .padding()
                     .background(Theme.card)
                     .clipShape(Circle())
-                    .shadow(color: Theme.shadow, radius: 4, x: 0, y: 2)
+                    .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
             }
             .padding()
         }
@@ -172,7 +180,16 @@ struct ChatNavigationView: View {
     private func chatDestination(for route: ChatRoute) -> some View {
         switch route {
         case .conversation(let id):
-            ChatView(conversationId: id)
+            // Create a temporary ChatSession for the given ID
+            // In production, this should fetch from state/store
+            ChatView(session: ChatSession(
+                id: id,
+                title: "Conversation",
+                lastMessage: "",
+                timestamp: Date(),
+                icon: "message",
+                tags: []
+            ))
                 .environmentObject(coordinator)
         case .search:
             ChatSearchView()
@@ -210,7 +227,8 @@ struct ProjectsNavigationView: View {
     private func projectDestination(for route: ProjectRoute) -> some View {
         switch route {
         case .detail(let id):
-            ProjectDetailView(projectId: id)
+            // TODO: Get project name from store/state
+            ProjectDetailView(projectId: id, projectName: "Project")
                 .environmentObject(coordinator)
         case .sshConfig(let id):
             SSHConfigurationView(projectId: id)

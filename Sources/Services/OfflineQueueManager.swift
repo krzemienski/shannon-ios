@@ -4,10 +4,10 @@ import Combine
 
 /// Offline queue manager for request persistence and retry (Tasks 486-490)
 @MainActor
-class OfflineQueueManager: ObservableObject {
+public class OfflineQueueManager: ObservableObject {
     // MARK: - Properties
     
-    static let shared = OfflineQueueManager()
+    public static let shared = OfflineQueueManager()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "OfflineQueue")
     
     // Published properties
@@ -32,7 +32,7 @@ class OfflineQueueManager: ObservableObject {
     
     // MARK: - Initialization
     
-    private init() {
+    public init() {
         loadPersistedQueue()
         setupNetworkMonitoring()
     }

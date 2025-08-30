@@ -10,33 +10,33 @@ import Combine
 
 /// ViewModel for managing tools interface
 @MainActor
-final class ToolsViewModel: ObservableObject {
+public final class ToolsViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var availableTools: [Tool] = []
-    @Published var recentTools: [Tool] = []
-    @Published var favoriteTools: [Tool] = []
-    @Published var toolExecutions: [ToolExecution] = []
-    @Published var selectedTool: Tool?
-    @Published var selectedCategory: ToolCategory?
-    @Published var searchText = ""
-    @Published var isExecuting = false
-    @Published var showToolDetail = false
-    @Published var showExecutionHistory = false
-    @Published var error: Error?
-    @Published var showError = false
+    @Published public var availableTools: [Tool] = []
+    @Published public var recentTools: [Tool] = []
+    @Published public var favoriteTools: [Tool] = []
+    @Published public var toolExecutions: [ToolExecution] = []
+    @Published public var selectedTool: Tool?
+    @Published public var selectedCategory: ToolCategory?
+    @Published public var searchText = ""
+    @Published public var isExecuting = false
+    @Published public var showToolDetail = false
+    @Published public var showExecutionHistory = false
+    @Published public var error: Error?
+    @Published public var showError = false
     
     // MARK: - Tool Parameters
     
-    @Published var toolParameters: [String: String] = [:]
-    @Published var parameterValidation: [String: Bool] = [:]
+    @Published public var toolParameters: [String: String] = [:]
+    @Published public var parameterValidation: [String: Bool] = [:]
     
     // MARK: - Execution Results
     
-    @Published var currentExecution: ToolExecution?
-    @Published var executionResult: ToolResult?
-    @Published var showResult = false
+    @Published public var currentExecution: ToolExecution?
+    @Published public var executionResult: ToolResult?
+    @Published public var showResult = false
     
     // MARK: - Private Properties
     
@@ -47,11 +47,11 @@ final class ToolsViewModel: ObservableObject {
     
     // MARK: - Computed Properties
     
-    var categorizedTools: [ToolCategory: [Tool]] {
+    public var categorizedTools: [ToolCategory: [Tool]] {
         Dictionary(grouping: filteredTools, by: { $0.category })
     }
     
-    var filteredTools: [Tool] {
+    public var filteredTools: [Tool] {
         var tools = availableTools
         
         // Filter by category
@@ -70,15 +70,15 @@ final class ToolsViewModel: ObservableObject {
         return tools
     }
     
-    var activeExecutions: [ToolExecution] {
+    public var activeExecutions: [ToolExecution] {
         toolExecutions.filter { $0.status == .running }
     }
     
-    var hasActiveExecutions: Bool {
+    public var hasActiveExecutions: Bool {
         !activeExecutions.isEmpty
     }
     
-    var canExecuteTool: Bool {
+    public var canExecuteTool: Bool {
         guard let tool = selectedTool else { return false }
         
         // Check all required parameters are filled
@@ -93,7 +93,7 @@ final class ToolsViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(toolStore: ToolStore,
+    public init(toolStore: ToolStore,
          apiClient: APIClient,
          appState: AppState) {
         self.toolStore = toolStore
@@ -143,7 +143,7 @@ final class ToolsViewModel: ObservableObject {
     // MARK: - Public Methods - Tool Selection
     
     /// Select a tool
-    func selectTool(_ tool: Tool) {
+    public func selectTool(_ tool: Tool) {
         selectedTool = tool
         toolParameters.removeAll()
         parameterValidation.removeAll()
@@ -164,7 +164,7 @@ final class ToolsViewModel: ObservableObject {
     }
     
     /// Clear tool selection
-    func clearSelection() {
+    public func clearSelection() {
         selectedTool = nil
         toolParameters.removeAll()
         parameterValidation.removeAll()
@@ -172,14 +172,14 @@ final class ToolsViewModel: ObservableObject {
     }
     
     /// Select category filter
-    func selectCategory(_ category: ToolCategory?) {
+    public func selectCategory(_ category: ToolCategory?) {
         selectedCategory = category
     }
     
     // MARK: - Public Methods - Tool Execution
     
     /// Execute selected tool
-    func executeTool() async {
+    public func executeTool() async {
         guard let tool = selectedTool, canExecuteTool else { return }
         
         isExecuting = true
@@ -218,7 +218,7 @@ final class ToolsViewModel: ObservableObject {
     }
     
     /// Retry failed execution
-    func retryExecution(_ execution: ToolExecution) async {
+    public func retryExecution(_ execution: ToolExecution) async {
         guard let tool = availableTools.first(where: { $0.id == execution.toolId }) else {
             return
         }
@@ -236,7 +236,7 @@ final class ToolsViewModel: ObservableObject {
     // MARK: - Public Methods - Favorites
     
     /// Toggle favorite status
-    func toggleFavorite(_ tool: Tool) {
+    public func toggleFavorite(_ tool: Tool) {
         toolStore.toggleFavorite(tool)
         
         // Haptic feedback
@@ -245,19 +245,19 @@ final class ToolsViewModel: ObservableObject {
     }
     
     /// Check if tool is favorite
-    func isFavorite(_ tool: Tool) -> Bool {
+    public func isFavorite(_ tool: Tool) -> Bool {
         toolStore.favoriteTools.contains(tool.id)
     }
     
     // MARK: - Public Methods - History
     
     /// Clear execution history
-    func clearHistory() {
+    public func clearHistory() {
         toolStore.clearExecutionHistory()
     }
     
     /// Export execution history
-    func exportHistory() async -> Data? {
+    public func exportHistory() async -> Data? {
         let export = ExecutionHistoryExport(
             timestamp: Date(),
             executionCount: toolExecutions.count,
@@ -274,13 +274,13 @@ final class ToolsViewModel: ObservableObject {
     // MARK: - Public Methods - Parameters
     
     /// Update tool parameter
-    func updateParameter(_ name: String, value: String) {
+    public func updateParameter(_ name: String, value: String) {
         toolParameters[name] = value
         validateParameter(name, value: value)
     }
     
     /// Validate parameter
-    func validateParameter(_ name: String, value: String) {
+    public func validateParameter(_ name: String, value: String) {
         guard let tool = selectedTool,
               let parameter = tool.parameters.first(where: { $0.name == name }) else {
             return
@@ -304,7 +304,7 @@ final class ToolsViewModel: ObservableObject {
     }
     
     /// Clear all parameters
-    func clearParameters() {
+    public func clearParameters() {
         for key in toolParameters.keys {
             toolParameters[key] = ""
         }
@@ -360,13 +360,13 @@ final class ToolsViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-struct ExecutionHistoryExport: Codable {
+public struct ExecutionHistoryExport: Codable {
     let timestamp: Date
     let executionCount: Int
     let executions: [ExecutionRecord]
 }
 
-struct ExecutionRecord: Codable {
+public struct ExecutionRecord: Codable {
     let toolId: String
     let toolName: String
     let startedAt: Date
@@ -374,7 +374,7 @@ struct ExecutionRecord: Codable {
     let status: String
     let success: Bool
     
-    init(from execution: ToolExecution) {
+    public init(from execution: ToolExecution) {
         self.toolId = execution.toolId
         self.toolName = execution.toolName
         self.startedAt = execution.startedAt

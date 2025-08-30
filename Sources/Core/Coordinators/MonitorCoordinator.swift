@@ -10,7 +10,7 @@ import Combine
 
 /// Coordinator managing monitoring navigation and flow
 @MainActor
-final class MonitorCoordinator: BaseCoordinator, ObservableObject {
+public final class MonitorCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Navigation State
     

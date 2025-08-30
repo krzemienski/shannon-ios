@@ -15,7 +15,7 @@ public struct ChatCompletionRequest: Codable {
     public let topP: Double?
     public let frequencyPenalty: Double?
     public let presencePenalty: Double?
-    public let stream: Bool?
+    public var stream: Bool?
     public let stop: [String]?
     public let user: String?
     public let tools: [ChatTool]?

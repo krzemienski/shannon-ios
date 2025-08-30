@@ -47,7 +47,7 @@ public struct LoadingIndicator: View {
             
             if let message = message {
                 Text(message)
-                    .font(Theme.Typography.callout)
+                    .font(.callout)
                     .foregroundColor(Theme.mutedForeground)
             }
         }
@@ -88,7 +88,7 @@ public struct LoadingIndicator: View {
             
             if let message = message {
                 Text(message)
-                    .font(Theme.Typography.footnote)
+                    .font(.footnote)
                     .foregroundColor(Theme.mutedForeground)
             }
         }
@@ -176,7 +176,7 @@ public struct CommonErrorView: View {
                 .foregroundColor(Theme.foreground)
             
             Text(error.localizedDescription)
-                .font(Theme.Typography.body)
+                .font(.body)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, ThemeSpacing.xl)
@@ -236,7 +236,7 @@ public struct CommonEmptyStateView: View {
             
             if let message = message {
                 Text(message)
-                    .font(Theme.Typography.body)
+                    .font(.body)
                     .foregroundColor(Theme.mutedForeground)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, ThemeSpacing.xl)

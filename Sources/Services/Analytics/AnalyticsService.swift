@@ -51,14 +51,21 @@ public struct UserProperties {
     
     public init() {
         self.userId = UserDefaults.standard.string(forKey: "userId") ?? UUID().uuidString
-        self.deviceId = UIDevice.current.identifierForVendor?.uuidString ?? ""
+        self.deviceId = ""  // Will be set asynchronously
         self.platform = "iOS"
-        self.osVersion = UIDevice.current.systemVersion
+        self.osVersion = ""  // Will be set asynchronously
         self.appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         self.buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        self.deviceModel = UIDevice.current.model
+        self.deviceModel = ""  // Will be set asynchronously
         self.locale = Locale.current.identifier
         self.timezone = TimeZone.current.identifier
+        
+        // Set device-specific properties asynchronously on MainActor
+        Task { @MainActor in
+            self.deviceId = UIDevice.current.identifierForVendor?.uuidString ?? ""
+            self.osVersion = UIDevice.current.systemVersion
+            self.deviceModel = UIDevice.current.model
+        }
         self.isPowerUser = false
         self.isNewUser = true
         self.customProperties = [:]

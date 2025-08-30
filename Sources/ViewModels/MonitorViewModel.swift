@@ -10,33 +10,33 @@ import Combine
 
 /// ViewModel for system monitoring interface
 @MainActor
-final class MonitorViewModel: ObservableObject {
+public final class MonitorViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var cpuUsage: Double = 0
-    @Published var memoryUsage: MemoryUsage = MemoryUsage()
-    @Published var diskUsage: DiskUsage = DiskUsage()
-    @Published var networkStats: NetworkStats = NetworkStats()
-    @Published var activeConnections: [SSHConnection] = []
-    @Published var systemLogs: [SystemLog] = []
-    @Published var processInfo: [ProcessInfo] = []
+    @Published public var cpuUsage: Double = 0
+    @Published public var memoryUsage: MemoryUsage = MemoryUsage()
+    @Published public var diskUsage: DiskUsage = DiskUsage()
+    @Published public var networkStats: NetworkStats = NetworkStats()
+    @Published public var activeConnections: [SSHConnection] = []
+    @Published public var systemLogs: [SystemLog] = []
+    @Published public var processInfo: [ProcessInfo] = []
     
     // MARK: - UI State
     
-    @Published var isMonitoring = false
-    @Published var selectedTab: MonitorTab = .overview
-    @Published var showExportOptions = false
-    @Published var showSettings = false
-    @Published var refreshInterval: TimeInterval = 5.0
-    @Published var selectedLogLevel: LogLevel? = nil
-    @Published var searchText = ""
+    @Published public var isMonitoring = false
+    @Published public var selectedTab: MonitorTab = .overview
+    @Published public var showExportOptions = false
+    @Published public var showSettings = false
+    @Published public var refreshInterval: TimeInterval = 5.0
+    @Published public var selectedLogLevel: LogLevel? = nil
+    @Published public var searchText = ""
     
     // MARK: - Charts Data
     
-    @Published var cpuHistory: [ChartDataPoint] = []
-    @Published var memoryHistory: [ChartDataPoint] = []
-    @Published var networkHistory: [NetworkChartData] = []
+    @Published public var cpuHistory: [ChartDataPoint] = []
+    @Published public var memoryHistory: [ChartDataPoint] = []
+    @Published public var networkHistory: [NetworkChartData] = []
     
     // MARK: - Private Properties
     
@@ -48,7 +48,7 @@ final class MonitorViewModel: ObservableObject {
     
     // MARK: - Computed Properties
     
-    var filteredLogs: [SystemLog] {
+    public var filteredLogs: [SystemLog] {
         var logs = systemLogs
         
         // Filter by log level
@@ -67,7 +67,7 @@ final class MonitorViewModel: ObservableObject {
         return logs
     }
     
-    var criticalMetrics: [MetricAlert] {
+    public var criticalMetrics: [MetricAlert] {
         var alerts: [MetricAlert] = []
         
         // CPU usage alert
@@ -100,13 +100,13 @@ final class MonitorViewModel: ObservableObject {
         return alerts
     }
     
-    var hasActiveAlerts: Bool {
+    public var hasActiveAlerts: Bool {
         !criticalMetrics.isEmpty
     }
     
     // MARK: - Initialization
     
-    init(monitorStore: MonitorStore,
+    public init(monitorStore: MonitorStore,
          sshManager: SSHManager,
          appState: AppState) {
         self.monitorStore = monitorStore
@@ -175,17 +175,17 @@ final class MonitorViewModel: ObservableObject {
     // MARK: - Public Methods - Monitoring Control
     
     /// Start monitoring
-    func startMonitoring() {
+    public func startMonitoring() {
         monitorStore.startMonitoring()
     }
     
     /// Stop monitoring
-    func stopMonitoring() {
+    public func stopMonitoring() {
         monitorStore.stopMonitoring()
     }
     
     /// Toggle monitoring
-    func toggleMonitoring() {
+    public func toggleMonitoring() {
         if isMonitoring {
             stopMonitoring()
         } else {
@@ -194,13 +194,13 @@ final class MonitorViewModel: ObservableObject {
     }
     
     /// Update refresh interval
-    func updateRefreshInterval(_ interval: TimeInterval) {
+    public func updateRefreshInterval(_ interval: TimeInterval) {
         refreshInterval = interval
         monitorStore.updateRefreshInterval(interval)
     }
     
     /// Refresh metrics manually
-    func refreshMetrics() async {
+    public func refreshMetrics() async {
         // Trigger manual refresh
         // The monitor store will handle the actual update
     }
@@ -208,17 +208,17 @@ final class MonitorViewModel: ObservableObject {
     // MARK: - Public Methods - Logs
     
     /// Clear system logs
-    func clearLogs() {
+    public func clearLogs() {
         monitorStore.clearLogs()
     }
     
     /// Filter logs by level
-    func filterByLogLevel(_ level: LogLevel?) {
+    public func filterByLogLevel(_ level: LogLevel?) {
         selectedLogLevel = level
     }
     
     /// Export logs
-    func exportLogs() async -> Data? {
+    public func exportLogs() async -> Data? {
         let logsToExport = filteredLogs
         
         let export = LogsExport(
@@ -237,12 +237,12 @@ final class MonitorViewModel: ObservableObject {
     // MARK: - Public Methods - Data Export
     
     /// Export monitoring data
-    func exportMonitoringData() async -> Data? {
+    public func exportMonitoringData() async -> Data? {
         await monitorStore.exportMonitoringData()
     }
     
     /// Export as CSV
-    func exportAsCSV() -> String {
+    public func exportAsCSV() -> String {
         var csv = "Timestamp,CPU %,Memory Used,Memory Total,Disk Used,Disk Total,Network In,Network Out\n"
         
         let timestamp = ISO8601DateFormatter().string(from: Date())
@@ -258,19 +258,19 @@ final class MonitorViewModel: ObservableObject {
     // MARK: - Public Methods - UI
     
     /// Select monitoring tab
-    func selectTab(_ tab: MonitorTab) {
+    public func selectTab(_ tab: MonitorTab) {
         selectedTab = tab
     }
     
     /// Format bytes for display
-    func formatBytes(_ bytes: Int) -> String {
+    public func formatBytes(_ bytes: Int) -> String {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .binary
         return formatter.string(fromByteCount: Int64(bytes))
     }
     
     /// Format percentage
-    func formatPercentage(_ value: Double) -> String {
+    public func formatPercentage(_ value: Double) -> String {
         String(format: "%.1f%%", value)
     }
     
@@ -320,7 +320,7 @@ final class MonitorViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-enum MonitorTab: String, CaseIterable {
+public enum MonitorTab: String, CaseIterable {
     case overview = "Overview"
     case performance = "Performance"
     case network = "Network"
@@ -351,7 +351,7 @@ struct NetworkChartData {
     let uploadSpeed: Int
 }
 
-struct MetricAlert: Identifiable {
+public struct MetricAlert: Identifiable {
     let id = UUID()
     let type: MetricType
     let severity: AlertSeverity
@@ -377,19 +377,19 @@ enum AlertSeverity {
 
 // MARK: - Export Types
 
-struct LogsExport: Codable {
+public struct LogsExport: Codable {
     let timestamp: Date
     let logCount: Int
     let logs: [LogEntry]
 }
 
-struct LogEntry: Codable {
+public struct LogEntry: Codable {
     let level: String
     let message: String
     let timestamp: Date
     let source: String?
     
-    init(from log: SystemLog) {
+    public     init(from log: SystemLog) {
         self.level = String(describing: log.level)
         self.message = log.message
         self.timestamp = log.timestamp

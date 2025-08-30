@@ -10,8 +10,8 @@ import Security
 
 /// Manager for secure keychain storage
 @MainActor
-class KeychainManager {
-    static let shared = KeychainManager()
+public class KeychainManager {
+    public static let shared = KeychainManager()
     
     private let service = "com.shannon.ClaudeCode"
     private let accessGroup: String? = nil // Set if using app groups

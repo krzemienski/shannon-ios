@@ -111,7 +111,7 @@ public final class PerformanceMonitor: @unchecked Sendable {
     public func markInteractive() {
         if timeToInteractive == nil {
             timeToInteractive = Date().timeIntervalSince(appLaunchTime)
-            logger.info("App became interactive after \(timeToInteractive ?? 0) seconds")
+            logger.info("App became interactive after \(self.timeToInteractive ?? 0) seconds")
         }
     }
     
@@ -156,7 +156,7 @@ public final class PerformanceMonitor: @unchecked Sendable {
             // Use method swizzling or observe view lifecycle
             var token: NSObjectProtocol?
             token = NotificationCenter.default.addObserver(
-                forName: UIViewController.viewDidAppearNotification,
+                forName: NSNotification.Name("UIViewControllerDidAppearNotification"),
                 object: viewController,
                 queue: .main
             ) { [weak self] _ in
@@ -242,7 +242,7 @@ public final class PerformanceMonitor: @unchecked Sendable {
     @objc private func appDidBecomeActive() {
         if timeToFirstFrame == nil {
             timeToFirstFrame = Date().timeIntervalSince(appLaunchTime)
-            logger.info("First frame rendered after \(timeToFirstFrame ?? 0) seconds")
+            logger.info("First frame rendered after \(self.timeToFirstFrame ?? 0) seconds")
         }
         
         displayLink?.isPaused = false
@@ -272,10 +272,12 @@ public final class PerformanceMonitor: @unchecked Sendable {
         
         // Record to metrics collector
         if let duration = tracker.duration {
-            MetricsCollector.shared.recordPerformanceMetric(
-                name: tracker.operation,
-                value: duration
-            )
+            Task { @MainActor in
+                MetricsCollector.shared.recordPerformanceMetric(
+                    name: tracker.operation,
+                    value: duration
+                )
+            }
         }
     }
     
@@ -323,7 +325,7 @@ public final class PerformanceMonitor: @unchecked Sendable {
 // MARK: - Supporting Types
 
 /// Performance tracker for individual operations
-public class PerformanceTracker: ObservableObject {
+public final class PerformanceTracker: ObservableObject, @unchecked Sendable {
     public let id: UUID
     public let operation: String
     public let startTime: Date

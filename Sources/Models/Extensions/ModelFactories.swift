@@ -210,47 +210,7 @@ extension APIError {
 
 // MARK: - File Tree Factory
 extension FileTreeNode {
-    /// Create a mock file tree for testing
-    public static func mockTree() -> FileTreeNode {
-        return FileTreeNode(
-            name: "Project",
-            path: "/",
-            isDirectory: true,
-            children: [
-                FileTreeNode(
-                    name: "src",
-                    path: "/src",
-                    isDirectory: true,
-                    children: [
-                        FileTreeNode(
-                            name: "main.swift",
-                            path: "/src/main.swift",
-                            isDirectory: false,
-                            size: 1024
-                        ),
-                        FileTreeNode(
-                            name: "utils.swift",
-                            path: "/src/utils.swift",
-                            isDirectory: false,
-                            size: 512
-                        )
-                    ]
-                ),
-                FileTreeNode(
-                    name: "README.md",
-                    path: "/README.md",
-                    isDirectory: false,
-                    size: 2048
-                ),
-                FileTreeNode(
-                    name: "Package.swift",
-                    path: "/Package.swift",
-                    isDirectory: false,
-                    size: 256
-                )
-            ]
-        )
-    }
+    // Removed mockTree() - production views should load real file trees from backend
 }
 
 // MARK: - Usage Stats Factory

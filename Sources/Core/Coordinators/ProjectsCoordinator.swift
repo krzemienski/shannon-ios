@@ -10,7 +10,7 @@ import Combine
 
 /// Coordinator managing projects navigation and flow
 @MainActor
-final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
+public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Navigation State
     

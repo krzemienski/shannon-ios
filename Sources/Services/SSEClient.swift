@@ -29,7 +29,7 @@ public struct SSEConfiguration: Sendable {
 }
 
 /// Enhanced Server-Sent Events client for streaming API responses (Tasks 351-400)
-class SSEClient: NSObject, @unchecked Sendable {
+public class SSEClient: NSObject, @unchecked Sendable {
     // MARK: - Properties
     
     private var urlSession: URLSession?
@@ -38,9 +38,9 @@ class SSEClient: NSObject, @unchecked Sendable {
     private let configuration: SSEConfiguration
     
     // Event handlers
-    private var onMessage: ((SSEMessage) -> Void)?
-    private var onError: ((Error) -> Void)?
-    private var onComplete: (() -> Void)?
+    public var onMessage: ((SSEMessage) -> Void)?
+    public var onError: ((Error) -> Void)?
+    public var onComplete: (() -> Void)?
     private var onReconnect: (() -> Void)?  // Task 361: Reconnection handler
     private var onHeartbeat: (() -> Void)?  // Task 365: Heartbeat handler
     
@@ -80,7 +80,7 @@ class SSEClient: NSObject, @unchecked Sendable {
     
     // MARK: - Initialization
     
-    init(configuration: SSEConfiguration = .default) {
+    public init(configuration: SSEConfiguration = .default) {
         self.configuration = configuration
         super.init()
         setupSession()
@@ -110,6 +110,22 @@ class SSEClient: NSObject, @unchecked Sendable {
     }
     
     // MARK: - Public Methods
+    
+    /// Connect to SSE endpoint with URLRequest
+    public func connect(request: URLRequest) async {
+        // Mark as connected
+        isConnected = true
+        reconnectAttempts = 0
+        streamMetrics.connectionStartTime = Date()
+        
+        // Start connection
+        logger.debug("Connecting to SSE: \(request.url?.absoluteString ?? "unknown")")
+        dataTask = urlSession?.dataTask(with: request)
+        dataTask?.resume()
+        
+        // Start heartbeat monitoring
+        startHeartbeatMonitoring()
+    }
     
     /// Connect to SSE endpoint with enhanced features (Tasks 351-360)
     func connect(
@@ -529,11 +545,18 @@ extension SSEClient: URLSessionDataDelegate {
 // MARK: - Supporting Types
 
 /// SSE message structure
-struct SSEMessage {
-    let id: String?
-    let event: String
-    let data: String
-    let retry: TimeInterval?
+public struct SSEMessage {
+    public let id: String?
+    public let event: String
+    public let data: String
+    public let retry: TimeInterval?
+    
+    public init(id: String? = nil, event: String, data: String, retry: TimeInterval? = nil) {
+        self.id = id
+        self.event = event
+        self.data = data
+        self.retry = retry
+    }
 }
 
 /// SSE Event for parsing (Task 366)

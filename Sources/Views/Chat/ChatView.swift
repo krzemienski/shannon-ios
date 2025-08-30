@@ -6,6 +6,40 @@
 //
 
 import SwiftUI
+import Combine
+
+// Temporary simple chat view model for compilation
+class SimpleChatViewModel: ObservableObject {
+    @Published var messages: [ChatMessage] = []
+    @Published var isLoading = false
+    @Published var streamingText = ""
+    @Published var currentTool: String?
+    @Published var toolExecutions: [ToolExecution] = []
+    
+    func sendMessage(_ text: String) {
+        // Implementation pending
+    }
+    
+    func preloadMessageContent(_ message: ChatMessage) {
+        // Implementation pending
+    }
+    
+    func cleanupMessageResources(_ message: ChatMessage) {
+        // Implementation pending
+    }
+    
+    func clearChat() {
+        messages.removeAll()
+    }
+    
+    func cancelCurrentRequest() {
+        isLoading = false
+    }
+    
+    func retryLastMessage() {
+        // Implementation pending
+    }
+}
 
 struct ChatView: View {
     let session: ChatSession
@@ -174,7 +208,7 @@ struct ChatView: View {
 // MARK: - Message View
 
 struct ChatMessageView: View {
-    let message: ChatMessageUI
+    let message: ChatMessage
     
     var body: some View {
         HStack(alignment: .top, spacing: ThemeSpacing.md) {
@@ -282,10 +316,13 @@ struct ThinkingIndicator: View {
 // MARK: - Chat View Model
 
 class SimpleChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessageUI] = ChatMessageUI.mockData
+    @Published var messages: [ChatMessageUI] = []
     @Published var isLoading = false
     @Published var tokenUsage = 0
     @Published var toolUsages: [ToolUsage] = []
+    
+    private let chatViewModel: ChatViewModel
+    private var cancellables = Set<AnyCancellable>()
     
     var hasToolUsage: Bool {
         !toolUsages.isEmpty
@@ -295,27 +332,47 @@ class SimpleChatViewModel: ObservableObject {
         toolUsages.count
     }
     
-    func sendMessage(_ text: String) {
-        let userMessage = ChatMessageUI(
-            role: .user,
-            content: text,
-            timestamp: Date()
+    init() {
+        let container = DependencyContainer.shared
+        self.chatViewModel = ChatViewModel(
+            conversationId: nil,
+            chatStore: container.chatStore,
+            apiClient: container.apiClient,
+            appState: container.appState
         )
-        messages.append(userMessage)
         
-        isLoading = true
+        setupBindings()
+    }
+    
+    private func setupBindings() {
+        // Sync messages from real ChatViewModel
+        chatViewModel.$messages
+            .map { messages in
+                messages.map { message in
+                    ChatMessageUI(
+                        role: message.role == .user ? .user : (message.role == .assistant ? .assistant : .system),
+                        content: message.content,
+                        timestamp: message.timestamp
+                    )
+                }
+            }
+            .assign(to: &$messages)
         
-        // Simulate response
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-            let aiMessage = ChatMessageUI(
-                role: .assistant,
-                content: "I understand you want help with: \(text). Let me assist you with that.",
-                timestamp: Date()
-            )
-            self?.messages.append(aiMessage)
-            self?.isLoading = false
-            self?.tokenUsage += Int.random(in: 100...500)
-        }
+        chatViewModel.$isLoading
+            .assign(to: &$isLoading)
+    }
+    
+    func sendMessage(_ text: String) {
+        chatViewModel.inputText = text
+        chatViewModel.sendMessage()
+    }
+    
+    func preloadMessageContent(_ message: ChatMessageUI) {
+        // Forward to real view model if needed
+    }
+    
+    func cleanupMessageResources(_ message: ChatMessageUI) {
+        // Forward to real view model if needed
     }
 }
 
@@ -339,23 +396,7 @@ struct ChatMessageUI: Identifiable {
         case system
     }
     
-    static let mockData: [ChatMessageUI] = [
-        ChatMessageUI(
-            role: .assistant,
-            content: "Hello! I'm Claude Code. How can I help you with your iOS development today?",
-            timestamp: Date().addingTimeInterval(-300)
-        ),
-        ChatMessageUI(
-            role: .user,
-            content: "Can you help me create a custom SwiftUI button with a gradient background?",
-            timestamp: Date().addingTimeInterval(-240)
-        ),
-        ChatMessageUI(
-            role: .assistant,
-            content: "I'll help you create a custom SwiftUI button with a gradient background. Here's a complete implementation with customizable parameters and smooth animations.",
-            timestamp: Date().addingTimeInterval(-180)
-        )
-    ]
+    // Removed mock data - now using real data from ChatViewModel
 }
 
 // MARK: - Tool Usage Model
@@ -377,7 +418,13 @@ struct ToolUsage: Identifiable {
 
 #Preview {
     NavigationStack {
-        ChatView(session: ChatSession.mockData[0])
+        ChatView(session: ChatSession(
+            title: "Preview Chat",
+            lastMessage: "This is a preview message",
+            timestamp: Date(),
+            icon: "message.fill",
+            tags: ["Preview"]
+        ))
             .environmentObject(AppState())
     }
     .preferredColorScheme(.dark)

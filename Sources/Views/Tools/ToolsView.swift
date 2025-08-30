@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct ToolsView: View {
-    @State private var tools: [MCPTool] = MCPTool.mockData
+    @StateObject private var toolStore = DependencyContainer.shared.toolStore
     @State private var searchText = ""
     @State private var selectedCategory: MCPToolCategory = .all
     @State private var showingAddTool = false
+    
+    private var tools: [MCPTool] {
+        toolStore.availableTools
+    }
     
     var filteredTools: [MCPTool] {
         let categoryFiltered = selectedCategory == .all ? tools : tools.filter { $0.category == selectedCategory }
@@ -288,142 +292,7 @@ struct MCPTool: Identifiable {
     }
 */
     
-extension MCPTool {
-    static let mockData: [MCPTool] = [
-        MCPTool(
-            id: "read-file",
-            serverId: "filesystem",
-            name: "Read File",
-            description: "Read contents of a file from the file system",
-            version: "1.0.0",
-            category: .filesystem,
-            inputSchema: JSONSchema(
-                type: "object",
-                properties: nil,
-                required: nil,
-                additionalProperties: nil,
-                description: nil
-            ),
-            outputSchema: nil,
-            examples: nil,
-            permissions: nil,
-            rateLimit: nil,
-            metadata: nil,
-            isDeprecated: false,
-            replacedBy: nil
-        ),
-        MCPTool(
-            id: "write-file",
-            serverId: "filesystem",
-            name: "Write File",
-            description: "Write or create a file with specified content",
-            version: "1.0.0",
-            category: .filesystem,
-            inputSchema: JSONSchema(
-                type: "object",
-                properties: [:],
-                required: ["path", "content"],
-                additionalProperties: nil,
-                description: nil
-            ),
-            outputSchema: nil,
-            examples: nil,
-            permissions: nil,
-            rateLimit: nil,
-            metadata: nil,
-            isDeprecated: false,
-            replacedBy: nil
-        ),
-        MCPTool(
-            id: "git-status",
-            serverId: "git",
-            name: "Git Status",
-            description: "Check the status of a git repository",
-            version: "1.0.0",
-            category: .utility,
-            inputSchema: JSONSchema(
-                type: "object",
-                properties: nil,
-                required: nil,
-                additionalProperties: nil,
-                description: nil
-            ),
-            outputSchema: nil,
-            examples: nil,
-            permissions: nil,
-            rateLimit: nil,
-            metadata: nil,
-            isDeprecated: false,
-            replacedBy: nil
-        ),
-        MCPTool(
-            id: "execute-command",
-            serverId: "terminal",
-            name: "Execute Command",
-            description: "Execute a shell command in the terminal",
-            version: "1.0.0",
-            category: .utility,
-            inputSchema: JSONSchema(
-                type: "object",
-                properties: [:],
-                required: ["command"],
-                additionalProperties: nil,
-                description: nil
-            ),
-            outputSchema: nil,
-            examples: nil,
-            permissions: nil,
-            rateLimit: nil,
-            metadata: nil,
-            isDeprecated: false,
-            replacedBy: nil
-        ),
-        MCPTool(
-            id: "query-database",
-            serverId: "database",
-            name: "Query Database",
-            description: "Execute SQL queries on connected databases",
-            version: "1.0.0",
-            category: .database,
-            inputSchema: JSONSchema(
-                type: "object",
-                properties: [:],
-                required: ["query", "database"],
-                additionalProperties: nil,
-                description: nil
-            ),
-            outputSchema: nil,
-            examples: nil,
-            permissions: nil,
-            rateLimit: nil,
-            metadata: nil,
-            isDeprecated: false,
-            replacedBy: nil
-        ),
-        MCPTool(
-            id: "api-request",
-            serverId: "api",
-            name: "API Request",
-            description: "Make HTTP requests to external APIs",
-            version: "1.0.0",
-            category: .network,
-            inputSchema: JSONSchema(
-                type: "object",
-                properties: [:],
-                required: ["url"],
-                additionalProperties: nil,
-                description: nil
-            ),
-            outputSchema: nil,
-            examples: nil,
-            permissions: nil,
-            rateLimit: nil,
-            metadata: nil,
-            isDeprecated: false,
-            replacedBy: nil
-        )
-    ]
-}
+// Removed mock data - now using real data from ToolStore
 
 // MARK: - Add Tool View
 
@@ -503,14 +372,33 @@ struct AddToolView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add") {
+                        // Create new MCP tool with required fields
                         let newTool = MCPTool(
+                            id: UUID().uuidString,
+                            serverId: serverURL,
                             name: toolName,
                             description: toolDescription,
-                            category: selectedCategory,
-                            usageCount: 0,
-                            lastUsed: nil,
-                            requiresConfig: true,
-                            parameters: []
+                            version: "1.0.0",
+                            category: selectedCategory == .fileSystem ? .filesystem : 
+                                     selectedCategory == .codeAnalysis ? .analysis :
+                                     selectedCategory == .git ? .utility :
+                                     selectedCategory == .database ? .database :
+                                     selectedCategory == .api ? .network :
+                                     selectedCategory == .terminal ? .utility : .custom,
+                            inputSchema: JSONSchema(
+                                type: "object",
+                                properties: nil,
+                                required: nil,
+                                additionalProperties: nil,
+                                description: nil
+                            ),
+                            outputSchema: nil,
+                            examples: nil,
+                            permissions: nil,
+                            rateLimit: nil,
+                            metadata: nil,
+                            isDeprecated: false,
+                            replacedBy: nil
                         )
                         onSave(newTool)
                         dismiss()

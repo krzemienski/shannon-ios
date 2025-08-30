@@ -10,10 +10,10 @@ import Combine
 
 /// Manages application settings with UserDefaults and Keychain integration
 @MainActor
-final class SettingsStore: ObservableObject {
+public final class SettingsStore: ObservableObject {
     
     // MARK: - API Settings
-    @Published var apiKey: String? {
+    @Published public var apiKey: String? {
         didSet {
             Task {
                 await saveAPIKey()
@@ -21,49 +21,49 @@ final class SettingsStore: ObservableObject {
         }
     }
     
-    @Published var baseURL: String = APIConfig.defaultBaseURL {
+    @Published public var baseURL: String = APIConfig.defaultBaseURL {
         didSet {
             UserDefaults.standard.set(baseURL, forKey: Keys.baseURL)
         }
     }
     
     /// Computed property for API base URL compatibility
-    var apiBaseURL: String? {
+    public var apiBaseURL: String? {
         return baseURL
     }
     
-    @Published var selectedModel: String = "claude-3-5-haiku-20241022" {
+    @Published public var selectedModel: String = "claude-3-5-haiku-20241022" {
         didSet {
             UserDefaults.standard.set(selectedModel, forKey: Keys.selectedModel)
         }
     }
     
     // MARK: - SSH Settings
-    @Published var sshEnabled: Bool = false {
+    @Published public var sshEnabled: Bool = false {
         didSet {
             UserDefaults.standard.set(sshEnabled, forKey: Keys.sshEnabled)
         }
     }
     
-    @Published var sshHost: String = "" {
+    @Published public var sshHost: String = "" {
         didSet {
             UserDefaults.standard.set(sshHost, forKey: Keys.sshHost)
         }
     }
     
-    @Published var sshPort: Int = 22 {
+    @Published public var sshPort: Int = 22 {
         didSet {
             UserDefaults.standard.set(sshPort, forKey: Keys.sshPort)
         }
     }
     
-    @Published var sshUsername: String = "" {
+    @Published public var sshUsername: String = "" {
         didSet {
             UserDefaults.standard.set(sshUsername, forKey: Keys.sshUsername)
         }
     }
     
-    @Published var sshPrivateKey: String? {
+    @Published public var sshPrivateKey: String? {
         didSet {
             Task {
                 await saveSSHPrivateKey()
@@ -71,7 +71,7 @@ final class SettingsStore: ObservableObject {
         }
     }
     
-    @Published var sshPassphrase: String? {
+    @Published public var sshPassphrase: String? {
         didSet {
             Task {
                 await saveSSHPassphrase()
@@ -80,157 +80,157 @@ final class SettingsStore: ObservableObject {
     }
     
     // MARK: - App Preferences
-    @Published var theme: AppTheme = .system {
+    @Published public var theme: AppTheme = .system {
         didSet {
             UserDefaults.standard.set(theme.rawValue, forKey: Keys.theme)
             applyTheme()
         }
     }
     
-    @Published var fontSize: FontSize = .medium {
+    @Published public var fontSize: FontSize = .medium {
         didSet {
             UserDefaults.standard.set(fontSize.rawValue, forKey: Keys.fontSize)
         }
     }
     
-    @Published var enableHaptics: Bool = true {
+    @Published public var enableHaptics: Bool = true {
         didSet {
             UserDefaults.standard.set(enableHaptics, forKey: Keys.enableHaptics)
         }
     }
     
-    @Published var enableSounds: Bool = true {
+    @Published public var enableSounds: Bool = true {
         didSet {
             UserDefaults.standard.set(enableSounds, forKey: Keys.enableSounds)
         }
     }
     
     // MARK: - Chat Settings
-    @Published var temperature: Double = 0.7 {
+    @Published public var temperature: Double = 0.7 {
         didSet {
             UserDefaults.standard.set(temperature, forKey: Keys.temperature)
         }
     }
     
-    @Published var maxTokens: Int = 4096 {
+    @Published public var maxTokens: Int = 4096 {
         didSet {
             UserDefaults.standard.set(maxTokens, forKey: Keys.maxTokens)
         }
     }
     
-    @Published var streamResponses: Bool = true {
+    @Published public var streamResponses: Bool = true {
         didSet {
             UserDefaults.standard.set(streamResponses, forKey: Keys.streamResponses)
         }
     }
     
-    @Published var saveHistory: Bool = true {
+    @Published public var saveHistory: Bool = true {
         didSet {
             UserDefaults.standard.set(saveHistory, forKey: Keys.saveHistory)
         }
     }
     
     // MARK: - Background Settings
-    @Published var enableBackgroundRefresh: Bool = true {
+    @Published public var enableBackgroundRefresh: Bool = true {
         didSet {
             UserDefaults.standard.set(enableBackgroundRefresh, forKey: Keys.enableBackgroundRefresh)
         }
     }
     
-    @Published var enableTelemetry: Bool = false {
+    @Published public var enableTelemetry: Bool = false {
         didSet {
             UserDefaults.standard.set(enableTelemetry, forKey: Keys.enableTelemetry)
         }
     }
     
     // MARK: - Developer Settings
-    @Published var debugMode: Bool = false {
+    @Published public var debugMode: Bool = true { // Enabled by default for development
         didSet {
             UserDefaults.standard.set(debugMode, forKey: Keys.debugMode)
         }
     }
     
-    @Published var showNetworkActivity: Bool = false {
+    @Published public var showNetworkActivity: Bool = false {
         didSet {
             UserDefaults.standard.set(showNetworkActivity, forKey: Keys.showNetworkActivity)
         }
     }
     
     // MARK: - Accessibility Settings
-    @Published var useBoldText: Bool = false {
+    @Published public var useBoldText: Bool = false {
         didSet {
             UserDefaults.standard.set(useBoldText, forKey: Keys.useBoldText)
         }
     }
     
-    @Published var useMonospaceCode: Bool = true {
+    @Published public var useMonospaceCode: Bool = true {
         didSet {
             UserDefaults.standard.set(useMonospaceCode, forKey: Keys.useMonospaceCode)
         }
     }
     
-    @Published var highContrast: Bool = false {
+    @Published public var highContrast: Bool = false {
         didSet {
             UserDefaults.standard.set(highContrast, forKey: Keys.highContrast)
         }
     }
     
-    @Published var reduceTransparency: Bool = false {
+    @Published public var reduceTransparency: Bool = false {
         didSet {
             UserDefaults.standard.set(reduceTransparency, forKey: Keys.reduceTransparency)
         }
     }
     
-    @Published var enableAnimations: Bool = true {
+    @Published public var enableAnimations: Bool = true {
         didSet {
             UserDefaults.standard.set(enableAnimations, forKey: Keys.enableAnimations)
         }
     }
     
-    @Published var reduceMotion: Bool = false {
+    @Published public var reduceMotion: Bool = false {
         didSet {
             UserDefaults.standard.set(reduceMotion, forKey: Keys.reduceMotion)
         }
     }
     
-    @Published var animationSpeed: Double = 1.0 {
+    @Published public var animationSpeed: Double = 1.0 {
         didSet {
             UserDefaults.standard.set(animationSpeed, forKey: Keys.animationSpeed)
         }
     }
     
-    @Published var smartInvert: Bool = false {
+    @Published public var smartInvert: Bool = false {
         didSet {
             UserDefaults.standard.set(smartInvert, forKey: Keys.smartInvert)
         }
     }
     
-    @Published var buttonShapes: Bool = false {
+    @Published public var buttonShapes: Bool = false {
         didSet {
             UserDefaults.standard.set(buttonShapes, forKey: Keys.buttonShapes)
         }
     }
     
-    @Published var differentiateWithoutColor: Bool = false {
+    @Published public var differentiateWithoutColor: Bool = false {
         didSet {
             UserDefaults.standard.set(differentiateWithoutColor, forKey: Keys.differentiateWithoutColor)
         }
     }
     
     // MARK: - Chat UI Settings
-    @Published var showTokenUsage: Bool = true {
+    @Published public var showTokenUsage: Bool = true {
         didSet {
             UserDefaults.standard.set(showTokenUsage, forKey: Keys.showTokenUsage)
         }
     }
     
-    @Published var enableCodeHighlighting: Bool = true {
+    @Published public var enableCodeHighlighting: Bool = true {
         didSet {
             UserDefaults.standard.set(enableCodeHighlighting, forKey: Keys.enableCodeHighlighting)
         }
     }
     
-    @Published var systemPrompt: String = "You are a helpful, harmless, and honest AI assistant." {
+    @Published public var systemPrompt: String = "You are a helpful, harmless, and honest AI assistant." {
         didSet {
             UserDefaults.standard.set(systemPrompt, forKey: Keys.systemPrompt)
         }
@@ -243,7 +243,7 @@ final class SettingsStore: ObservableObject {
     
     // MARK: - Initialization
     
-    init() {
+    public     init() {
         Task {
             await loadSettings()
         }
@@ -252,7 +252,7 @@ final class SettingsStore: ObservableObject {
     // MARK: - Public Methods
     
     /// Load all settings from UserDefaults and Keychain
-    func loadSettings() async {
+    public func loadSettings() async {
         // Load API settings
         baseURL = userDefaults.string(forKey: Keys.baseURL) ?? APIConfig.defaultBaseURL
         selectedModel = userDefaults.string(forKey: Keys.selectedModel) ?? "claude-3-5-haiku-20241022"
@@ -304,7 +304,7 @@ final class SettingsStore: ObservableObject {
     }
     
     /// Save all settings
-    func saveSettings() async {
+    public func saveSettings() async {
         // Keychain items are saved automatically via didSet
         // UserDefaults are also saved automatically via didSet
         
@@ -313,7 +313,7 @@ final class SettingsStore: ObservableObject {
     }
     
     /// Reset all settings to defaults
-    func resetToDefaults() async {
+    public func resetToDefaults() async {
         // Clear keychain items
         try? await keychainManager.delete(for: KeychainManager.Keys.apiKey)
         try? await keychainManager.delete(for: KeychainManager.Keys.sshPrivateKey)
@@ -442,7 +442,7 @@ final class SettingsStore: ObservableObject {
     
     // MARK: - Public Methods
     
-    func updateAPIConfiguration(apiKey: String, baseURL: String?) {
+    public func updateAPIConfiguration(apiKey: String, baseURL: String?) {
         // Store API configuration
         self.apiKey = apiKey
         if let baseURL = baseURL {
@@ -450,7 +450,7 @@ final class SettingsStore: ObservableObject {
         }
     }
     
-    func updateSSHConfiguration(_ config: AppSSHConfig) {
+    public func updateSSHConfiguration(_ config: AppSSHConfig) {
         // Store SSH configuration
         sshEnabled = true
         sshHost = config.host
@@ -458,7 +458,7 @@ final class SettingsStore: ObservableObject {
         sshUsername = config.username
     }
     
-    var sshConfiguration: AppSSHConfig? {
+    public var sshConfiguration: AppSSHConfig? {
         guard sshEnabled else { return nil }
         return AppSSHConfig(
             name: "SSH Connection",
@@ -468,19 +468,19 @@ final class SettingsStore: ObservableObject {
         )
     }
     
-    func updateTheme(_ newTheme: AppTheme) {
+    public func updateTheme(_ newTheme: AppTheme) {
         theme = newTheme
     }
     
-    func updateFontSize(_ size: FontSize) {
+    public func updateFontSize(_ size: FontSize) {
         fontSize = size
     }
     
-    func toggleReduceMotion(_ enabled: Bool) {
+    public func toggleReduceMotion(_ enabled: Bool) {
         reduceMotion = enabled
     }
     
-    func exportSettings() async throws -> URL {
+    public func exportSettings() async throws -> URL {
         // Export settings as JSON
         let settings: [String: Any] = [
             "theme": theme.rawValue,
@@ -500,7 +500,7 @@ final class SettingsStore: ObservableObject {
         return fileURL
     }
     
-    func importSettings(from url: URL) async throws {
+    public func importSettings(from url: URL) async throws {
         // Import settings from JSON
         let data = try Data(contentsOf: url)
         guard let settings = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
@@ -532,7 +532,7 @@ final class SettingsStore: ObservableObject {
         }
     }
     
-    func updateNotificationSettings(_ settings: NotificationSettings) {
+    public func updateNotificationSettings(_ settings: NotificationSettings) {
         // Update notification settings
         UserDefaults.standard.set(settings.enabled, forKey: "notifications.enabled")
         UserDefaults.standard.set(settings.soundEnabled, forKey: "notifications.soundEnabled")
@@ -540,7 +540,7 @@ final class SettingsStore: ObservableObject {
         UserDefaults.standard.set(settings.showPreviews, forKey: "notifications.showPreviews")
     }
     
-    func updatePrivacySettings(_ settings: PrivacySettings) {
+    public func updatePrivacySettings(_ settings: PrivacySettings) {
         // Update privacy settings
         enableTelemetry = settings.telemetryEnabled
         UserDefaults.standard.set(settings.analyticsEnabled, forKey: "privacy.analyticsEnabled")
@@ -548,7 +548,7 @@ final class SettingsStore: ObservableObject {
         UserDefaults.standard.set(settings.shareUsageData, forKey: "privacy.shareUsageData")
     }
     
-    func toggleAnalytics(_ enabled: Bool) {
+    public func toggleAnalytics(_ enabled: Bool) {
         enableTelemetry = enabled
     }
 }
@@ -560,13 +560,13 @@ final class SettingsStore: ObservableObject {
 // Removed typealias to avoid conflict with Theme struct
 // Use AppTheme directly instead
 
-enum FontSize: String, CaseIterable {
+public enum FontSize: String, CaseIterable {
     case small = "small"
     case medium = "medium"
     case large = "large"
     case extraLarge = "extraLarge"
     
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .small: return "Small"
         case .medium: return "Medium"
@@ -575,7 +575,7 @@ enum FontSize: String, CaseIterable {
         }
     }
     
-    var scaleFactor: CGFloat {
+    public var scaleFactor: CGFloat {
         switch self {
         case .small: return 0.85
         case .medium: return 1.0

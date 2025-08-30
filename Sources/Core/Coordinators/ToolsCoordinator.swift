@@ -10,7 +10,7 @@ import Combine
 
 /// Coordinator managing tools navigation and flow
 @MainActor
-final class ToolsCoordinator: BaseCoordinator, ObservableObject {
+public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Navigation State
     

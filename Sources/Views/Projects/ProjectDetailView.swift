@@ -77,7 +77,10 @@ public struct ProjectDetailView: View {
                     TerminalContainerView(projectId: projectId)
                     
                 case .settings:
-                    ProjectSettingsView(projectId: projectId)
+                    // TODO: Pass proper coordinator when available
+                    Text("Project Settings")
+                        .font(.title2)
+                        .foregroundColor(.secondary)
                     
                 case .git:
                     GitView(projectId: projectId)
@@ -87,7 +90,7 @@ public struct ProjectDetailView: View {
         .navigationTitle(projectName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarContent()
+            ProjectToolbarContent()
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFileInEditor)) { notification in
             if let node = notification.userInfo?["node"] as? FileTreeNode {
@@ -222,6 +225,7 @@ struct FileContentView: View {
 struct CodeEditorContainer: View {
     let file: FileTreeNode
     @StateObject private var editorViewModel = CodeEditorViewModel()
+    @State private var language: ProgrammingLanguage = .swift
     
     var body: some View {
         VStack(spacing: 0) {
@@ -254,10 +258,43 @@ struct CodeEditorContainer: View {
             Divider()
             
             // Code editor
-            CodeEditorView(viewModel: editorViewModel)
-                .task {
-                    await editorViewModel.loadFile(file)
-                }
+            CodeEditorView(
+                text: $editorViewModel.content,
+                language: $language,
+                fileName: file.name
+            )
+            .task {
+                await editorViewModel.loadFile(file)
+                // Detect language from file extension
+                language = detectLanguage(from: file.name)
+            }
+        }
+    }
+    
+    private func detectLanguage(from fileName: String) -> ProgrammingLanguage {
+        let ext = (fileName as NSString).pathExtension.lowercased()
+        switch ext {
+        case "swift": return .swift
+        case "js", "mjs": return .javascript
+        case "ts", "tsx": return .typescript
+        case "py": return .python
+        case "rb": return .ruby
+        case "go": return .go
+        case "rs": return .rust
+        case "java": return .java
+        case "kt": return .kotlin
+        case "cpp", "cc", "cxx": return .cpp
+        case "c": return .c
+        case "h", "hpp": return .cpp
+        case "m": return .objectiveC
+        case "json": return .json
+        case "xml": return .xml
+        case "html": return .html
+        case "css": return .css
+        case "sh", "bash": return .bash
+        case "yml", "yaml": return .yaml
+        case "md": return .markdown
+        default: return .plainText
         }
     }
 }

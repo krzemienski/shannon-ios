@@ -139,28 +139,7 @@ public extension SSHCredentialManager {
 
 // MARK: - SSH Errors
 
-public enum SSHError: LocalizedError {
-    case credentialNotFound
-    case keyNotFound
-    case connectionFailed(String)
-    case authenticationFailed
-    case timeout
-    
-    public var errorDescription: String? {
-        switch self {
-        case .credentialNotFound:
-            return "SSH credential not found"
-        case .keyNotFound:
-            return "SSH key not found"
-        case .connectionFailed(let reason):
-            return "Connection failed: \(reason)"
-        case .authenticationFailed:
-            return "Authentication failed"
-        case .timeout:
-            return "Connection timeout"
-        }
-    }
-}
+// SSHError is defined in SSHClient.swift
 
 // MARK: - SSH Credential Extension
 

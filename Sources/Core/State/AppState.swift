@@ -11,7 +11,7 @@ import BackgroundTasks
 
 /// Global application state manager
 @MainActor
-class AppState: ObservableObject {
+public class AppState: ObservableObject {
     // MARK: - Published Properties (Original)
     @Published var selectedChatId: String?
     @Published var selectedProjectId: String?

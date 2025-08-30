@@ -9,6 +9,7 @@ import Foundation
 
 /// Core module for fundamental services
 struct CoreModule: ModuleRegistration {
+    @MainActor
     func register() {
         let locator = ServiceLocator.shared
         let container = DIContainer.shared
@@ -39,6 +40,7 @@ struct CoreModule: ModuleRegistration {
 
 /// API module for network services
 struct APIModule: ModuleRegistration {
+    @MainActor
     func register() {
         let locator = ServiceLocator.shared
         let container = DIContainer.shared
@@ -71,6 +73,7 @@ struct APIModule: ModuleRegistration {
 
 /// State module for stores
 struct StateModule: ModuleRegistration {
+    @MainActor
     func register() {
         let locator = ServiceLocator.shared
         let container = DIContainer.shared
@@ -123,6 +126,7 @@ struct StateModule: ModuleRegistration {
 
 /// ViewModel module
 struct ViewModelModule: ModuleRegistration {
+    @MainActor
     func register() {
         let container = DIContainer.shared
         
@@ -188,6 +192,7 @@ struct ViewModelModule: ModuleRegistration {
 
 /// Coordinator module
 struct CoordinatorModule: ModuleRegistration {
+    @MainActor
     func register() {
         let container = DIContainer.shared
         
@@ -223,8 +228,9 @@ struct CoordinatorModule: ModuleRegistration {
 public struct AppModuleRegistration {
     
     /// Register all app modules
+    @MainActor
     public static func registerAllModules() {
-        let modules: [DependencyContainer] = [
+        let modules: [ModuleRegistration] = [
             CoreModule(),
             APIModule(),
             StateModule(),
@@ -232,10 +238,7 @@ public struct AppModuleRegistration {
             CoordinatorModule()
         ]
         
-        // Register with ServiceLocator
-        ServiceLocator.shared.register(modules: modules)
-        
-        // Also ensure modules are registered
+        // Register all modules
         modules.forEach { $0.register() }
     }
     

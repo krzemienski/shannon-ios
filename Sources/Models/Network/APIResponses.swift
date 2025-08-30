@@ -21,31 +21,13 @@ public struct MockResponseProvider {
                     id: "claude-sonnet-4",
                     object: "model",
                     created: Int(Date().timeIntervalSince1970),
-                    ownedBy: "anthropic",
-                    capabilities: ModelCapabilities(
-                        contextWindow: 200000,
-                        maxOutputTokens: 8192,
-                        supportsFunctions: true,
-                        supportsVision: true,
-                        supportsStreaming: true,
-                        supportsSystemMessage: true,
-                        supportsToolUse: true
-                    )
+                    ownedBy: "anthropic"
                 ),
                 APIModel(
                     id: "claude-opus-4",
                     object: "model",
                     created: Int(Date().timeIntervalSince1970),
-                    ownedBy: "anthropic",
-                    capabilities: ModelCapabilities(
-                        contextWindow: 200000,
-                        maxOutputTokens: 8192,
-                        supportsFunctions: true,
-                        supportsVision: true,
-                        supportsStreaming: true,
-                        supportsSystemMessage: true,
-                        supportsToolUse: true
-                    )
+                    ownedBy: "anthropic"
                 )
             ]
         )
@@ -61,11 +43,14 @@ public struct MockResponseProvider {
                 ChatChoice(
                     index: 0,
                     message: ChatMessage(
-                        role: .assistant,
-                        content: "This is a mock response for testing. The backend is not currently running."
+                        role: "assistant",
+                        content: "This is a mock response for testing. The backend is not currently running.",
+                        name: nil,
+                        toolCalls: nil,
+                        toolCallId: nil
                     ),
-                    logprobs: nil,
-                    finishReason: "stop"
+                    finishReason: "stop",
+                    logprobs: nil
                 )
             ],
             usage: Usage(
@@ -80,24 +65,12 @@ public struct MockResponseProvider {
     public static func mockSessionInfo() -> SessionInfo {
         SessionInfo(
             id: UUID().uuidString,
-            name: "Mock Session",
-            messages: [
-                ChatMessage(role: .system, content: "You are a helpful assistant."),
-                ChatMessage(role: .user, content: "Hello!"),
-                ChatMessage(role: .assistant, content: "Hello! How can I help you today?")
-            ],
-            metadata: SessionMetadata(
-                model: "claude-sonnet-4",
-                temperature: 0.7,
-                maxTokens: 2048
-            ),
-            stats: SessionStats(
-                messageCount: 3,
-                totalTokens: 25,
-                inputTokens: 10,
-                outputTokens: 15,
-                totalCost: 0.0001
-            )
+            title: "Mock Session",
+            createdAt: Date(),
+            updatedAt: Date(),
+            messageCount: 3,
+            model: "claude-sonnet-4",
+            metadata: nil
         )
     }
     

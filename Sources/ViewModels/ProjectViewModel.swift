@@ -10,43 +10,43 @@ import Combine
 
 /// ViewModel for managing projects
 @MainActor
-final class ProjectViewModel: ObservableObject {
+public final class ProjectViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var projects: [Project] = []
-    @Published var currentProject: Project?
-    @Published var searchText = ""
-    @Published var isLoading = false
-    @Published var error: Error?
-    @Published var showError = false
-    @Published var showCreateProject = false
-    @Published var showEditProject = false
-    @Published var selectedProject: Project?
+    @Published public var projects: [Project] = []
+    @Published public var currentProject: Project?
+    @Published public var searchText = ""
+    @Published public var isLoading = false
+    @Published public var error: Error?
+    @Published public var showError = false
+    @Published public var showCreateProject = false
+    @Published public var showEditProject = false
+    @Published public var selectedProject: Project?
     
     // MARK: - Project Creation
     
-    @Published var newProjectName = ""
-    @Published var newProjectPath = ""
-    @Published var newProjectType: ProjectType = .general
-    @Published var newProjectDescription = ""
+    @Published public var newProjectName = ""
+    @Published public var newProjectPath = ""
+    @Published public var newProjectType: ProjectType = .general
+    @Published public var newProjectDescription = ""
     
     // MARK: - SSH Configuration
     
-    @Published var showSSHConfig = false
-    @Published var sshHost = ""
-    @Published var sshPort = 22
-    @Published var sshUsername = ""
-    @Published var sshAuthMethod: AppSSHAuthMethod = .publicKey
-    @Published var sshPrivateKey = ""
-    @Published var sshPassphrase = ""
+    @Published public var showSSHConfig = false
+    @Published public var sshHost = ""
+    @Published public var sshPort = 22
+    @Published public var sshUsername = ""
+    @Published public var sshAuthMethod: AppSSHAuthMethod = .publicKey
+    @Published public var sshPrivateKey = ""
+    @Published public var sshPassphrase = ""
     
     // MARK: - Environment Variables
     
-    @Published var showEnvVarEditor = false
-    @Published var envVarKey = ""
-    @Published var envVarValue = ""
-    @Published var environmentVariables: [String: String] = [:]
+    @Published public var showEnvVarEditor = false
+    @Published public var envVarKey = ""
+    @Published public var envVarValue = ""
+    @Published public var environmentVariables: [String: String] = [:]
     
     // MARK: - Private Properties
     
@@ -58,7 +58,7 @@ final class ProjectViewModel: ObservableObject {
     
     // MARK: - Computed Properties
     
-    var filteredProjects: [Project] {
+    public var filteredProjects: [Project] {
         if searchText.isEmpty {
             return projects
         }
@@ -69,21 +69,21 @@ final class ProjectViewModel: ObservableObject {
         }
     }
     
-    var hasProjects: Bool {
+    public var hasProjects: Bool {
         !projects.isEmpty
     }
     
-    var canCreateProject: Bool {
+    public var canCreateProject: Bool {
         !newProjectName.isEmpty && !newProjectPath.isEmpty
     }
     
-    var canSaveSSHConfig: Bool {
+    public var canSaveSSHConfig: Bool {
         !sshHost.isEmpty && !sshUsername.isEmpty && sshPort > 0
     }
     
     // MARK: - Initialization
     
-    init(projectId: String? = nil,
+    public init(projectId: String? = nil,
          projectStore: ProjectStore,
          sshManager: SSHManager,
          appState: AppState) {
@@ -125,7 +125,7 @@ final class ProjectViewModel: ObservableObject {
     // MARK: - Public Methods - Project Management
     
     /// Create a new project
-    func createProject() {
+    public func createProject() {
         guard canCreateProject else { return }
         
         let project = projectStore.createProject(
@@ -149,7 +149,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Edit existing project
-    func editProject(_ project: Project) {
+    public func editProject(_ project: Project) {
         selectedProject = project
         newProjectName = project.name
         newProjectPath = project.path
@@ -159,7 +159,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Save project edits
-    func saveProjectEdits() {
+    public func saveProjectEdits() {
         guard let project = selectedProject else { return }
         
         projectStore.updateProject(project) { proj in
@@ -175,12 +175,12 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Delete a project
-    func deleteProject(_ project: Project) {
+    public func deleteProject(_ project: Project) {
         projectStore.deleteProject(project)
     }
     
     /// Set active project
-    func setActiveProject(_ project: Project) {
+    public func setActiveProject(_ project: Project) {
         projectStore.setActiveProject(project)
         
         // Update app state
@@ -195,7 +195,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Duplicate a project
-    func duplicateProject(_ project: Project) {
+    public func duplicateProject(_ project: Project) {
         let duplicated = projectStore.createProject(
             name: "\(project.name) Copy",
             path: project.path,
@@ -213,7 +213,7 @@ final class ProjectViewModel: ObservableObject {
     // MARK: - Public Methods - SSH Configuration
     
     /// Open SSH configuration for project
-    func openSSHConfig(for project: Project) {
+    public func openSSHConfig(for project: Project) {
         selectedProject = project
         
         if let config = project.sshConfig {
@@ -231,7 +231,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Save SSH configuration
-    func saveSSHConfig() {
+    public func saveSSHConfig() {
         guard let project = selectedProject, canSaveSSHConfig else { return }
         
         let config = AppSSHConfig(
@@ -249,7 +249,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Test SSH connection
-    func testSSHConnection() async {
+    public func testSSHConnection() async {
         guard canSaveSSHConfig else { return }
         
         isLoading = true
@@ -275,7 +275,7 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Connect SSH for project
-    func connectSSH(with config: AppSSHConfig) async {
+    public func connectSSH(with config: AppSSHConfig) async {
         isLoading = true
         
         do {
@@ -289,21 +289,21 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Disconnect SSH
-    func disconnectSSH() async {
+    public func disconnectSSH() async {
         await sshManager.disconnect()
     }
     
     // MARK: - Public Methods - Environment Variables
     
     /// Open environment variables editor
-    func openEnvVarEditor(for project: Project) {
+    public func openEnvVarEditor(for project: Project) {
         selectedProject = project
         environmentVariables = project.environmentVariables ?? [:]
         showEnvVarEditor = true
     }
     
     /// Add environment variable
-    func addEnvironmentVariable() {
+    public func addEnvironmentVariable() {
         guard !envVarKey.isEmpty, !envVarValue.isEmpty else { return }
         
         environmentVariables[envVarKey] = envVarValue
@@ -314,12 +314,12 @@ final class ProjectViewModel: ObservableObject {
     }
     
     /// Remove environment variable
-    func removeEnvironmentVariable(_ key: String) {
+    public func removeEnvironmentVariable(_ key: String) {
         environmentVariables.removeValue(forKey: key)
     }
     
     /// Save environment variables
-    func saveEnvironmentVariables() {
+    public func saveEnvironmentVariables() {
         guard let project = selectedProject else { return }
         
         projectStore.updateProject(project) { proj in
@@ -332,12 +332,12 @@ final class ProjectViewModel: ObservableObject {
     // MARK: - Public Methods - Search
     
     /// Search projects
-    func searchProjects(_ text: String) {
+    public func searchProjects(_ text: String) {
         searchText = text
     }
     
     /// Clear search
-    func clearSearch() {
+    public func clearSearch() {
         searchText = ""
     }
     

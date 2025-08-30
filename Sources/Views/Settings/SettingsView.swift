@@ -216,8 +216,7 @@ struct PrivacySettingsView: View {
 
 struct DeveloperSettingsView: View {
     var body: some View {
-        Text("Developer Settings")
-            .navigationTitle("Developer Options")
+        BackendTestView()
     }
 }
 

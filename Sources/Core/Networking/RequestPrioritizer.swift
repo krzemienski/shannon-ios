@@ -24,12 +24,12 @@ actor RequestPrioritizer {
     
     // MARK: - Types
     
-    struct PrioritizedRequest {
+    struct PrioritizedRequest: Sendable {
         let id: UUID
         let request: URLRequest
         let priority: RequestPriority
         let timestamp: Date
-        let completion: (Result<Data, Error>) -> Void
+        let completion: @Sendable (Result<Data, Error>) -> Void
         
         var score: Double {
             // Higher priority = higher score
@@ -46,7 +46,7 @@ actor RequestPrioritizer {
     private var activeRequests: [UUID: URLSessionDataTask] = [:]
     private let maxConcurrentRequests: Int
     private let session: URLSession
-    private let debouncer = Debouncer(delay: 0.1)
+    // Debouncer removed - not needed in actor context
     
     // Metrics
     private var requestMetrics: [RequestMetric] = []
@@ -65,7 +65,7 @@ actor RequestPrioritizer {
     func enqueue(
         request: URLRequest,
         priority: RequestPriority = .normal,
-        completion: @escaping (Result<Data, Error>) -> Void
+        completion: @escaping @Sendable (Result<Data, Error>) -> Void
     ) -> UUID {
         let requestId = UUID()
         
@@ -170,7 +170,7 @@ actor RequestPrioritizer {
         data: Data?,
         response: URLResponse?,
         error: Error?,
-        completion: @escaping (Result<Data, Error>) -> Void
+        completion: @escaping @Sendable (Result<Data, Error>) -> Void
     ) async {
         // Remove from active requests
         activeRequests.removeValue(forKey: requestId)

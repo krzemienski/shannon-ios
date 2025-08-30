@@ -163,6 +163,8 @@ public enum SSHError: LocalizedError {
     case authenticationFailed(String)
     case commandFailed(String)
     case sessionCreationFailed(String)
+    case credentialNotFound
+    case keyNotFound
     
     public var errorDescription: String? {
         switch self {
@@ -176,6 +178,10 @@ public enum SSHError: LocalizedError {
             return "Command failed: \(reason)"
         case .sessionCreationFailed(let reason):
             return "Session creation failed: \(reason)"
+        case .credentialNotFound:
+            return "SSH credential not found"
+        case .keyNotFound:
+            return "SSH key not found"
         }
     }
 }

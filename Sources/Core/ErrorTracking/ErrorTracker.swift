@@ -206,8 +206,11 @@ public class ErrorTracker: ObservableObject {
         errorHandlers.forEach { $0(error) }
         
         // Persist error
-        errorQueue.async {
-            self.persistError(error)
+        errorQueue.async { [weak self] in
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.persistError(error)
+            }
         }
     }
     
@@ -247,6 +250,7 @@ public class ErrorTracker: ObservableObject {
         )
     }
     
+    @MainActor
     private func persistError(_ error: TrackedError) {
         var errors = loadPersistedErrorsSync()
         errors.append(error)
@@ -320,8 +324,8 @@ public class ErrorTracker: ObservableObject {
     private func setupSignalHandlers() {
         let signals = [SIGABRT, SIGILL, SIGSEGV, SIGFPE, SIGBUS, SIGPIPE]
         
-        for signal in signals {
-            signal(signal) { sig in
+        for signalNumber in signals {
+            Foundation.signal(signalNumber) { sig in
                 Task { @MainActor in
                     ErrorTracker.shared.track(
                         message: "Signal \(sig) received",

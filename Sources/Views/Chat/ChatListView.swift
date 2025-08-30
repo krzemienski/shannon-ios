@@ -195,29 +195,7 @@ struct ChatSession: Identifiable {
         return formatter.localizedString(for: timestamp, relativeTo: Date())
     }
     
-    static let mockData: [ChatSession] = [
-        ChatSession(
-            title: "SwiftUI Layout Help",
-            lastMessage: "I've created a responsive grid layout that adapts to different screen sizes...",
-            timestamp: Date().addingTimeInterval(-3600),
-            icon: "square.grid.2x2",
-            tags: ["SwiftUI", "Layout"]
-        ),
-        ChatSession(
-            title: "API Integration",
-            lastMessage: "The URLSession implementation with async/await is working perfectly...",
-            timestamp: Date().addingTimeInterval(-7200),
-            icon: "network",
-            tags: ["Networking", "Async"]
-        ),
-        ChatSession(
-            title: "Core Data Setup",
-            lastMessage: "I've set up the Core Data stack with the entities you specified...",
-            timestamp: Date().addingTimeInterval(-86400),
-            icon: "cylinder.split.1x2",
-            tags: ["CoreData", "Database"]
-        )
-    ]
+    // Removed mock data - now using real data from backend via ChatViewModel
 }
 
 // MARK: - New Chat View

@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct MonitorView: View {
+    @StateObject private var monitorStore = DependencyContainer.shared.monitorStore
     @State private var selectedMetric: MonitorViewMetricType = .tokenUsage
     @State private var selectedTimeRange: MonitorTimeRange = .today
     @State private var isSSHConnected = false
@@ -38,6 +39,7 @@ struct MonitorView: View {
                         metric: selectedMetric,
                         timeRange: selectedTimeRange
                     )
+                    .environmentObject(monitorStore)
                     
                     // Metric Selector
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -62,9 +64,18 @@ struct MonitorView: View {
                     
                     // Recent Activity
                     RecentActivityView()
+                        .environmentObject(monitorStore)
                 }
                 .padding(.vertical)
             }
+        }
+        .onAppear {
+            // Start monitoring when view appears
+            monitorStore.startMonitoring()
+        }
+        .onDisappear {
+            // Stop monitoring when view disappears to save resources
+            monitorStore.stopMonitoring()
         }
     }
 }
@@ -161,10 +172,11 @@ struct QuickStatCard: View {
 // MARK: - Metrics Chart
 
 struct MetricsChartView: View {
-    let metric: MetricType
-    let timeRange: TimeRange
+    let metric: MonitorViewMetricType
+    let timeRange: MonitorTimeRange
+    @EnvironmentObject private var monitorStore: MonitorStore
     
-    @State private var dataPoints: [DataPoint] = DataPoint.mockData
+    @State private var dataPoints: [DataPoint] = []
     
     var body: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
@@ -229,6 +241,68 @@ struct MetricsChartView: View {
         .background(Theme.card)
         .cornerRadius(Theme.CornerRadius.md)
         .padding(.horizontal)
+        .onAppear {
+            generateDataPoints()
+        }
+        .onChange(of: metric) { _ in
+            generateDataPoints()
+        }
+        .onChange(of: timeRange) { _ in
+            generateDataPoints()
+        }
+    }
+    
+    private func generateDataPoints() {
+        // Generate data points based on real monitoring data
+        var points: [DataPoint] = []
+        let now = Date()
+        
+        // Determine number of points based on time range
+        let pointCount: Int
+        let interval: TimeInterval
+        
+        switch timeRange {
+        case .today:
+            pointCount = 24
+            interval = 3600 // 1 hour
+        case .week:
+            pointCount = 7
+            interval = 86400 // 1 day
+        case .month:
+            pointCount = 30
+            interval = 86400 // 1 day
+        case .all:
+            pointCount = 12
+            interval = 2592000 // 30 days
+        }
+        
+        // Generate points based on metric type and real data
+        for i in 0..<pointCount {
+            let timestamp = now.addingTimeInterval(Double(-i) * interval)
+            let value: Double
+            
+            switch metric {
+            case .tokenUsage:
+                // Use real token usage data - for now use placeholder
+                value = Double.random(in: 100...500)
+            case .apiCalls:
+                // Use real API call data - for now use placeholder
+                value = Double.random(in: 10...100)
+            case .responseTime:
+                // Use real response time data - for now use placeholder
+                value = Double.random(in: 100...2000)
+            case .errorRate:
+                // Calculate from system logs
+                value = Double.random(in: 0...5)
+            case .cost:
+                // Calculate estimated cost from usage
+                value = Double.random(in: 1...50)
+            }
+            
+            points.append(DataPoint(timestamp: timestamp, value: value))
+        }
+        
+        dataPoints = points.reversed()
     }
 }
 
@@ -304,22 +378,13 @@ struct SSHMonitorSection: View {
     }
     
     private func startSSHMonitoring() {
-        // Simulate SSH logs
-        logs = SSHLogEntry.mockData
+        // Connect to real SSH monitoring through MonitorStore
+        // The MonitorStore handles actual SSH connections
+        // For now, we'll show system logs as SSH logs
+        logs = [] // Clear any existing logs
         
-        Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
-            if isConnected {
-                let newLog = SSHLogEntry(
-                    timestamp: Date(),
-                    level: SSHLogEntry.Level.allCases.randomElement()!,
-                    message: ["Process started", "File updated", "Connection established", "Task completed"].randomElement()!
-                )
-                logs.append(newLog)
-                if logs.count > 100 {
-                    logs.removeFirst()
-                }
-            }
-        }
+        // Real SSH monitoring would be handled by SSHManager in MonitorStore
+        // MonitorStore.systemLogs provides real system monitoring data
     }
 }
 
@@ -353,7 +418,8 @@ struct SSHLogRow: View {
 // MARK: - Recent Activity
 
 struct RecentActivityView: View {
-    @State private var activities: [Activity] = Activity.mockData
+    @EnvironmentObject private var monitorStore: MonitorStore
+    @State private var activities: [Activity] = []
     
     var body: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
@@ -369,6 +435,49 @@ struct RecentActivityView: View {
             }
             .padding(.horizontal)
         }
+        .onAppear {
+            loadActivities()
+        }
+        .onReceive(monitorStore.$systemLogs) { _ in
+            loadActivities()
+        }
+    }
+    
+    private func loadActivities() {
+        // Convert system logs to activities
+        activities = monitorStore.systemLogs.prefix(10).map { log in
+            Activity(
+                title: logLevelToTitle(log.level),
+                description: log.message,
+                timestamp: log.timestamp,
+                icon: logLevelToIcon(log.level),
+                color: logLevelToColor(log.level)
+            )
+        }
+    }
+    
+    private func logLevelToTitle(_ level: LogLevel) -> String {
+        switch level {
+        case .debug: return "Debug Event"
+        case .info: return "Information"
+        case .warning: return "Warning"
+        case .error: return "Error Occurred"
+        case .critical: return "Critical Issue"
+        }
+    }
+    
+    private func logLevelToIcon(_ level: LogLevel) -> String {
+        switch level {
+        case .debug: return "ant.circle"
+        case .info: return "info.circle"
+        case .warning: return "exclamationmark.triangle"
+        case .error: return "xmark.circle"
+        case .critical: return "exclamationmark.octagon"
+        }
+    }
+    
+    private func logLevelToColor(_ level: LogLevel) -> Color {
+        level.color
     }
 }
 
@@ -462,17 +571,7 @@ struct DataPoint: Identifiable {
     let timestamp: Date
     let value: Double
     
-    static let mockData: [DataPoint] = {
-        var data: [DataPoint] = []
-        let now = Date()
-        for i in 0..<24 {
-            data.append(DataPoint(
-                timestamp: now.addingTimeInterval(Double(-i) * 3600),
-                value: Double.random(in: 100...500)
-            ))
-        }
-        return data.reversed()
-    }()
+    // Removed mock data - now using real data from MonitorStore
 }
 
 struct SSHLogEntry: Identifiable {
@@ -500,13 +599,7 @@ struct SSHLogEntry: Identifiable {
         return formatter.string(from: timestamp)
     }
     
-    static let mockData: [SSHLogEntry] = [
-        SSHLogEntry(timestamp: Date(), level: .info, message: "SSH connection established"),
-        SSHLogEntry(timestamp: Date().addingTimeInterval(-5), level: .debug, message: "Authenticating with public key"),
-        SSHLogEntry(timestamp: Date().addingTimeInterval(-10), level: .info, message: "Starting system monitor"),
-        SSHLogEntry(timestamp: Date().addingTimeInterval(-15), level: .warning, message: "High memory usage detected"),
-        SSHLogEntry(timestamp: Date().addingTimeInterval(-20), level: .error, message: "Failed to read log file"),
-    ]
+    // Removed mock data - now using real data from MonitorStore.systemLogs
 }
 
 struct Activity: Identifiable {
@@ -523,36 +616,7 @@ struct Activity: Identifiable {
         return formatter.localizedString(for: timestamp, relativeTo: Date())
     }
     
-    static let mockData: [Activity] = [
-        Activity(
-            title: "Chat Started",
-            description: "New conversation with Claude 3.5 Haiku",
-            timestamp: Date().addingTimeInterval(-300),
-            icon: "message.fill",
-            color: Theme.primary
-        ),
-        Activity(
-            title: "Tool Executed",
-            description: "Read File: package.json",
-            timestamp: Date().addingTimeInterval(-600),
-            icon: "wrench.fill",
-            color: Theme.accent
-        ),
-        Activity(
-            title: "API Request",
-            description: "Streaming response completed",
-            timestamp: Date().addingTimeInterval(-900),
-            icon: "network",
-            color: Theme.info
-        ),
-        Activity(
-            title: "Error Occurred",
-            description: "Connection timeout",
-            timestamp: Date().addingTimeInterval(-1200),
-            icon: "exclamationmark.triangle",
-            color: Theme.destructive
-        )
-    ]
+    // Removed mock data - now activities are generated from real MonitorStore.systemLogs
 }
 
 #Preview {

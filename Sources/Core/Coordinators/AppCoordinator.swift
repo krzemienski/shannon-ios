@@ -10,7 +10,7 @@ import Combine
 
 /// Main application coordinator
 @MainActor
-final class AppCoordinator: BaseCoordinator, ObservableObject {
+public final class AppCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Navigation State
     

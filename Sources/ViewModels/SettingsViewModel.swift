@@ -10,24 +10,24 @@ import Combine
 
 /// ViewModel for managing application settings
 @MainActor
-final class SettingsViewModel: ObservableObject {
+public final class SettingsViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var isLoading = false
-    @Published var showAlert = false
-    @Published var alertMessage = ""
-    @Published var alertTitle = ""
-    @Published var showAPIKeyInput = false
-    @Published var tempAPIKey = ""
-    @Published var connectionTestResult: ConnectionTestResult?
-    @Published var isTestingConnection = false
+    @Published public var isLoading = false
+    @Published public var showAlert = false
+    @Published public var alertMessage = ""
+    @Published public var alertTitle = ""
+    @Published public var showAPIKeyInput = false
+    @Published public var tempAPIKey = ""
+    @Published public var connectionTestResult: ConnectionTestResult?
+    @Published public var isTestingConnection = false
     
     // MARK: - Sections State
     
-    @Published var expandedSections: Set<SettingsSection> = []
-    @Published var selectedTheme: AppTheme = .system
-    @Published var selectedFontSize: FontSize = .medium
+    @Published public var expandedSections: Set<SettingsSection> = []
+    @Published public var selectedTheme: AppTheme = .system
+    @Published public var selectedFontSize: FontSize = .medium
     
     // MARK: - Private Properties
     
@@ -56,7 +56,7 @@ final class SettingsViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(settingsStore: SettingsStore,
+    public init(settingsStore: SettingsStore,
          keychainManager: KeychainManager,
          appState: AppState) {
         self.settingsStore = settingsStore
@@ -383,7 +383,7 @@ final class SettingsViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-enum SettingsViewSection: String, CaseIterable {
+public enum SettingsViewSection: String, CaseIterable {
     case api = "API Configuration"
     case ssh = "SSH Settings"
     case appearance = "Appearance"
@@ -407,7 +407,7 @@ enum SettingsViewSection: String, CaseIterable {
 
 // Moved ConnectionTestResult to SSHConfigurationView.swift to avoid duplication
 
-struct ExportedSettings: Codable {
+public struct ExportedSettings: Codable {
     let baseURL: String
     let selectedModel: String
     let theme: String

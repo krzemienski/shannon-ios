@@ -20,11 +20,14 @@ extension APIClient {
         streamRequest.stream = true
         
         // Create SSE client for streaming
-        let sseClient = SSEClient(configuration: SSEConfiguration(
-            reconnectTime: 3.0,
+        let sseConfiguration = SSEConfiguration(
+            timeoutInterval: 30,
+            reconnectEnabled: true,
             maxReconnectAttempts: 3,
-            heartbeatInterval: 30.0
-        ))
+            compressionEnabled: false,
+            bufferSize: 1024 * 1024
+        )
+        let sseClient = SSEClient(configuration: sseConfiguration)
         
         // Setup callbacks
         sseClient.onMessage = { message in
@@ -48,17 +51,14 @@ extension APIClient {
         }
         
         // Build request
-        guard let url = URL(string: "\(configuration.baseURL)/chat/completions") else {
-            onError(APIConfig.APIError.invalidURL)
-            return
-        }
+        let url = APIConfig.Endpoint.chatCompletions.url()
         
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("text/event-stream", forHTTPHeaderField: "Accept")
         
-        if let apiKey = configuration.apiKey {
+        if let apiKey = apiKey {
             urlRequest.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         }
         
@@ -108,33 +108,64 @@ extension APIClient {
 extension APIClient {
     /// Task 417: Implement getChatStatus method
     public func getChatStatus(sessionId: String) async throws -> ChatStatus {
-        let endpoint = "/chat/status/\(sessionId)"
-        return try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: ChatStatus.self
-        )
+        // TODO: Add proper endpoint to APIConfig.Endpoint enum
+        // For now, using a direct URL construction
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/chat/status/\(sessionId)"))
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to get chat status"
+            )
+        }
+        
+        return try JSONDecoder().decode(ChatStatus.self, from: data)
     }
     
     /// Task 418: Create stopChat method
     public func stopChat(sessionId: String) async throws -> Bool {
-        let endpoint = "/chat/stop/\(sessionId)"
-        let response: GenericResponse = try await request(
-            endpoint: endpoint,
-            method: .POST,
-            responseType: GenericResponse.self
-        )
-        return response.success
+        // TODO: Add proper endpoint to APIConfig.Endpoint enum
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/chat/stop/\(sessionId)"))
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to stop chat"
+            )
+        }
+        
+        let genericResponse = try JSONDecoder().decode(GenericResponse.self, from: data)
+        return genericResponse.success
     }
     
     /// Task 419: Implement debugChat method
     public func debugChat(sessionId: String) async throws -> ChatDebugInfo {
-        let endpoint = "/chat/debug/\(sessionId)"
-        return try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: ChatDebugInfo.self
-        )
+        // TODO: Add proper endpoint to APIConfig.Endpoint enum
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/chat/debug/\(sessionId)"))
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to get chat debug info"
+            )
+        }
+        
+        return try JSONDecoder().decode(ChatDebugInfo.self, from: data)
     }
 }
 
@@ -142,60 +173,105 @@ extension APIClient {
 extension APIClient {
     /// Task 420: Create listMCPServers method
     public func listMCPServers() async throws -> [MCPServerInfo] {
-        let endpoint = "/mcp/servers"
-        let response: MCPServersResponse = try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: MCPServersResponse.self
-        )
-        return response.servers
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/mcp/servers"))
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to list MCP servers"
+            )
+        }
+        
+        let mcpResponse = try JSONDecoder().decode(MCPServersResponse.self, from: data)
+        return mcpResponse.servers
     }
     
     /// Task 421: Implement getMCPServerTools method
     public func getMCPServerTools(serverId: String) async throws -> [ToolInfo] {
-        let endpoint = "/mcp/servers/\(serverId)/tools"
-        let response: ToolsResponse = try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: ToolsResponse.self
-        )
-        return response.tools
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/mcp/servers/\(serverId)/tools"))
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to get MCP server tools"
+            )
+        }
+        
+        let toolsResponse = try JSONDecoder().decode(ToolsResponse.self, from: data)
+        return toolsResponse.tools
     }
     
     /// Task 422: Create updateSessionTools method
     public func updateSessionTools(sessionId: String, toolIds: [String]) async throws -> SessionInfo {
-        let endpoint = "/sessions/\(sessionId)/tools"
-        let body = UpdateToolsRequest(toolIds: toolIds)
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/sessions/\(sessionId)/tools"))
+        request.httpMethod = "PUT"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
         
-        return try await request(
-            endpoint: endpoint,
-            method: .PUT,
-            body: body,
-            responseType: SessionInfo.self
-        )
+        let body = UpdateToolsRequest(toolIds: toolIds)
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to update session tools"
+            )
+        }
+        
+        return try JSONDecoder().decode(SessionInfo.self, from: data)
     }
     
     /// Task 423: Implement tool execution endpoint
     public func executeMCPTool(_ toolRequest: ToolExecutionRequest) async throws -> ToolExecutionResponse {
-        let endpoint = "/mcp/tools/execute"
-        return try await request(
-            endpoint: endpoint,
-            method: .POST,
-            body: toolRequest,
-            responseType: ToolExecutionResponse.self
-        )
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/mcp/tools/execute"))
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        request.httpBody = try JSONEncoder().encode(toolRequest)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to execute MCP tool"
+            )
+        }
+        
+        return try JSONDecoder().decode(ToolExecutionResponse.self, from: data)
     }
     
     /// Task 424: Create tool result submission
     public func submitToolResult(sessionId: String, toolCallId: String, result: ToolResultEvent) async throws -> Bool {
-        let endpoint = "/sessions/\(sessionId)/tools/\(toolCallId)/result"
-        let response: GenericResponse = try await request(
-            endpoint: endpoint,
-            method: .POST,
-            body: result,
-            responseType: GenericResponse.self
-        )
-        return response.success
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/sessions/\(sessionId)/tools/\(toolCallId)/result"))
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        request.httpBody = try JSONEncoder().encode(result)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to submit tool result"
+            )
+        }
+        
+        let genericResponse = try JSONDecoder().decode(GenericResponse.self, from: data)
+        return genericResponse.success
     }
 }
 
@@ -203,7 +279,7 @@ extension APIClient {
 extension APIClient {
     /// Task 425: Implement usage tracking endpoint
     public func getUsageStats(startDate: Date? = nil, endDate: Date? = nil) async throws -> UsageStats {
-        var endpoint = "/usage/stats"
+        var components = URLComponents(url: APIConfig.baseURL.appendingPathComponent("/usage/stats"), resolvingAgainstBaseURL: false)!
         var queryItems: [URLQueryItem] = []
         
         if let startDate = startDate {
@@ -215,32 +291,47 @@ extension APIClient {
         }
         
         if !queryItems.isEmpty {
-            var components = URLComponents()
             components.queryItems = queryItems
-            if let query = components.query {
-                endpoint += "?\(query)"
-            }
         }
         
-        return try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: UsageStats.self
-        )
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to get usage stats"
+            )
+        }
+        
+        return try JSONDecoder().decode(UsageStats.self, from: data)
     }
     
     /// Track API usage for a specific session
     public func trackUsage(sessionId: String, usage: APIUsage) async throws -> Bool {
-        let endpoint = "/usage/track"
-        let body = UsageTrackingRequest(sessionId: sessionId, usage: usage)
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/usage/track"))
+        request.httpMethod = "POST"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
         
-        let response: GenericResponse = try await request(
-            endpoint: endpoint,
-            method: .POST,
-            body: body,
-            responseType: GenericResponse.self
-        )
-        return response.success
+        let body = UsageTrackingRequest(sessionId: sessionId, usage: usage)
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to track usage"
+            )
+        }
+        
+        let genericResponse = try JSONDecoder().decode(GenericResponse.self, from: data)
+        return genericResponse.success
     }
 }
 
@@ -248,22 +339,40 @@ extension APIClient {
 extension APIClient {
     /// Task 412: Create getSessionStats method
     public func getSessionStats(sessionId: String) async throws -> SessionStats {
-        let endpoint = "/sessions/\(sessionId)/stats"
-        return try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: SessionStats.self
-        )
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/sessions/\(sessionId)/stats"))
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to get session stats"
+            )
+        }
+        
+        return try JSONDecoder().decode(SessionStats.self, from: data)
     }
     
     /// Task 414: Create getModelCapabilities method
     public func getModelCapabilities(modelId: String) async throws -> ModelCapabilities {
-        let endpoint = "/models/\(modelId)/capabilities"
-        return try await request(
-            endpoint: endpoint,
-            method: .GET,
-            responseType: ModelCapabilities.self
-        )
+        var request = URLRequest(url: APIConfig.baseURL.appendingPathComponent("/models/\(modelId)/capabilities"))
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = APIConfig.defaultHeaders(apiKey: apiKey)
+        
+        let (data, response) = try await session.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200...299 ~= httpResponse.statusCode else {
+            throw APIConfig.APIError.serverError(
+                statusCode: (response as? HTTPURLResponse)?.statusCode ?? 0,
+                message: "Failed to get model capabilities"
+            )
+        }
+        
+        return try JSONDecoder().decode(ModelCapabilities.self, from: data)
     }
 }
 

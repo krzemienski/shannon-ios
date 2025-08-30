@@ -529,9 +529,9 @@ class ProjectFilesViewModel: ObservableObject {
         isLoading = true
         
         // TODO: Implement actual API call to load project files
-        // For now, using mock data
         await MainActor.run {
-            self.files = ProjectFile.mockFiles
+            // Real implementation would load from backend
+            self.files = []  // Start with empty list until backend is connected
             self.isLoading = false
         }
     }
@@ -580,42 +580,7 @@ struct ProjectFile: Identifiable {
         return formatter.localizedString(for: modifiedDate, relativeTo: Date())
     }
     
-    // Mock data for testing
-    static let mockFiles: [ProjectFile] = [
-        ProjectFile(
-            id: "1",
-            name: "AppDelegate.swift",
-            path: "/Sources",
-            size: 4096,
-            modifiedDate: Date().addingTimeInterval(-3600),
-            category: .code,
-            remoteURL: "http://localhost:8000/files/1",
-            localURL: nil,
-            isDownloaded: false
-        ),
-        ProjectFile(
-            id: "2",
-            name: "README.md",
-            path: "/",
-            size: 2048,
-            modifiedDate: Date().addingTimeInterval(-7200),
-            category: .document,
-            remoteURL: "http://localhost:8000/files/2",
-            localURL: nil,
-            isDownloaded: true
-        ),
-        ProjectFile(
-            id: "3",
-            name: "app_icon.png",
-            path: "/Assets",
-            size: 8192,
-            modifiedDate: Date().addingTimeInterval(-86400),
-            category: .image,
-            remoteURL: "http://localhost:8000/files/3",
-            localURL: nil,
-            isDownloaded: false
-        )
-    ]
+    // Removed mock data - now loads from backend via API
 }
 
 enum FileCategory: String, CaseIterable {

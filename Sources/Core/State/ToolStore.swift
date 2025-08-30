@@ -10,28 +10,28 @@ import Combine
 
 /// Store for managing available tools and their execution
 @MainActor
-final class ToolStore: ObservableObject {
+public final class ToolStore: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var availableTools: [Tool] = []
-    @Published var recentTools: [Tool] = []
-    @Published var favoriteTools: Set<String> = []
-    @Published var toolExecutions: [ToolExecution] = []
-    @Published var isLoading = false
-    @Published var error: ToolError?
+    @Published public var availableTools: [Tool] = []
+    @Published public var recentTools: [Tool] = []
+    @Published public var favoriteTools: Set<String> = []
+    @Published public var toolExecutions: [ToolExecution] = []
+    @Published public var isLoading = false
+    @Published public var error: ToolError?
     
     // MARK: - Computed Properties
     
-    var categorizedTools: [ToolStoreCategory: [Tool]] {
+    public var categorizedTools: [ToolStoreCategory: [Tool]] {
         Dictionary(grouping: availableTools, by: { $0.category })
     }
     
-    var favoritedTools: [Tool] {
+    public var favoritedTools: [Tool] {
         availableTools.filter { favoriteTools.contains($0.id) }
     }
     
-    var activeExecutions: [ToolExecution] {
+    public var activeExecutions: [ToolExecution] {
         toolExecutions.filter { $0.status == .running }
     }
     
@@ -42,7 +42,7 @@ final class ToolStore: ObservableObject {
     
     // MARK: - Initialization
     
-    init() {
+    public init() {
         loadTools()
         loadFavorites()
         loadRecentTools()
@@ -51,7 +51,7 @@ final class ToolStore: ObservableObject {
     // MARK: - Public Methods
     
     /// Execute a tool with given parameters
-    func executeTool(_ tool: Tool, parameters: [String: Any]) async throws -> ToolResult {
+    public func executeTool(_ tool: Tool, parameters: [String: Any]) async throws -> ToolResult {
         let execution = ToolExecution(
             id: UUID().uuidString,
             toolId: tool.id,
@@ -89,7 +89,7 @@ final class ToolStore: ObservableObject {
     }
     
     /// Toggle favorite status for a tool
-    func toggleFavorite(_ tool: Tool) {
+    public func toggleFavorite(_ tool: Tool) {
         if favoriteTools.contains(tool.id) {
             favoriteTools.remove(tool.id)
         } else {
@@ -99,24 +99,24 @@ final class ToolStore: ObservableObject {
     }
     
     /// Clear execution history
-    func clearExecutionHistory() {
+    public func clearExecutionHistory() {
         toolExecutions.removeAll()
     }
     
     /// Clear recent tools
-    func clearRecentTools() {
+    public func clearRecentTools() {
         recentTools.removeAll()
         userDefaults.removeObject(forKey: "recentToolIds")
     }
     
     /// Get tools by category (compatibility method for ToolsCoordinator)
-    func getToolsByCategory(_ category: Any) -> [Tool] {
+    public func getToolsByCategory(_ category: Any) -> [Tool] {
         // For now, return all tools - proper category mapping would be needed
         return availableTools
     }
     
     /// Search tools by query
-    func searchTools(query: String) -> [Tool] {
+    public func searchTools(query: String) -> [Tool] {
         guard !query.isEmpty else { return availableTools }
         
         let lowercasedQuery = query.lowercased()
@@ -262,14 +262,14 @@ final class ToolStore: ObservableObject {
     
     // MARK: - Missing Methods
     
-    func clearAll() {
+    public func clearAll() {
         availableTools.removeAll()
         recentTools.removeAll()
         favoriteTools.removeAll()
         toolExecutions.removeAll()
     }
     
-    func clearCache() {
+    public func clearCache() {
         // Clear any cached tool data
         recentTools.removeAll()
         toolExecutions.removeAll()
@@ -278,8 +278,8 @@ final class ToolStore: ObservableObject {
 
 // MARK: - Models
 
-struct Tool: Identifiable, Equatable {
-    let id: String
+public struct Tool: Identifiable, Equatable {
+    public let id: String
     let name: String
     let description: String
     let category: ToolStoreCategory
@@ -287,14 +287,14 @@ struct Tool: Identifiable, Equatable {
     let parameters: [ToolParameter]
 }
 
-struct ToolParameter: Equatable {
+public struct ToolParameter: Equatable {
     let name: String
     let type: ParameterType
     let required: Bool
     let description: String
     let defaultValue: Any?
     
-    init(name: String, type: ParameterType, required: Bool, description: String, defaultValue: Any? = nil) {
+    public init(name: String, type: ParameterType, required: Bool, description: String, defaultValue: Any? = nil) {
         self.name = name
         self.type = type
         self.required = required
@@ -302,12 +302,12 @@ struct ToolParameter: Equatable {
         self.defaultValue = defaultValue
     }
     
-    static func == (lhs: ToolParameter, rhs: ToolParameter) -> Bool {
+    public static func == (lhs: ToolParameter, rhs: ToolParameter) -> Bool {
         lhs.name == rhs.name && lhs.type == rhs.type && lhs.required == rhs.required
     }
 }
 
-enum ParameterType: String, Equatable {
+public enum ParameterType: String, Equatable {
     case string
     case number
     case boolean
@@ -315,7 +315,7 @@ enum ParameterType: String, Equatable {
     case object
 }
 
-enum ToolStoreCategory: String, CaseIterable {
+public enum ToolStoreCategory: String, CaseIterable {
     case fileSystem = "File System"
     case shell = "Shell"
     case git = "Git"
@@ -335,26 +335,26 @@ enum ToolStoreCategory: String, CaseIterable {
     }
 }
 
-struct ToolExecution: Identifiable {
-    let id: String
-    let toolId: String
-    let toolName: String
-    let parameters: [String: Any]
-    var status: ExecutionStatus
-    let startedAt: Date
-    var completedAt: Date?
-    var result: ToolResult?
-    var error: String?
+public struct ToolExecution: Identifiable {
+    public let id: String
+    public let toolId: String
+    public let toolName: String
+    public let parameters: [String: Any]
+    public var status: ExecutionStatus
+    public let startedAt: Date
+    public var completedAt: Date?
+    public var result: ToolResult?
+    public var error: String?
 }
 
-enum ExecutionStatus {
+public enum ExecutionStatus {
     case pending
     case running
     case completed
     case failed
     case cancelled
     
-    var color: Color {
+    public var color: Color {
         switch self {
         case .pending: return .gray
         case .running: return .blue
@@ -365,20 +365,20 @@ enum ExecutionStatus {
     }
 }
 
-struct ToolResult {
-    let toolId: String
-    let success: Bool
-    let output: String?
-    let data: Any?
+public struct ToolResult {
+    public let toolId: String
+    public let success: Bool
+    public let output: String?
+    public let data: Any?
 }
 
-enum ToolError: LocalizedError {
+public enum ToolError: LocalizedError {
     case toolNotFound
     case invalidParameters
     case executionFailed(String)
     case timeout
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .toolNotFound:
             return "Tool not found"

@@ -61,16 +61,22 @@ public final class CertificatePinningManager: NSObject, @unchecked Sendable {
         // These are example hashes - replace with your actual certificate hashes
         
         // Production certificates
-        pinnedPublicKeys.insert("PRODUCTION_CERT_HASH_1")
-        pinnedPublicKeys.insert("PRODUCTION_CERT_HASH_2")
+        pinnedPublicKeys.lock()
+        _pinnedPublicKeys.insert("PRODUCTION_CERT_HASH_1")
+        _pinnedPublicKeys.insert("PRODUCTION_CERT_HASH_2")
+        pinnedPublicKeys.unlock()
         
         // Backup certificates for rotation
-        backupPins.insert("BACKUP_CERT_HASH_1")
-        backupPins.insert("BACKUP_CERT_HASH_2")
+        backupPinsLock.lock()
+        _backupPins.insert("BACKUP_CERT_HASH_1")
+        _backupPins.insert("BACKUP_CERT_HASH_2")
+        backupPinsLock.unlock()
         
         // Development certificates (only in debug mode)
         #if DEBUG
-        pinnedPublicKeys.insert("DEV_CERT_HASH")
+        pinnedPublicKeys.lock()
+        _pinnedPublicKeys.insert("DEV_CERT_HASH")
+        pinnedPublicKeys.unlock()
         #endif
     }
     
@@ -87,20 +93,29 @@ public final class CertificatePinningManager: NSObject, @unchecked Sendable {
     
     /// Add a pinned certificate hash
     public func addPinnedCertificate(_ hash: String) {
-        pinnedPublicKeys.insert(hash)
+        pinnedPublicKeys.lock()
+        _pinnedPublicKeys.insert(hash)
+        pinnedPublicKeys.unlock()
         logger.info("Added pinned certificate: \(String(hash.prefix(8)))...")
     }
     
     /// Remove a pinned certificate hash
     public func removePinnedCertificate(_ hash: String) {
-        pinnedPublicKeys.remove(hash)
+        pinnedPublicKeys.lock()
+        _pinnedPublicKeys.remove(hash)
+        pinnedPublicKeys.unlock()
         logger.info("Removed pinned certificate: \(String(hash.prefix(8)))...")
     }
     
     /// Update pinned certificates from remote configuration
     public func updatePinnedCertificates(from config: CertificatePinningConfig) {
-        pinnedPublicKeys = Set(config.primaryPins)
-        backupPins = Set(config.backupPins)
+        pinnedPublicKeys.lock()
+        _pinnedPublicKeys = Set(config.primaryPins)
+        pinnedPublicKeys.unlock()
+        
+        backupPinsLock.lock()
+        _backupPins = Set(config.backupPins)
+        backupPinsLock.unlock()
         logger.info("Updated pinned certificates from remote config")
     }
     
@@ -182,7 +197,15 @@ public final class CertificatePinningManager: NSObject, @unchecked Sendable {
             }
             
             // Check against pinned keys
-            if pinnedPublicKeys.contains(publicKeyHash) || backupPins.contains(publicKeyHash) {
+            pinnedPublicKeys.lock()
+            let hasPrimary = _pinnedPublicKeys.contains(publicKeyHash)
+            pinnedPublicKeys.unlock()
+            
+            backupPinsLock.lock()
+            let hasBackup = _backupPins.contains(publicKeyHash)
+            backupPinsLock.unlock()
+            
+            if hasPrimary || hasBackup {
                 logger.debug("Found matching pin at index \(index)")
                 return .success
             }
@@ -218,6 +241,7 @@ public final class CertificatePinningManager: NSObject, @unchecked Sendable {
             if !allowSelfSignedCertificates {
                 return .invalidCertificateChain
             }
+            return nil
         }
         
         // Additional chain validation logic here

@@ -52,7 +52,7 @@ extension Coordinator {
 }
 
 /// Base implementation of Coordinator protocol
-class BaseCoordinator: Coordinator {
+public class BaseCoordinator: Coordinator {
     let id = UUID()
     weak var parent: Coordinator?
     var children: [Coordinator] = []

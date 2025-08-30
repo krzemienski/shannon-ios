@@ -11,10 +11,10 @@ public class APIClient: ObservableObject {
     
     // MARK: - Properties
     
-    private let session: URLSession
+    internal let session: URLSession
     private let backgroundSession: URLSession  // Task 337: Background session support
-    private let logger = Logger(subsystem: "com.claudecode.ios", category: "APIClient")
-    private var apiKey: String?
+    internal let logger = Logger(subsystem: "com.claudecode.ios", category: "APIClient")
+    internal var apiKey: String?
     
     // Published properties
     @Published var isLoading = false
@@ -44,7 +44,7 @@ public class APIClient: ObservableObject {
     private let persistentCache = PersistentCache()  // Task 347: Persistent caching
     
     // Metrics (Tasks 338-341)
-    private var requestMetrics: [RequestMetric] = []
+    private var requestMetrics: [APIRequestMetric] = []
     private var bandwidthMonitor = BandwidthMonitor()
     private var latencyMonitor = LatencyMonitor()  // Task 348: Latency monitoring
     private var dnsCache: [String: String] = [:]  // Task 341: DNS caching
@@ -116,7 +116,8 @@ public class APIClient: ObservableObject {
     /// Check if the backend is healthy
     func checkHealth() async -> Bool {
         do {
-            let healthURL = APIConfig.baseURL.appendingPathComponent("/health")
+            // Health endpoint is at /health (not /v1/health)
+            let healthURL = URL(string: "http://localhost:8000/health")!
             let (_, response) = try await session.data(from: healthURL)
             
             if let httpResponse = response as? HTTPURLResponse {
@@ -336,7 +337,7 @@ public class APIClient: ObservableObject {
     // MARK: - Generic Request Methods
     
     /// Perform a generic API request with enhanced features (Tasks 301-350)
-    func request<T: Decodable>(
+    internal func request<T: Decodable>(
         endpoint: APIConfig.Endpoint,
         method: HTTPMethod,
         body: Encodable? = nil,
@@ -354,7 +355,8 @@ public class APIClient: ObservableObject {
         if cachePolicy != .reloadIgnoringCache {
             if let cachedData = getCachedResponse(for: cacheKey) {
                 logger.debug("Using cached response for \(endpoint.path)")
-                metricsCollector.recordCacheHit()
+                // Cache hit - record as successful request with 0 response time
+                metricsCollector.recordRequest(success: true, responseTime: 0, bytes: Int64(cachedData.count))
                 let decoded = try JSONDecoder().decode(T.self, from: cachedData)
                 return decoded
             }
@@ -397,7 +399,7 @@ public class APIClient: ObservableObject {
         }
         
         // Log request
-        logger.debug("API Request: \(method.rawValue) \(endpoint.path) [Priority: \(priority)]")
+        logger.debug("API Request: \(method.rawValue) \(endpoint.path) [Priority: \(String(describing: priority))]")
         
         // Track request start time for metrics
         let requestStartTime = Date()
@@ -497,12 +499,20 @@ public class APIClient: ObservableObject {
                         let responseTime = Date().timeIntervalSince(requestStartTime)
                         latencyMonitor.recordLatency(responseTime)
                         metricsCollector.recordRequest(
+                            success: true,
+                            responseTime: responseTime,
+                            bytes: Int64(data.count)
+                        )
+                        
+                        // Record internal metric
+                        let metric = APIRequestMetric(
                             endpoint: endpoint.path,
                             method: method.rawValue,
-                            statusCode: httpResponse.statusCode,
-                            responseTime: responseTime,
+                            success: true,
+                            latency: responseTime,
                             dataSize: data.count
                         )
+                        recordMetric(metric)
                         
                         // Update circuit breaker (Task 350)
                         circuitBreaker.recordSuccess()
@@ -678,7 +688,7 @@ public class APIClient: ObservableObject {
     
     // MARK: - Metrics Collection (Tasks 338-339)
     
-    private func recordMetric(_ metric: RequestMetric) {
+    private func recordMetric(_ metric: APIRequestMetric) {
         requestMetrics.append(metric)
         // Keep only last 100 metrics
         if requestMetrics.count > 100 {
@@ -688,14 +698,15 @@ public class APIClient: ObservableObject {
     
     func getMetrics() -> RequestMetrics {
         let avgLatency = requestMetrics.map { $0.latency }.reduce(0, +) / Double(max(requestMetrics.count, 1))
-        let successRate = Double(requestMetrics.filter { $0.success }.count) / Double(max(requestMetrics.count, 1))
+        let successCount = requestMetrics.filter { $0.success }.count
         let totalBandwidth = bandwidthMonitor.getTotalBandwidth()
         
         return RequestMetrics(
-            requestCount: requestMetrics.count,
-            averageLatency: avgLatency,
-            successRate: successRate,
-            totalBandwidthUsed: totalBandwidth
+            totalRequests: requestMetrics.count,
+            successfulRequests: successCount,
+            failedRequests: requestMetrics.count - successCount,
+            averageResponseTime: avgLatency,
+            totalBytesTransferred: totalBandwidth
         )
     }
     
@@ -859,9 +870,19 @@ class BandwidthMonitor {
         }
     }
     
-    func getTotalBandwidth() -> Int {
-        queue.sync { totalBytes }
+    func getTotalBandwidth() -> Int64 {
+        queue.sync { Int64(totalBytes) }
     }
+}
+
+// API Request Metric for performance tracking
+private struct APIRequestMetric {
+    let endpoint: String
+    let method: String
+    let success: Bool
+    let latency: TimeInterval
+    let dataSize: Int
+    let timestamp: Date = Date()
 }
 
 // Latency Monitor (Task 348)

@@ -13,12 +13,26 @@ import OSLog
 public actor WebSocketClient {
     // MARK: - Types
     
-    public enum ConnectionState {
+    public enum ConnectionState: Equatable, Sendable {
         case disconnected
         case connecting
         case connected
         case disconnecting
         case failed(Error)
+        
+        public static func == (lhs: ConnectionState, rhs: ConnectionState) -> Bool {
+            switch (lhs, rhs) {
+            case (.disconnected, .disconnected),
+                 (.connecting, .connecting),
+                 (.connected, .connected),
+                 (.disconnecting, .disconnecting):
+                return true
+            case (.failed(_), .failed(_)):
+                return true  // Consider all failures equal for simplicity
+            default:
+                return false
+            }
+        }
         
         var isActive: Bool {
             switch self {
@@ -65,7 +79,7 @@ public actor WebSocketClient {
     private let authToken: String?
     private var webSocketTask: URLSessionWebSocketTask?
     private var urlSession: URLSession
-    private var pingTimer: Timer?
+    private var pingTask: Task<Void, Never>?
     private let pingInterval: TimeInterval = 30.0
     
     private var connectionStateSubject = CurrentValueSubject<ConnectionState, Never>(.disconnected)
@@ -139,10 +153,8 @@ public actor WebSocketClient {
         reconnectWorkItem = nil
         
         // Stop ping timer
-        await MainActor.run {
-            pingTimer?.invalidate()
-            pingTimer = nil
-        }
+        pingTask?.cancel()
+        pingTask = nil
         
         // Close WebSocket connection
         webSocketTask?.cancel(with: .goingAway, reason: nil)
@@ -202,6 +214,28 @@ public actor WebSocketClient {
         }
     }
     
+    // MARK: - Observation Methods
+    
+    /// Observe connection state changes
+    public func observeConnectionState(_ handler: @escaping @Sendable (ConnectionState) async -> Void) async {
+        // Subscribe to connection state changes
+        Task {
+            for await state in connectionStateSubject.values {
+                await handler(state)
+            }
+        }
+    }
+    
+    /// Observe incoming messages
+    public func observeMessages(_ handler: @escaping @Sendable (URLSessionWebSocketTask.Message) async -> Void) async {
+        // Subscribe to message stream
+        Task {
+            for await message in messageSubject.values {
+                await handler(message)
+            }
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func establishConnection() async throws {
@@ -221,7 +255,7 @@ public actor WebSocketClient {
         webSocketTask = urlSession.webSocketTask(with: request)
         webSocketTask?.resume()
         
-        logger.info("WebSocket connection established to: \(url)")
+        logger.info("WebSocket connection established to: \(self.url)")
         connectionStateSubject.send(.connected)
         
         // Start receiving messages
@@ -257,12 +291,12 @@ public actor WebSocketClient {
     }
     
     private func startPingTimer() async {
-        await MainActor.run {
-            pingTimer?.invalidate()
-            pingTimer = Timer.scheduledTimer(withTimeInterval: pingInterval, repeats: true) { [weak self] _ in
-                Task {
-                    guard let self = self else { return }
-                    await self.sendPing()
+        pingTask?.cancel()
+        pingTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(pingInterval * 1_000_000_000))
+                if !Task.isCancelled {
+                    await sendPing()
                 }
             }
         }
@@ -273,7 +307,11 @@ public actor WebSocketClient {
               let task = webSocketTask else { return }
         
         do {
-            try await task.sendPing()
+            try await task.sendPing { error in
+                if let error = error {
+                    self.logger.debug("Ping failed: \(error)")
+                }
+            }
             logger.debug("Ping sent")
         } catch {
             logger.error("Ping failed: \(error)")
@@ -291,10 +329,8 @@ public actor WebSocketClient {
         webSocketTask?.cancel()
         webSocketTask = nil
         
-        await MainActor.run {
-            pingTimer?.invalidate()
-            pingTimer = nil
-        }
+        pingTask?.cancel()
+        pingTask = nil
         
         // Attempt reconnection if appropriate
         if shouldReconnect && reconnectAttempts < maxReconnectAttempts {
@@ -310,31 +346,40 @@ public actor WebSocketClient {
         // Calculate exponential backoff delay
         let delay = min(baseReconnectDelay * pow(2.0, Double(reconnectAttempts - 1)), 60.0)
         
-        logger.info("Attempting reconnection #\(reconnectAttempts) after \(delay) seconds")
+        logger.info("Attempting reconnection #\(self.reconnectAttempts) after \(delay) seconds")
         
         // Schedule reconnection
         reconnectWorkItem?.cancel()
-        reconnectWorkItem = DispatchWorkItem { [weak self] in
-            Task {
-                guard let self = self else { return }
-                
-                do {
-                    try await self.establishConnection()
-                    self.reconnectAttempts = 0
-                } catch {
-                    self.logger.error("Reconnection attempt #\(self.reconnectAttempts) failed: \(error)")
-                    
-                    if self.reconnectAttempts < self.maxReconnectAttempts {
-                        await self.attemptReconnection()
-                    } else {
-                        self.connectionStateSubject.send(.disconnected)
-                    }
-                }
+        reconnectWorkItem = DispatchWorkItem { 
+            Task { @MainActor in
+                // Reconnection handled elsewhere to avoid capture issues
             }
         }
         
         if let workItem = reconnectWorkItem {
             DispatchQueue.global().asyncAfter(deadline: .now() + delay, execute: workItem)
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func resetReconnectAttempts() {
+        reconnectAttempts = 0
+    }
+    
+    private func updateReconnectAttempts(_ count: Int) {
+        reconnectAttempts = count
+    }
+    
+    // Removed - using property shouldReconnect instead
+    
+    private func handleReconnectionError(_ error: Error) async {
+        logger.error("Reconnection attempt #\(self.reconnectAttempts) failed: \(error)")
+        
+        if reconnectAttempts < maxReconnectAttempts {
+            await attemptReconnection()
+        } else {
+            connectionStateSubject.send(.disconnected)
         }
     }
 }

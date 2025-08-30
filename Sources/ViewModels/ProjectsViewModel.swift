@@ -11,15 +11,15 @@ import OSLog
 
 /// ViewModel for managing projects
 @MainActor
-final class ProjectsViewModel: ObservableObject {
+public final class ProjectsViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var projects: [Project] = []
-    @Published var isLoading = false
-    @Published var error: Error?
-    @Published var showError = false
-    @Published var connectionStatus: ConnectionStatus = .disconnected
+    @Published public var projects: [Project] = []
+    @Published public var isLoading = false
+    @Published public var error: Error?
+    @Published public var showError = false
+    @Published public var connectionStatus: ConnectionStatus = .disconnected
     
     // MARK: - Private Properties
     
@@ -30,7 +30,7 @@ final class ProjectsViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(apiClient: APIClient, appState: AppState) {
+    public init(apiClient: APIClient, appState: AppState) {
         self.apiClient = apiClient
         self.appState = appState
         
@@ -66,19 +66,19 @@ final class ProjectsViewModel: ObservableObject {
     // MARK: - Public Methods
     
     /// Load projects from backend
-    func loadProjects() {
+    public func loadProjects() {
         Task {
             await fetchProjects()
         }
     }
     
     /// Refresh projects
-    func refreshProjects() async {
+    public func refreshProjects() async {
         await fetchProjects()
     }
     
     /// Create a new project
-    func createProject(_ project: Project) async throws {
+    public func createProject(_ project: Project) async throws {
         isLoading = true
         error = nil
         
@@ -122,7 +122,7 @@ final class ProjectsViewModel: ObservableObject {
     }
     
     /// Delete a project
-    func deleteProject(_ project: Project) async throws {
+    public func deleteProject(_ project: Project) async throws {
         isLoading = true
         error = nil
         
@@ -144,7 +144,7 @@ final class ProjectsViewModel: ObservableObject {
     }
     
     /// Update a project
-    func updateProject(_ project: Project) async throws {
+    public func updateProject(_ project: Project) async throws {
         isLoading = true
         error = nil
         
@@ -274,7 +274,7 @@ final class ProjectsViewModel: ObservableObject {
 // MARK: - API Request/Response Models
 // CreateProjectRequest is now defined in NetworkModels.swift
 
-struct UpdateProjectRequest: Codable {
+public struct UpdateProjectRequest: Codable {
     let name: String?
     let description: String?
     let isActive: Bool?

@@ -21,7 +21,6 @@ public final class BiometricAuthManager: ObservableObject {
     
     // MARK: - Private Properties
     
-    private let context = LAContext()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "BiometricAuth")
     private let sessionTimeout: TimeInterval = 300 // 5 minutes
     
@@ -62,6 +61,7 @@ public final class BiometricAuthManager: ObservableObject {
     /// Check if biometric authentication is available
     public func checkBiometricAvailability() {
         var error: NSError?
+        let context = LAContext()
         
         // Check if biometric authentication is available
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
@@ -99,6 +99,7 @@ public final class BiometricAuthManager: ObservableObject {
         defer { isAuthenticating = false }
         
         // Configure context
+        let context = LAContext()
         context.localizedReason = reason
         if let fallbackTitle = fallbackTitle {
             context.localizedFallbackTitle = fallbackTitle
@@ -168,7 +169,7 @@ public final class BiometricAuthManager: ObservableObject {
     /// Invalidate current authentication session
     public func invalidateSession() {
         lastAuthenticationTime = nil
-        context.invalidate()
+        // Context is created locally for each authentication now
         logger.info("Authentication session invalidated")
     }
     

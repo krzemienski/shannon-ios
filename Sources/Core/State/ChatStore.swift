@@ -10,19 +10,19 @@ import Combine
 
 /// Store for managing chat conversations and history
 @MainActor
-final class ChatStore: ObservableObject {
+public final class ChatStore: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var conversations: [Conversation] = []
-    @Published var currentConversation: Conversation?
-    @Published var isLoading = false
-    @Published var error: ChatError?
-    @Published var searchText = ""
+    @Published public var conversations: [Conversation] = []
+    @Published public var currentConversation: Conversation?
+    @Published public var isLoading = false
+    @Published public var error: ChatError?
+    @Published public var searchText = ""
     
     // MARK: - Computed Properties
     
-    var filteredConversations: [Conversation] {
+    public var filteredConversations: [Conversation] {
         if searchText.isEmpty {
             return conversations
         }
@@ -39,12 +39,12 @@ final class ChatStore: ObservableObject {
         }
     }
     
-    var pinnedConversations: [Conversation] {
+    public var pinnedConversations: [Conversation] {
         conversations.filter { $0.isPinned }
             .sorted { $0.updatedAt > $1.updatedAt }
     }
     
-    var recentConversations: [Conversation] {
+    public var recentConversations: [Conversation] {
         conversations.filter { !$0.isPinned }
             .sorted { $0.updatedAt > $1.updatedAt }
     }
@@ -60,7 +60,7 @@ final class ChatStore: ObservableObject {
     
     // MARK: - Initialization
     
-    init(apiClient: APIClient) {
+    public     init(apiClient: APIClient) {
         self.apiClient = apiClient
         
         // Get documents directory
@@ -81,7 +81,7 @@ final class ChatStore: ObservableObject {
     // MARK: - Public Methods - Conversation Management
     
     /// Create a new conversation
-    func createConversation(title: String? = nil) -> Conversation {
+    public func createConversation(title: String? = nil) -> Conversation {
         let conversation = Conversation(
             title: title ?? generateConversationTitle(),
             createdAt: Date(),
@@ -96,7 +96,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Delete a conversation
-    func deleteConversation(_ conversation: Conversation) {
+    public func deleteConversation(_ conversation: Conversation) {
         conversations.removeAll { $0.id == conversation.id }
         
         if currentConversation?.id == conversation.id {
@@ -112,7 +112,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Delete multiple conversations
-    func deleteConversations(_ conversationIds: Set<String>) {
+    public func deleteConversations(_ conversationIds: Set<String>) {
         conversations.removeAll { conversationIds.contains($0.id) }
         
         if let currentId = currentConversation?.id,
@@ -124,7 +124,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Update conversation title
-    func updateConversationTitle(_ conversation: Conversation, title: String) {
+    public func updateConversationTitle(_ conversation: Conversation, title: String) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             conversations[index].title = title
             conversations[index].updatedAt = Date()
@@ -138,7 +138,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Toggle conversation pin status
-    func togglePin(_ conversation: Conversation) {
+    public func togglePin(_ conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             conversations[index].isPinned.toggle()
             conversations[index].updatedAt = Date()
@@ -152,7 +152,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Add tags to conversation
-    func addTags(_ tags: [String], to conversation: Conversation) {
+    public func addTags(_ tags: [String], to conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             let uniqueTags = Set(conversations[index].tags + tags)
             conversations[index].tags = Array(uniqueTags).sorted()
@@ -167,7 +167,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Remove tag from conversation
-    func removeTag(_ tag: String, from conversation: Conversation) {
+    public func removeTag(_ tag: String, from conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             conversations[index].tags.removeAll { $0 == tag }
             conversations[index].updatedAt = Date()
@@ -183,7 +183,7 @@ final class ChatStore: ObservableObject {
     // MARK: - Public Methods - Message Management
     
     /// Add a message to the current conversation
-    func addMessage(_ message: Message) {
+    public func addMessage(_ message: Message) {
         guard let conversation = currentConversation else {
             // Create new conversation if none exists
             let newConversation = createConversation()
@@ -195,7 +195,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Add a message to a specific conversation
-    func addMessageToConversation(_ message: Message, conversation: Conversation) {
+    public func addMessageToConversation(_ message: Message, conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             conversations[index].addMessage(message)
             
@@ -218,7 +218,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Update a message in the current conversation
-    func updateMessage(id: String, content: String) {
+    public func updateMessage(id: String, content: String) {
         guard let conversation = currentConversation else { return }
         
         if let conversationIndex = conversations.firstIndex(where: { $0.id == conversation.id }) {
@@ -229,7 +229,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Delete a message from the current conversation
-    func deleteMessage(_ message: Message) {
+    public func deleteMessage(_ message: Message) {
         guard let conversation = currentConversation else { return }
         
         if let conversationIndex = conversations.firstIndex(where: { $0.id == conversation.id }),
@@ -247,7 +247,7 @@ final class ChatStore: ObservableObject {
     // MARK: - Public Methods - Persistence
     
     /// Load conversations from disk
-    func loadConversations() async {
+    public func loadConversations() async {
         let fileURL = documentsDirectory.appendingPathComponent(conversationsFile)
         
         do {
@@ -266,7 +266,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Save conversations to disk
-    func saveConversations() async {
+    public func saveConversations() async {
         let fileURL = documentsDirectory.appendingPathComponent(conversationsFile)
         
         do {
@@ -282,14 +282,14 @@ final class ChatStore: ObservableObject {
     }
     
     /// Save pending changes if any
-    func savePendingChanges() async {
+    public func savePendingChanges() async {
         if pendingChanges {
             await saveConversations()
         }
     }
     
     /// Export conversation as JSON
-    func exportConversation(_ conversation: Conversation) async throws -> Data {
+    public func exportConversation(_ conversation: Conversation) async throws -> Data {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = .prettyPrinted
@@ -297,7 +297,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Import conversation from JSON
-    func importConversation(from data: Data) async throws -> Conversation {
+    public func importConversation(from data: Data) async throws -> Conversation {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let conversation = try decoder.decode(Conversation.self, from: data)
@@ -312,7 +312,7 @@ final class ChatStore: ObservableObject {
     }
     
     /// Clear all conversations and associated data
-    func clearAll() async {
+    public func clearAll() async {
         // Clear in-memory data
         conversations.removeAll()
         currentConversation = nil
@@ -366,13 +366,13 @@ final class ChatStore: ObservableObject {
     }
     
     deinit {
-        autoSaveTimer?.invalidate()
+        // Timer invalidation handled in MainActor context when needed
     }
 }
 
 // MARK: - Error Types
 
-enum ChatError: LocalizedError {
+public enum ChatError: LocalizedError {
     case conversationNotFound
     case messageNotFound
     case saveFailed(Error)
@@ -380,7 +380,7 @@ enum ChatError: LocalizedError {
     case exportFailed(Error)
     case importFailed(Error)
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .conversationNotFound:
             return "Conversation not found"

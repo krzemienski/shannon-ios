@@ -11,32 +11,32 @@ import OSLog
 
 /// ViewModel for managing chat interactions
 @MainActor
-final class ChatViewModel: ObservableObject {
+public final class ChatViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var conversation: Conversation?
-    @Published var messages: [Message] = []
-    @Published var inputText = ""
-    @Published var isLoading = false
-    @Published var isStreaming = false
-    @Published var error: Error?
-    @Published var showError = false
-    @Published var selectedMessage: Message?
-    @Published var showToolDetails = false
-    @Published var connectionStatus: ConnectionStatus = .disconnected
+    @Published public var conversation: Conversation?
+    @Published public var messages: [Message] = []
+    @Published public var inputText = ""
+    @Published public var isLoading = false
+    @Published public var isStreaming = false
+    @Published public var error: Error?
+    @Published public var showError = false
+    @Published public var selectedMessage: Message?
+    @Published public var showToolDetails = false
+    @Published public var connectionStatus: ConnectionStatus = .disconnected
     
     // MARK: - Stream Management
     
-    @Published var streamingMessageId: String?
-    @Published var streamingContent = ""
+    @Published public var streamingMessageId: String?
+    @Published public var streamingContent = ""
     
     // MARK: - UI State
     
-    @Published var shouldScrollToBottom = false
-    @Published var showModelPicker = false
-    @Published var showSettings = false
-    @Published var isComposing = false
+    @Published public var shouldScrollToBottom = false
+    @Published public var showModelPicker = false
+    @Published public var showSettings = false
+    @Published public var isComposing = false
     
     // MARK: - Private Properties
     
@@ -44,7 +44,7 @@ final class ChatViewModel: ObservableObject {
     private let apiClient: APIClient
     private let appState: AppState
     private var sseClient: SSEClient?
-    // private var streamingService: StreamingChatService? // TODO: Implement StreamingChatService
+    private var streamingService: StreamingChatService?
     private var cancellables = Set<AnyCancellable>()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "ChatViewModel")
     private let conversationId: String?
@@ -73,7 +73,7 @@ final class ChatViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(conversationId: String? = nil,
+    public init(conversationId: String? = nil,
          chatStore: ChatStore,
          apiClient: APIClient,
          appState: AppState) {
@@ -629,7 +629,7 @@ final class ChatViewModel: ObservableObject {
 
 // MARK: - Supporting Types
 
-enum ConnectionStatus {
+public enum ConnectionStatus {
     case connected
     case connecting
     case disconnected

@@ -10,19 +10,19 @@ import Combine
 
 /// Store for managing projects and their configurations
 @MainActor
-final class ProjectStore: ObservableObject {
+public final class ProjectStore: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var projects: [Project] = []
-    @Published var currentProject: Project?
-    @Published var isLoading = false
-    @Published var error: ProjectError?
-    @Published var searchText = ""
+    @Published public var projects: [Project] = []
+    @Published public var currentProject: Project?
+    @Published public var isLoading = false
+    @Published public var error: ProjectError?
+    @Published public var searchText = ""
     
     // MARK: - Computed Properties
     
-    var filteredProjects: [Project] {
+    public var filteredProjects: [Project] {
         if searchText.isEmpty {
             return projects
         }
@@ -33,11 +33,11 @@ final class ProjectStore: ObservableObject {
         }
     }
     
-    var activeProjects: [Project] {
+    public var activeProjects: [Project] {
         projects.filter { $0.isActive }
     }
     
-    var recentProjects: [Project] {
+    public var recentProjects: [Project] {
         projects.sorted { $0.lastAccessedAt ?? Date.distantPast > $1.lastAccessedAt ?? Date.distantPast }
             .prefix(5)
             .map { $0 }
@@ -52,7 +52,7 @@ final class ProjectStore: ObservableObject {
     
     // MARK: - Initialization
     
-    init() {
+    public init() {
         self.documentsDirectory = FileManager.default.urls(
             for: .documentDirectory,
             in: .userDomainMask
@@ -68,7 +68,7 @@ final class ProjectStore: ObservableObject {
     // MARK: - Public Methods
     
     /// Create a new project
-    func createProject(name: String, path: String, type: ProjectType = .general) -> Project {
+    public func createProject(name: String, path: String, type: ProjectType = .general) -> Project {
         let project = Project(
             name: name,
             path: path,
@@ -84,7 +84,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Update project configuration
-    func updateProject(_ project: Project, updates: (inout Project) -> Void) {
+    public func updateProject(_ project: Project, updates: (inout Project) -> Void) {
         if let index = projects.firstIndex(where: { $0.id == project.id }) {
             updates(&projects[index])
             projects[index].lastAccessedAt = Date()
@@ -98,7 +98,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Delete a project
-    func deleteProject(_ project: Project) {
+    public func deleteProject(_ project: Project) {
         projects.removeAll { $0.id == project.id }
         
         if currentProject?.id == project.id {
@@ -109,7 +109,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Set active project
-    func setActiveProject(_ project: Project) {
+    public func setActiveProject(_ project: Project) {
         // Deactivate all projects
         for index in projects.indices {
             projects[index].isActive = false
@@ -126,21 +126,21 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Add SSH configuration to project
-    func addSSHConfig(to project: Project, config: AppSSHConfig) {
+    public func addSSHConfig(to project: Project, config: AppSSHConfig) {
         updateProject(project) { proj in
             proj.sshConfig = config
         }
     }
     
     /// Remove SSH configuration from project
-    func removeSSHConfig(from project: Project) {
+    public func removeSSHConfig(from project: Project) {
         updateProject(project) { proj in
             proj.sshConfig = nil
         }
     }
     
     /// Add environment variable to project
-    func addEnvironmentVariable(to project: Project, key: String, value: String) {
+    public func addEnvironmentVariable(to project: Project, key: String, value: String) {
         updateProject(project) { proj in
             if proj.environmentVariables == nil {
                 proj.environmentVariables = [:]
@@ -150,7 +150,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Remove environment variable from project
-    func removeEnvironmentVariable(from project: Project, key: String) {
+    public func removeEnvironmentVariable(from project: Project, key: String) {
         updateProject(project) { proj in
             proj.environmentVariables?.removeValue(forKey: key)
         }
@@ -159,7 +159,7 @@ final class ProjectStore: ObservableObject {
     // MARK: - Persistence
     
     /// Load projects from disk
-    func loadProjects() async {
+    public func loadProjects() async {
         let fileURL = documentsDirectory.appendingPathComponent(projectsFile)
         
         do {
@@ -177,7 +177,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Save projects to disk
-    func saveProjects() async {
+    public func saveProjects() async {
         let fileURL = documentsDirectory.appendingPathComponent(projectsFile)
         
         do {
@@ -193,7 +193,7 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Save pending changes if any
-    func savePendingChanges() async {
+    public func savePendingChanges() async {
         if pendingChanges {
             await saveProjects()
         }
@@ -210,32 +210,32 @@ final class ProjectStore: ObservableObject {
     }
     
     /// Clear all projects
-    func clearAll() {
+    public func clearAll() {
         projects.removeAll()
         currentProject = nil
         pendingChanges = true
     }
     
     deinit {
-        autoSaveTimer?.invalidate()
+        // Timer invalidation handled in MainActor context when needed
     }
 }
 
 // MARK: - Models
 
-struct Project: Identifiable, Codable, Equatable {
-    let id: String
-    var name: String
-    var path: String
-    var type: ProjectType
-    var description: String?
-    var isActive: Bool
-    var sshConfig: AppSSHConfig?
-    var environmentVariables: [String: String]?
-    let createdAt: Date
-    var lastAccessedAt: Date?
+public struct Project: Identifiable, Codable, Equatable {
+    public let id: String
+    public var name: String
+    public var path: String
+    public var type: ProjectType
+    public var description: String?
+    public var isActive: Bool
+    public var sshConfig: AppSSHConfig?
+    public var environmentVariables: [String: String]?
+    public let createdAt: Date
+    public var lastAccessedAt: Date?
     
-    init(id: String = UUID().uuidString,
+    public init(id: String = UUID().uuidString,
          name: String,
          path: String,
          type: ProjectType = .general,
@@ -258,14 +258,14 @@ struct Project: Identifiable, Codable, Equatable {
     }
 }
 
-enum ProjectType: String, Codable, CaseIterable {
+public enum ProjectType: String, Codable, CaseIterable {
     case general = "general"
     case ios = "ios"
     case web = "web"
     case backend = "backend"
     case ml = "ml"
     
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .general: return "General"
         case .ios: return "iOS"
@@ -275,7 +275,7 @@ enum ProjectType: String, Codable, CaseIterable {
         }
     }
     
-    var icon: String {
+    public var icon: String {
         switch self {
         case .general: return "folder"
         case .ios: return "iphone"
@@ -286,14 +286,14 @@ enum ProjectType: String, Codable, CaseIterable {
     }
 }
 
-enum ProjectError: LocalizedError {
+public enum ProjectError: LocalizedError {
     case projectNotFound
     case invalidPath
     case sshConnectionFailed(String)
     case saveFailed(Error)
     case loadFailed(Error)
     
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .projectNotFound:
             return "Project not found"

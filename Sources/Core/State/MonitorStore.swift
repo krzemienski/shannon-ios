@@ -10,31 +10,31 @@ import Combine
 
 /// Store for managing system monitoring and metrics
 @MainActor
-final class MonitorStore: ObservableObject {
+public final class MonitorStore: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var cpuUsage: Double = 0
-    @Published var memoryUsage: MemoryUsage = MemoryUsage()
-    @Published var diskUsage: DiskUsage = DiskUsage()
-    @Published var networkStats: NetworkStats = NetworkStats()
-    @Published var activeConnections: [SSHMonitorConnection] = []
-    @Published var processInfo: [ProcessInfo] = []
-    @Published var systemLogs: [SystemLog] = []
-    @Published var isMonitoring = false
-    @Published var refreshInterval: TimeInterval = 5.0
+    @Published public var cpuUsage: Double = 0
+    @Published public var memoryUsage: MemoryUsage = MemoryUsage()
+    @Published public var diskUsage: DiskUsage = DiskUsage()
+    @Published public var networkStats: NetworkStats = NetworkStats()
+    @Published public var activeConnections: [SSHMonitorConnection] = []
+    @Published public var processInfo: [ProcessInfo] = []
+    @Published public var systemLogs: [SystemLog] = []
+    @Published public var isMonitoring = false
+    @Published public var refreshInterval: TimeInterval = 5.0
     
     // MARK: - Computed Properties
     
-    var hasActiveConnections: Bool {
+    public var hasActiveConnections: Bool {
         !activeConnections.isEmpty
     }
     
-    var totalBandwidthUsed: Int {
+    public var totalBandwidthUsed: Int {
         networkStats.totalBytesReceived + networkStats.totalBytesSent
     }
     
-    var criticalLogs: [SystemLog] {
+    public var criticalLogs: [SystemLog] {
         systemLogs.filter { $0.level == .error || $0.level == .critical }
     }
     
@@ -46,7 +46,7 @@ final class MonitorStore: ObservableObject {
     
     // MARK: - Initialization
     
-    init(sshManager: SSHManager) {
+    public init(sshManager: SSHManager) {
         self.sshManager = sshManager
         setupBindings()
     }
@@ -54,7 +54,7 @@ final class MonitorStore: ObservableObject {
     // MARK: - Public Methods
     
     /// Start monitoring
-    func startMonitoring() {
+    public func startMonitoring() {
         guard !isMonitoring else { return }
         
         isMonitoring = true
@@ -73,14 +73,14 @@ final class MonitorStore: ObservableObject {
     }
     
     /// Stop monitoring
-    func stopMonitoring() {
+    public func stopMonitoring() {
         isMonitoring = false
         monitoringTimer?.invalidate()
         monitoringTimer = nil
     }
     
     /// Update refresh interval
-    func updateRefreshInterval(_ interval: TimeInterval) {
+    public func updateRefreshInterval(_ interval: TimeInterval) {
         refreshInterval = interval
         
         if isMonitoring {
@@ -90,12 +90,12 @@ final class MonitorStore: ObservableObject {
     }
     
     /// Clear system logs
-    func clearLogs() {
+    public func clearLogs() {
         systemLogs.removeAll()
     }
     
     /// Export monitoring data
-    func exportMonitoringData() async -> Data? {
+    public func exportMonitoringData() async -> Data? {
         let exportData = MonitoringExport(
             timestamp: Date(),
             cpuUsage: cpuUsage,
@@ -116,11 +116,9 @@ final class MonitorStore: ObservableObject {
     
     private func setupBindings() {
         // Observe SSH connection changes
-        sshManager.$connections
-            .sink { [weak self] connections in
-                self?.activeConnections = connections
-            }
-            .store(in: &cancellables)
+        // For now, we'll initialize with empty connections
+        // TODO: Add proper SSH connection tracking when SSHManager is enhanced
+        self.activeConnections = []
     }
     
     private func updateMetrics() async {
@@ -163,7 +161,7 @@ final class MonitorStore: ObservableObject {
             total: total,
             used: used,
             available: available,
-            appUsage: ProcessInfo.processInfo.physicalMemory
+            appUsage: Foundation.ProcessInfo.processInfo.physicalMemory
         )
     }
     
@@ -206,13 +204,22 @@ final class MonitorStore: ObservableObject {
         // Get app process info
         let processInfo = Foundation.ProcessInfo.processInfo
         
+        let pid = Int(processInfo.processIdentifier)
         return [
             ProcessInfo(
+                id: String(pid),
+                pid: pid,
                 name: processInfo.processName,
-                pid: Int(processInfo.processIdentifier),
+                command: processInfo.arguments.joined(separator: " "),
+                user: nil, // userName not available on iOS
                 cpuUsage: cpuUsage,
-                memoryUsage: Int(processInfo.physicalMemory),
-                status: .running
+                memoryUsage: Int64(processInfo.physicalMemory),
+                virtualMemory: nil,
+                threads: processInfo.activeProcessorCount,
+                startTime: Date(),
+                state: .running,
+                parentPid: nil,
+                priority: processInfo.processorCount
             )
         ]
     }
@@ -227,7 +234,7 @@ final class MonitorStore: ObservableObject {
     }
     
     /// Clear all monitoring data and reset to defaults
-    func clearAll() async {
+    public func clearAll() async {
         cpuUsage = 0
         memoryUsage = MemoryUsage()
         diskUsage = DiskUsage()
@@ -244,49 +251,49 @@ final class MonitorStore: ObservableObject {
 
 // MARK: - Models
 
-struct MemoryUsage {
-    let total: Int
-    let used: Int
-    let available: Int
-    let appUsage: UInt64
+public struct MemoryUsage {
+    public let total: Int
+    public let used: Int
+    public let available: Int
+    public let appUsage: UInt64
     
-    init(total: Int = 0, used: Int = 0, available: Int = 0, appUsage: UInt64 = 0) {
+    public init(total: Int = 0, used: Int = 0, available: Int = 0, appUsage: UInt64 = 0) {
         self.total = total
         self.used = used
         self.available = available
         self.appUsage = appUsage
     }
     
-    var usedPercentage: Double {
+    public var usedPercentage: Double {
         guard total > 0 else { return 0 }
         return Double(used) / Double(total) * 100
     }
 }
 
-struct DiskUsage {
-    let total: Int
-    let used: Int
-    let available: Int
+public struct DiskUsage {
+    public let total: Int
+    public let used: Int
+    public let available: Int
     
-    init(total: Int = 0, used: Int = 0, available: Int = 0) {
+    public init(total: Int = 0, used: Int = 0, available: Int = 0) {
         self.total = total
         self.used = used
         self.available = available
     }
     
-    var usedPercentage: Double {
+    public var usedPercentage: Double {
         guard total > 0 else { return 0 }
         return Double(used) / Double(total) * 100
     }
 }
 
-struct NetworkStats {
-    let totalBytesReceived: Int
-    let totalBytesSent: Int
-    let currentDownloadSpeed: Int
-    let currentUploadSpeed: Int
+public struct NetworkStats {
+    public let totalBytesReceived: Int
+    public let totalBytesSent: Int
+    public let currentDownloadSpeed: Int
+    public let currentUploadSpeed: Int
     
-    init(totalBytesReceived: Int = 0,
+    public init(totalBytesReceived: Int = 0,
          totalBytesSent: Int = 0,
          currentDownloadSpeed: Int = 0,
          currentUploadSpeed: Int = 0) {
@@ -297,26 +304,26 @@ struct NetworkStats {
     }
 }
 
-struct SSHMonitorConnection: Identifiable {
-    let id: String
-    let host: String
-    let port: Int
-    let username: String
-    let status: ConnectionStatus
-    let connectedAt: Date
-    let bytesTransferred: Int
+public struct SSHMonitorConnection: Identifiable {
+    public let id: String
+    public let host: String
+    public let port: Int
+    public let username: String
+    public let status: ConnectionStatus
+    public let connectedAt: Date
+    public let bytesTransferred: Int
 }
 
 // ProcessInfo is defined in Models/Network/MonitoringModels.swift
 
 // ProcessStatus is defined in MonitoringModels.swift (if not already there)
-enum ProcessStatus {
+public enum ProcessStatus {
     case running
     case sleeping
     case stopped
     case zombie
     
-    var color: Color {
+    public var color: Color {
         switch self {
         case .running: return .green
         case .sleeping: return .blue
@@ -326,14 +333,14 @@ enum ProcessStatus {
     }
 }
 
-struct SystemLog: Identifiable {
-    let id = UUID()
-    let level: LogLevel
-    let message: String
-    let timestamp: Date
-    let source: String?
+public struct SystemLog: Identifiable {
+    public let id = UUID()
+    public let level: LogLevel
+    public let message: String
+    public let timestamp: Date
+    public let source: String?
     
-    init(level: LogLevel, message: String, timestamp: Date, source: String? = nil) {
+    public init(level: LogLevel, message: String, timestamp: Date, source: String? = nil) {
         self.level = level
         self.message = message
         self.timestamp = timestamp
@@ -341,14 +348,14 @@ struct SystemLog: Identifiable {
     }
 }
 
-enum LogLevel {
+public enum LogLevel {
     case debug
     case info
     case warning
     case error
     case critical
     
-    var color: Color {
+    public var color: Color {
         switch self {
         case .debug: return .gray
         case .info: return .blue
@@ -358,7 +365,7 @@ enum LogLevel {
         }
     }
     
-    var icon: String {
+    public var icon: String {
         switch self {
         case .debug: return "ant"
         case .info: return "info.circle"
@@ -371,22 +378,22 @@ enum LogLevel {
 
 // MARK: - Export Models
 
-struct MonitoringExport: Codable {
-    let timestamp: Date
-    let cpuUsage: Double
-    let memoryUsage: MemoryUsage
-    let diskUsage: DiskUsage
-    let networkStats: NetworkStats
-    let activeConnections: [ConnectionExport]
+public struct MonitoringExport: Codable {
+    public let timestamp: Date
+    public let cpuUsage: Double
+    public let memoryUsage: MemoryUsage
+    public let diskUsage: DiskUsage
+    public let networkStats: NetworkStats
+    public let activeConnections: [ConnectionExport]
 }
 
-struct ConnectionExport: Codable {
-    let host: String
-    let port: Int
-    let username: String
-    let connectedAt: Date
+public struct ConnectionExport: Codable {
+    public let host: String
+    public let port: Int
+    public let username: String
+    public let connectedAt: Date
     
-    init(from connection: SSHMonitorConnection) {
+    public init(from connection: SSHMonitorConnection) {
         self.host = connection.host
         self.port = connection.port
         self.username = connection.username

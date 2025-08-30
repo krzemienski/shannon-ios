@@ -104,20 +104,22 @@ public class WebSocketService: ObservableObject {
         self.webSocketClient = client
         
         // Subscribe to connection state changes
-        await client.connectionState
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] state in
-                self?.handleConnectionStateChange(state)
+        Task {
+            await client.observeConnectionState { [weak self] state in
+                await MainActor.run {
+                    self?.handleConnectionStateChange(state)
+                }
             }
-            .store(in: &cancellables)
+        }
         
         // Subscribe to messages
-        await client.messages
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] message in
-                self?.handleMessage(message)
+        Task {
+            await client.observeMessages { [weak self] message in
+                await MainActor.run {
+                    self?.handleMessage(message)
+                }
             }
-            .store(in: &cancellables)
+        }
         
         // Connect
         try await client.connect()
@@ -141,7 +143,10 @@ public class WebSocketService: ObservableObject {
             throw WebSocketClient.WebSocketError.notConnected
         }
         
-        try await client.send(message)
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(message)
+        let text = String(data: data, encoding: .utf8) ?? ""
+        try await client.send(text: text)
     }
     
     /// Send a raw text message

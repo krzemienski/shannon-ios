@@ -19,7 +19,7 @@ public struct Experiment: Identifiable, Codable {
     public let startDate: Date
     public let endDate: Date?
     public let status: ExperimentStatus
-    public let variants: [Variant]
+    public var variants: [Variant]
     public let metrics: [Metric]
     public let targetAudience: TargetCriteria?
     public let minimumSampleSize: Int

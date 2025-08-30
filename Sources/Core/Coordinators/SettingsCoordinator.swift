@@ -10,7 +10,7 @@ import Combine
 
 /// Coordinator managing settings navigation and flow
 @MainActor
-final class SettingsCoordinator: BaseCoordinator, ObservableObject {
+public final class SettingsCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Navigation State
     
@@ -315,19 +315,39 @@ enum SettingsSection: String, CaseIterable, Identifiable {
 
 // AppTheme and FontSize are defined in SettingsStore.swift
 
-struct NotificationSettings {
-    var enabled: Bool
-    var soundEnabled: Bool
-    var vibrationEnabled: Bool
-    var showPreviews: Bool
-    var chatNotifications: Bool
-    var toolNotifications: Bool
-    var systemNotifications: Bool
+public struct NotificationSettings {
+    public var enabled: Bool
+    public var soundEnabled: Bool
+    public var vibrationEnabled: Bool
+    public var showPreviews: Bool
+    public var chatNotifications: Bool
+    public var toolNotifications: Bool
+    public var systemNotifications: Bool
+    
+    public init(enabled: Bool = true, soundEnabled: Bool = true, vibrationEnabled: Bool = true, 
+                showPreviews: Bool = true, chatNotifications: Bool = true, 
+                toolNotifications: Bool = true, systemNotifications: Bool = true) {
+        self.enabled = enabled
+        self.soundEnabled = soundEnabled
+        self.vibrationEnabled = vibrationEnabled
+        self.showPreviews = showPreviews
+        self.chatNotifications = chatNotifications
+        self.toolNotifications = toolNotifications
+        self.systemNotifications = systemNotifications
+    }
 }
 
-struct PrivacySettings {
-    var analyticsEnabled: Bool
-    var crashReportingEnabled: Bool
-    var telemetryEnabled: Bool
-    var shareUsageData: Bool
+public struct PrivacySettings {
+    public var analyticsEnabled: Bool
+    public var crashReportingEnabled: Bool
+    public var telemetryEnabled: Bool
+    public var shareUsageData: Bool
+    
+    public init(analyticsEnabled: Bool = false, crashReportingEnabled: Bool = false,
+                telemetryEnabled: Bool = false, shareUsageData: Bool = false) {
+        self.analyticsEnabled = analyticsEnabled
+        self.crashReportingEnabled = crashReportingEnabled
+        self.telemetryEnabled = telemetryEnabled
+        self.shareUsageData = shareUsageData
+    }
 }

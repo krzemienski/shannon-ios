@@ -295,8 +295,8 @@ struct Project: Identifiable {
 
 // Extension for Project compatibility
 extension Project {
-    var sessionCount: Int { 0 }  // TODO: Track sessions
-    var toolCount: Int { 0 }  // TODO: Track tools
+    var sessionCount: Int { 0 }  // TODO: Track sessions from backend
+    var toolCount: Int { 0 }  // TODO: Track tools from backend
     var icon: String { type.icon }
     var lastUpdated: Date { lastAccessedAt ?? createdAt }
     
@@ -306,35 +306,7 @@ extension Project {
         return formatter.localizedString(for: lastUpdated, relativeTo: Date())
     }
     
-    static let mockData: [Project] = [
-        Project(
-            name: "ClaudeCode iOS",
-            path: "/Users/developer/claude-ios",
-            type: .ios,
-            description: "Native iOS client for Claude Code API",
-            isActive: true,
-            createdAt: Date().addingTimeInterval(-86400),
-            lastAccessedAt: Date().addingTimeInterval(-3600)
-        ),
-        Project(
-            name: "Web Dashboard",
-            path: "/Users/developer/web-dashboard",
-            type: .web,
-            description: "React-based admin dashboard with TypeScript",
-            isActive: false,
-            createdAt: Date().addingTimeInterval(-172800),
-            lastAccessedAt: Date().addingTimeInterval(-86400)
-        ),
-        Project(
-            name: "API Backend",
-            path: "/Users/developer/api-backend",
-            type: .backend,
-            description: "Node.js REST API with Express and MongoDB",
-            isActive: true,
-            createdAt: Date().addingTimeInterval(-259200),
-            lastAccessedAt: Date().addingTimeInterval(-7200)
-        )
-    ]
+    // Removed mock data - now using real data from backend via ProjectsViewModel
 }
 
 // MARK: - New Project View (Inline)

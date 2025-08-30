@@ -6,10 +6,10 @@ import Combine
 /// Network monitoring and quality assessment service (Tasks 451-500)
 /// Provides real-time network status, quality metrics, and error recovery
 @MainActor
-class NetworkMonitor: ObservableObject {
+public class NetworkMonitor: ObservableObject {
     // MARK: - Properties
     
-    static let shared = NetworkMonitor()
+    public static let shared = NetworkMonitor()
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "NetworkMonitor")
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "com.claudecode.network.monitor")
@@ -69,7 +69,7 @@ class NetworkMonitor: ObservableObject {
     
     // MARK: - Initialization
     
-    private init() {
+    public init() {
         setupMonitoring()
         setupMetricsCollection()
         setupAnalytics()

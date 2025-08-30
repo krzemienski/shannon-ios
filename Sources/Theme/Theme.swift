@@ -4,48 +4,80 @@ import SwiftUI
 /// Based on the Claude Code specification with HSL tokens
 public struct Theme {
     
-    // MARK: - Dark Cyberpunk Color Values
+    // MARK: - Dark Cyberpunk Color Values (EXACT SPEC FROM CUSTOM_INSTRUCTIONS.md)
     // These define the dark cyberpunk theme colors to be used in ThemeExtensions
     
     struct DarkCyberpunk {
-        /// Background: Deep dark blue-black - hsl(240, 10%, 5%)
+        // MARK: - Background Colors
+        /// Background: Very dark blue-gray - hsl(240, 10%, 5%)
         static let backgroundHSL = (h: 240.0, s: 10.0, l: 5.0)
         
-        /// Foreground: Almost white text - hsl(0, 0%, 95%)
-        static let foregroundHSL = (h: 0.0, s: 0.0, l: 95.0)
+        /// Surface: Slightly lighter - hsl(240, 10%, 8%)
+        static let surfaceHSL = (h: 240.0, s: 10.0, l: 8.0)
         
-        /// Card: Slightly lighter dark for cards - hsl(240, 10%, 8%)
+        /// Elevated: Elevated surfaces - hsl(240, 10%, 12%)
+        static let elevatedHSL = (h: 240.0, s: 10.0, l: 12.0)
+        
+        /// Card: Same as surface for consistency - hsl(240, 10%, 8%)
         static let cardHSL = (h: 240.0, s: 10.0, l: 8.0)
-        
-        /// Border: Subtle border - hsl(240, 10%, 20%)
-        static let borderHSL = (h: 240.0, s: 10.0, l: 20.0)
         
         /// Input: Form input background - hsl(240, 10%, 12%)
         static let inputHSL = (h: 240.0, s: 10.0, l: 12.0)
         
-        /// Primary: Green accent - hsl(142, 70%, 45%)
+        // MARK: - Text Colors
+        /// Text Primary: Almost white - hsl(0, 0%, 95%)
+        static let textPrimaryHSL = (h: 0.0, s: 0.0, l: 95.0)
+        
+        /// Text Secondary: Muted gray - hsl(0, 0%, 70%)
+        static let textSecondaryHSL = (h: 0.0, s: 0.0, l: 70.0)
+        
+        /// Text Tertiary: Dim gray - hsl(0, 0%, 50%)
+        static let textTertiaryHSL = (h: 0.0, s: 0.0, l: 50.0)
+        
+        /// Foreground (legacy compatibility): Almost white text - hsl(0, 0%, 95%)
+        static let foregroundHSL = (h: 0.0, s: 0.0, l: 95.0)
+        
+        /// Muted foreground - hsl(240, 10%, 65%)
+        static let mutedForegroundHSL = (h: 240.0, s: 10.0, l: 65.0)
+        
+        // MARK: - Accent Colors (Cyberpunk Theme)
+        /// Accent Primary: Vibrant purple - hsl(280, 100%, 60%)
+        static let accentPrimaryHSL = (h: 280.0, s: 100.0, l: 60.0)
+        
+        /// Accent Secondary: Cyan - hsl(180, 100%, 50%)
+        static let accentSecondaryHSL = (h: 180.0, s: 100.0, l: 50.0)
+        
+        /// Accent Tertiary: Magenta - hsl(330, 100%, 60%)
+        static let accentTertiaryHSL = (h: 330.0, s: 100.0, l: 60.0)
+        
+        // Legacy accent for compatibility - maps to accentPrimary
+        static let accentHSL = (h: 280.0, s: 100.0, l: 60.0)
+        
+        // MARK: - Semantic Colors
+        /// Success: Green - hsl(120, 100%, 40%)
+        static let successHSL = (h: 120.0, s: 100.0, l: 40.0)
+        
+        /// Warning: Yellow - hsl(45, 100%, 50%)
+        static let warningHSL = (h: 45.0, s: 100.0, l: 50.0)
+        
+        /// Error: Red - hsl(0, 100%, 50%)
+        static let errorHSL = (h: 0.0, s: 100.0, l: 50.0)
+        
+        /// Info: Blue - hsl(200, 100%, 50%)
+        static let infoHSL = (h: 200.0, s: 100.0, l: 50.0)
+        
+        // Legacy destructive for compatibility - maps to error
+        static let destructiveHSL = (h: 0.0, s: 100.0, l: 50.0)
+        
+        // MARK: - UI Elements
+        /// Border: Subtle border - hsl(240, 10%, 20%)
+        static let borderHSL = (h: 240.0, s: 10.0, l: 20.0)
+        
+        /// Primary (legacy green): Green accent - hsl(142, 70%, 45%)
         static let primaryHSL = (h: 142.0, s: 70.0, l: 45.0)
         
         /// Secondary: Muted blue - hsl(240, 10%, 20%)
         static let secondaryHSL = (h: 240.0, s: 10.0, l: 20.0)
-        
-        /// Accent: Purple highlight - hsl(280, 70%, 50%)
-        static let accentHSL = (h: 280.0, s: 70.0, l: 50.0)
-        
-        /// Destructive: Red for errors - hsl(0, 80%, 60%)
-        static let destructiveHSL = (h: 0.0, s: 80.0, l: 60.0)
-        
-        /// Success state - green - hsl(142, 70%, 45%)
-        static let successHSL = (h: 142.0, s: 70.0, l: 45.0)
-        
-        /// Warning state - amber - hsl(45, 80%, 60%)
-        static let warningHSL = (h: 45.0, s: 80.0, l: 60.0)
-        
-        /// Info state - cyan - hsl(201, 70%, 50%)
-        static let infoHSL = (h: 201.0, s: 70.0, l: 50.0)
-        
-        /// Muted foreground - hsl(240, 10%, 65%)
-        static let mutedForegroundHSL = (h: 240.0, s: 10.0, l: 65.0)
         
         /// Muted background - hsl(240, 10%, 15%)
         static let mutedHSL = (h: 240.0, s: 10.0, l: 15.0)

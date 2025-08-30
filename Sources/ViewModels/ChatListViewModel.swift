@@ -11,15 +11,15 @@ import OSLog
 
 /// ViewModel for managing chat sessions list
 @MainActor
-final class ChatListViewModel: ObservableObject {
+public final class ChatListViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var sessions: [ChatSession] = []
-    @Published var isLoading = false
-    @Published var error: Error?
-    @Published var showError = false
-    @Published var connectionStatus: ConnectionStatus = .disconnected
+    @Published var public sessions: [ChatSession] = []
+    @Published var public isLoading = false
+    @Published var public error: Error?
+    @Published var public showError = false
+    @Published var public connectionStatus: ConnectionStatus = .disconnected
     
     // MARK: - Private Properties
     
@@ -30,7 +30,7 @@ final class ChatListViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    init(apiClient: APIClient, appState: AppState) {
+    public     init(apiClient: APIClient, appState: AppState) {
         self.apiClient = apiClient
         self.appState = appState
         
@@ -66,19 +66,19 @@ final class ChatListViewModel: ObservableObject {
     // MARK: - Public Methods
     
     /// Load sessions from backend
-    func loadSessions() {
+    public func loadSessions() {
         Task {
             await fetchSessions()
         }
     }
     
     /// Refresh sessions
-    func refreshSessions() async {
+    public func refreshSessions() async {
         await fetchSessions()
     }
     
     /// Create a new chat session
-    func createSession(_ session: ChatSession) async throws -> SessionInfo {
+    public func createSession(_ session: ChatSession) async throws -> SessionInfo {
         isLoading = true
         error = nil
         
@@ -113,7 +113,7 @@ final class ChatListViewModel: ObservableObject {
     }
     
     /// Delete a chat session
-    func deleteSession(_ session: ChatSession) async throws {
+    public func deleteSession(_ session: ChatSession) async throws {
         isLoading = true
         error = nil
         
@@ -135,7 +135,7 @@ final class ChatListViewModel: ObservableObject {
     }
     
     /// Get session details
-    func getSessionDetails(_ sessionId: String) async throws -> SessionInfo {
+    public func getSessionDetails(_ sessionId: String) async throws -> SessionInfo {
         do {
             return try await apiClient.getSessionInfo(sessionId: sessionId)
         } catch {
@@ -261,7 +261,7 @@ final class ChatListViewModel: ObservableObject {
 
 extension ChatSession {
     // Constructor with id parameter for backend integration
-    init(id: String,
+    public     init(id: String,
          title: String,
          lastMessage: String,
          timestamp: Date,

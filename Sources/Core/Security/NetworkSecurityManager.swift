@@ -11,7 +11,7 @@ import Network
 import OSLog
 
 /// Manager for secure network communication with anti-tampering and request signing
-public final class NetworkSecurityManager: NSObject {
+public final class NetworkSecurityManager: NSObject, @unchecked Sendable {
     // MARK: - Properties
     
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "NetworkSecurity")
@@ -346,7 +346,8 @@ public final class NetworkSecurityManager: NSObject {
     // MARK: - Network Monitoring
     
     private func handleNetworkChange(_ path: NWPath) {
-        logger.info("Network status changed: \(path.status)")
+        let statusString = String(describing: path.status)
+        logger.info("Network status changed: \(statusString)")
         
         // Check for insecure network
         if path.status == .satisfied {

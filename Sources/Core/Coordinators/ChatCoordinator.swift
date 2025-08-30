@@ -10,7 +10,7 @@ import Combine
 
 /// Coordinator managing chat navigation and flow
 @MainActor
-final class ChatCoordinator: BaseCoordinator, ObservableObject {
+public final class ChatCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Navigation State
     

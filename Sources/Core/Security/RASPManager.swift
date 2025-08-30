@@ -12,11 +12,11 @@ import OSLog
 import MachO
 
 /// Runtime Application Self-Protection manager
-public final class RASPManager {
+public final class RASPManager: @unchecked Sendable {
     // MARK: - Properties
     
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "RASP")
-    private let jailbreakDetector = JailbreakDetector.shared
+    private var jailbreakDetector: JailbreakDetector?
     
     // Protection status
     private var isProtectionActive = false
@@ -286,13 +286,13 @@ public final class RASPManager {
         
         // Method 1: sysctl check
         var info = kinfo_proc()
-        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+        var mib: [Int32] = [Int32(CTL_KERN), Int32(KERN_PROC), Int32(KERN_PROC_PID), getpid()]
         var size = MemoryLayout<kinfo_proc>.size
         
         let result = sysctl(&mib, UInt32(mib.count), &info, &size, nil, 0)
         
         if result == 0 {
-            if (info.kp_proc.p_flag & P_TRACED) != 0 {
+            if (info.kp_proc.p_flag & Int32(P_TRACED)) != 0 {
                 return true
             }
         }
@@ -318,7 +318,7 @@ public final class RASPManager {
         ]
         
         for functionName in criticalFunctions {
-            if let function = dlsym(RTLD_DEFAULT, functionName) {
+            if let function = dlsym(UnsafeMutableRawPointer(bitPattern: -2), functionName) {
                 // Check first bytes for common hook patterns
                 let bytes = UnsafeRawPointer(function).assumingMemoryBound(to: UInt8.self)
                 
@@ -366,9 +366,10 @@ public final class RASPManager {
         
         // Check if our code section has been modified
         let header = _dyld_get_image_header(0)
-        var size: UInt64 = 0
+        var size: UInt = 0
         
-        if let textSection = getsectiondata(header, "__TEXT", "__text", &size) {
+        if let header = header,
+           let textSection = getsectiondata(header.withMemoryRebound(to: mach_header_64.self, capacity: 1) { $0 }, "__TEXT", "__text", &size) {
             // Calculate checksum of text section
             let data = Data(bytes: textSection, count: Int(size))
             let hash = SHA256.hash(data: data)
@@ -436,7 +437,7 @@ public final class RASPManager {
                 let attributes = try FileManager.default.attributesOfItem(atPath: path)
                 
                 // Check modification date
-                if let modDate = attributes[.modificationDate] as? Date {
+                if attributes[.modificationDate] is Date {
                     // Check if modified after installation
                     // This is simplified - would need to store original dates
                 }
@@ -505,40 +506,39 @@ public final class RASPManager {
     // MARK: - Response Methods
     
     private func handleThreat(_ threat: ThreatType) {
-        responseQueue.async {
-            self.logger.critical("🚨 RASP Threat Detected: \(threat)")
-            
-            // Add to detected threats
-            self.detectedThreats.insert(threat)
-            
-            // Take appropriate action based on threat type
-            switch threat {
-            case .debuggerAttached:
-                self.respondToDebugger()
-            case .jailbreakDetected:
-                self.respondToJailbreak()
-            case .codeInjection:
-                self.respondToInjection()
-            case .methodSwizzling:
-                self.respondToSwizzling()
-            case .hookDetected:
-                self.respondToHooks()
-            case .binaryTampering:
-                self.respondToTampering()
-            case .memoryTampering, .memoryPatching:
-                self.respondToMemoryAttack()
-            case .stackCorruption:
-                self.respondToStackAttack()
-            case .resourceTampering:
-                self.respondToResourceTampering()
-            }
-            
-            // Log security event
-            self.logSecurityEvent(threat)
-            
-            // Notify security monitoring
-            self.notifySecurityMonitoring(threat)
+        // TODO: Fix type inference issue with async closure
+        logger.critical("🚨 RASP Threat Detected: \(threat.rawValue)")
+        
+        // Add to detected threats
+        detectedThreats.insert(threat)
+        
+        // Take appropriate action based on threat type
+        switch threat {
+        case .debuggerAttached:
+            respondToDebugger()
+        case .jailbreakDetected:
+            respondToJailbreak()
+        case .codeInjection:
+            respondToInjection()
+        case .methodSwizzling:
+            respondToSwizzling()
+        case .hookDetected:
+            respondToHooks()
+        case .binaryTampering:
+            respondToTampering()
+        case .memoryTampering, .memoryPatching:
+            respondToMemoryAttack()
+        case .stackCorruption:
+            respondToStackAttack()
+        case .resourceTampering:
+            respondToResourceTampering()
         }
+        
+        // Log security event
+        logSecurityEvent(threat)
+        
+        // Notify security monitoring
+        notifySecurityMonitoring(threat)
     }
     
     private func respondToDebugger() {
@@ -670,16 +670,16 @@ public final class RASPManager {
     private func clearSensitiveData() {
         // Clear all sensitive data from memory
         Task {
-            await SecureTokenManager.shared.clearAllTokens()
-            await EnhancedKeychainManager.shared.clearCategory(.apiKey)
-            await EnhancedKeychainManager.shared.clearCategory(.authToken)
+            try? await SecureTokenManager.shared.clearAllTokens()
+            try? await EnhancedKeychainManager.shared.clearCategory(.apiKey)
+            try? await EnhancedKeychainManager.shared.clearCategory(.authToken)
         }
     }
     
     private func clearAllData() {
         // Clear all application data
         Task {
-            await DataEncryptionManager.shared.wipeAllEncryptedData()
+            try? await DataEncryptionManager.shared.wipeAllEncryptedData()
         }
     }
     
@@ -690,12 +690,13 @@ public final class RASPManager {
     
     private func showSecurityAlert(_ title: String, _ message: String) {
         DispatchQueue.main.async {
-            if let window = UIApplication.shared.windows.first,
-               let rootViewController = window.rootViewController {
-                let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                rootViewController.present(alert, animated: true)
-            }
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let window = windowScene.windows.first,
+                  let rootViewController = window.rootViewController else { return }
+            
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            rootViewController.present(alert, animated: true)
         }
     }
     
@@ -716,7 +717,7 @@ public final class RASPManager {
     
     private func reprotectMemory() {
         // Re-protect memory regions
-        for region in protectedMemoryRegions {
+        for _ in protectedMemoryRegions {
             // Re-apply memory protection
             // mprotect(region.address, region.size, region.protection)
         }
@@ -729,16 +730,18 @@ public final class RASPManager {
     
     private func logSecurityEvent(_ threat: ThreatType) {
         // Log security event for analysis
-        let event = SecurityEvent(
-            timestamp: Date(),
-            threat: threat,
-            deviceInfo: getDeviceInfo(),
-            stackTrace: Thread.callStackSymbols
-        )
+        Task { @MainActor in
+            let event = SecurityEvent(
+                timestamp: Date(),
+                threat: threat,
+                deviceInfo: await getDeviceInfo(),
+                stackTrace: Thread.callStackSymbols
+            )
         
-        // Store securely for later analysis
-        // In production, would send to security monitoring service
-        logger.critical("Security Event: \(event)")
+            // Store securely for later analysis
+            // In production, would send to security monitoring service
+            logger.critical("Security Event: \(String(describing: event))")
+        }
     }
     
     private func notifySecurityMonitoring(_ threat: ThreatType) {
@@ -746,10 +749,10 @@ public final class RASPManager {
         // In production, would send to backend security service
     }
     
-    private func getDeviceInfo() -> [String: Any] {
+    private func getDeviceInfo() async -> [String: String] {
         return [
-            "device": UIDevice.current.model,
-            "os": UIDevice.current.systemVersion,
+            "device": await MainActor.run { UIDevice.current.model },
+            "os": await MainActor.run { UIDevice.current.systemVersion },
             "app_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
         ]
     }
@@ -826,7 +829,7 @@ public final class RASPManager {
 
 // MARK: - Supporting Types
 
-public enum ThreatType: String, CaseIterable {
+public enum ThreatType: String, CaseIterable, Sendable {
     case debuggerAttached = "Debugger Attached"
     case jailbreakDetected = "Jailbreak Detected"
     case codeInjection = "Code Injection"
@@ -846,17 +849,31 @@ public struct ThreatStatus {
     public let lastCheck: Date
 }
 
-private struct MemoryRegion {
+private struct MemoryRegion: Hashable {
     let address: UnsafeRawPointer
     let size: Int
     let protection: Int32
     let originalHash: String
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(address)
+        hasher.combine(size)
+        hasher.combine(protection)
+        hasher.combine(originalHash)
+    }
+    
+    static func == (lhs: MemoryRegion, rhs: MemoryRegion) -> Bool {
+        lhs.address == rhs.address &&
+        lhs.size == rhs.size &&
+        lhs.protection == rhs.protection &&
+        lhs.originalHash == rhs.originalHash
+    }
 }
 
 private struct SecurityEvent {
     let timestamp: Date
     let threat: ThreatType
-    let deviceInfo: [String: Any]
+    let deviceInfo: [String: String]
     let stackTrace: [String]
 }
 

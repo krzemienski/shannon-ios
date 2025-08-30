@@ -1,3 +1,5 @@
 import ProjectDescription
 
-let tuist = Tuist(fullHandle: "krzemienski/ClaudeCodeSwift", project: .xcode())
+let tuist = Tuist(
+    fullHandle: "claude-code/shannon-ios"
+)

@@ -4,6 +4,10 @@ import SwiftUI
 /// Based on the Claude Code specification with HSL tokens
 public struct Theme {
     
+    // MARK: - Static properties for compatibility
+    public static let typography = Typography.self
+    public static let spacing = ThemeSpacing.self
+    
     // MARK: - Dark Cyberpunk Color Values (EXACT SPEC FROM CUSTOM_INSTRUCTIONS.md)
     // These define the dark cyberpunk theme colors to be used in ThemeExtensions
     
@@ -97,9 +101,6 @@ public struct Theme {
     /// Secondary color
     public static let secondary = Color(hsl: 240, 10, 20)
     
-    /// Muted foreground
-    public static let mutedForeground = Color(hsl: 240, 10, 65)
-    
     // MARK: - Chart Colors (5 variants as per Task 144)
     
     public static let chart1 = Color(hsl: 142, 70, 45)  // Green (matches primary)
@@ -112,24 +113,28 @@ public struct Theme {
     
     public struct Typography {
         // Display
-        public static let largeTitle = Font.system(size: 34, weight: .bold, design: .default)
-        public static let title = Font.system(size: 28, weight: .bold, design: .default)
-        public static let title2 = Font.system(size: 22, weight: .semibold, design: .default)
-        public static let title3 = Font.system(size: 20, weight: .semibold, design: .default)
+        public static let largeTitleFont: SwiftUI.Font = Font.system(size: 34, weight: .bold, design: .default)
+        public static let titleFont: SwiftUI.Font = Font.system(size: 28, weight: .bold, design: .default)
+        public static let title2Font: SwiftUI.Font = Font.system(size: 22, weight: .semibold, design: .default)
+        public static let title3Font: SwiftUI.Font = Font.system(size: 20, weight: .semibold, design: .default)
         
         // Body
-        public static let headline = Font.system(size: 17, weight: .semibold, design: .default)
-        public static let body = Font.system(size: 17, weight: .regular, design: .default)
-        public static let callout = Font.system(size: 16, weight: .regular, design: .default)
-        public static let subheadline = Font.system(size: 15, weight: .regular, design: .default)
-        public static let footnote = Font.system(size: 13, weight: .regular, design: .default)
-        public static let caption = Font.system(size: 12, weight: .regular, design: .default)
-        public static let caption2 = Font.system(size: 11, weight: .regular, design: .default)
+        public static let headlineFont: SwiftUI.Font = Font.system(size: 17, weight: .semibold, design: .default)
+        public static let bodyFont: SwiftUI.Font = Font.system(size: 17, weight: .regular, design: .default)
+        public static let calloutFont: SwiftUI.Font = Font.system(size: 16, weight: .regular, design: .default)
+        public static let subheadlineFont: SwiftUI.Font = Font.system(size: 15, weight: .regular, design: .default)
+        public static let footnoteFont: SwiftUI.Font = Font.system(size: 13, weight: .regular, design: .default)
+        public static let captionFont: SwiftUI.Font = Font.system(size: 12, weight: .regular, design: .default)
+        public static let caption2Font: SwiftUI.Font = Font.system(size: 11, weight: .regular, design: .default)
         
         // Code
-        public static let code = Font.system(size: 14, weight: .regular, design: .monospaced)
-        public static let codeSmall = Font.system(size: 12, weight: .regular, design: .monospaced)
-        public static let codeBlock = Font.system(size: 13, weight: .regular, design: .monospaced)
+        public static let codeFont: SwiftUI.Font = Font.system(size: 14, weight: .regular, design: .monospaced)
+        public static let codeSmallFont: SwiftUI.Font = Font.system(size: 12, weight: .regular, design: .monospaced)
+        public static let codeBlockFont: SwiftUI.Font = Font.system(size: 13, weight: .regular, design: .monospaced)
+        
+        // Note: All font properties now use the "Font" suffix to avoid ambiguity with SwiftUI's built-in font modifiers
+        // Use: Theme.Typography.headlineFont instead of Theme.Typography.headline
+        public static let smallFont: Font? = Font.system(size: 13, weight: .regular, design: .default)  // Small font for specific uses
     }
     
     // MARK: - Animation Constants (Task 156)
@@ -188,7 +193,7 @@ public struct Theme {
     // MARK: - Shadow Styles (Task 152)
     
     public struct Shadows {
-        public struct ShadowStyle {
+        public struct ShadowStyle: Sendable {
             let color: Color
             let radius: CGFloat
             let x: CGFloat
@@ -290,7 +295,7 @@ public extension View {
     /// Apply primary button style
     func primaryButton() -> some View {
         self
-            .font(Theme.Typography.headline)
+            .font(Theme.Typography.headlineFont)
             .foregroundColor(Theme.background)
             .padding(.horizontal, ThemeSpacing.xl)
             .padding(.vertical, ThemeSpacing.md)
@@ -301,7 +306,7 @@ public extension View {
     /// Apply secondary button style
     func secondaryButton() -> some View {
         self
-            .font(Theme.Typography.headline)
+            .font(Theme.Typography.headlineFont)
             .foregroundColor(Theme.foreground)
             .padding(.horizontal, ThemeSpacing.xl)
             .padding(.vertical, ThemeSpacing.md)

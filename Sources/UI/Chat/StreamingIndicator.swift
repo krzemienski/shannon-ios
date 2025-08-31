@@ -35,7 +35,7 @@ struct StreamingIndicator: View {
             }
             
             Text("Claude is thinking...")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
             
             Spacer()
@@ -46,7 +46,7 @@ struct StreamingIndicator: View {
                     Image(systemName: "cube")
                         .font(.system(size: 12))
                     Text("\(tokenCount)")
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                 }
                 .foregroundColor(Theme.mutedForeground)
                 .padding(.horizontal, ThemeSpacing.sm)
@@ -121,23 +121,23 @@ struct DetailedStreamingIndicator: View {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Streaming response...")
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.foreground)
                     
                     if isExpanded {
                         HStack(spacing: ThemeSpacing.md) {
                             // Speed
                             Label("\(charactersPerSecond) c/s", systemImage: "speedometer")
-                                .font(Theme.Typography.caption2)
+                                .font(Theme.Typography.caption2Font)
                             
                             // Tokens
                             Label("\(tokenCount) tokens", systemImage: "cube")
-                                .font(Theme.Typography.caption2)
+                                .font(Theme.Typography.caption2Font)
                             
                             // Time remaining
                             if let time = estimatedTimeRemaining {
                                 Label(formatTime(time), systemImage: "clock")
-                                    .font(Theme.Typography.caption2)
+                                    .font(Theme.Typography.caption2Font)
                             }
                         }
                         .foregroundColor(Theme.mutedForeground)

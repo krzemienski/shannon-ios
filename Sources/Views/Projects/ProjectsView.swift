@@ -45,11 +45,11 @@ struct ProjectsView: View {
                         .foregroundColor(Theme.muted)
                     
                     Text("No Projects")
-                        .font(Theme.Typography.title2)
+                        .font(Theme.Typography.title2Font)
                         .foregroundColor(Theme.foreground)
                     
                     Text("Create a project to organize your development work")
-                        .font(Theme.Typography.body)
+                        .font(Theme.Typography.bodyFont)
                         .foregroundColor(Theme.mutedForeground)
                         .multilineTextAlignment(.center)
                     
@@ -145,13 +145,13 @@ struct ProjectCard: View {
                 
                 // Project name
                 Text(project.name)
-                    .font(Theme.Typography.headline)
+                    .font(Theme.Typography.headlineFont)
                     .foregroundColor(Theme.foreground)
                     .lineLimit(1)
                 
                 // Description
                 Text(project.description)
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
                     .lineLimit(2)
                 
@@ -162,12 +162,12 @@ struct ProjectCard: View {
                     Label("\(project.sessionCount)", systemImage: "message")
                     Label("\(project.toolCount)", systemImage: "wrench")
                 }
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.muted)
                 
                 // Last updated
                 Text(project.formattedLastUpdated)
-                    .font(Theme.Typography.caption2)
+                    .font(Theme.Typography.caption2Font)
                     .foregroundColor(Theme.muted)
             }
             .padding(ThemeSpacing.md)
@@ -349,11 +349,11 @@ struct InlineNewProjectView: View {
                             
                             VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                                 Text("Description")
-                                    .font(Theme.Typography.caption)
+                                    .font(Theme.Typography.captionFont)
                                     .foregroundColor(Theme.mutedForeground)
                                 
                                 TextEditor(text: $description)
-                                    .font(Theme.Typography.body)
+                                    .font(Theme.Typography.bodyFont)
                                     .foregroundColor(Theme.foreground)
                                     .scrollContentBackground(.hidden)
                                     .background(Theme.input)
@@ -366,7 +366,7 @@ struct InlineNewProjectView: View {
                                     .overlay(alignment: .topLeading) {
                                         if description.isEmpty {
                                             Text("Brief description of your project...")
-                                                .font(Theme.Typography.body)
+                                                .font(Theme.Typography.bodyFont)
                                                 .foregroundColor(Theme.muted)
                                                 .padding(.horizontal, 4)
                                                 .padding(.vertical, 8)
@@ -378,7 +378,7 @@ struct InlineNewProjectView: View {
                             // Icon selector
                             VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
                                 Text("Icon")
-                                    .font(Theme.Typography.caption)
+                                    .font(Theme.Typography.captionFont)
                                     .foregroundColor(Theme.mutedForeground)
                                 
                                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: ThemeSpacing.sm) {
@@ -409,7 +409,7 @@ struct InlineNewProjectView: View {
                         VStack(spacing: ThemeSpacing.md) {
                             Toggle(isOn: $enableSSH) {
                                 Label("Enable SSH Monitoring", systemImage: "terminal")
-                                    .font(Theme.Typography.headline)
+                                    .font(Theme.Typography.headlineFont)
                                     .foregroundColor(Theme.foreground)
                             }
                             .tint(Theme.primary)
@@ -440,7 +440,7 @@ struct InlineNewProjectView: View {
                                 // Auth method picker
                                 VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                                     Text("Authentication")
-                                        .font(Theme.Typography.caption)
+                                        .font(Theme.Typography.captionFont)
                                         .foregroundColor(Theme.mutedForeground)
                                     
                                     Picker("Authentication", selection: $sshAuthMethod) {
@@ -523,11 +523,11 @@ struct ProjectDetailView: View {
                             
                             VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                                 Text(project.name)
-                                    .font(Theme.Typography.title2)
+                                    .font(Theme.Typography.title2Font)
                                     .foregroundColor(Theme.foreground)
                                 
                                 Text(project.description)
-                                    .font(Theme.Typography.subheadline)
+                                    .font(Theme.Typography.subheadlineFont)
                                     .foregroundColor(Theme.mutedForeground)
                                 
                                 HStack {
@@ -535,7 +535,7 @@ struct ProjectDetailView: View {
                                         .fill(project.isActive ? Theme.success : Theme.muted)
                                         .frame(width: 8, height: 8)
                                     Text(project.isActive ? "Active" : "Inactive")
-                                        .font(Theme.Typography.caption)
+                                        .font(Theme.Typography.captionFont)
                                         .foregroundColor(project.isActive ? Theme.success : Theme.muted)
                                 }
                             }
@@ -567,7 +567,7 @@ struct ProjectDetailView: View {
                         if let sshConfig = project.sshConfig {
                             VStack(alignment: .leading, spacing: ThemeSpacing.md) {
                                 Text("SSH Configuration")
-                                    .font(Theme.Typography.headline)
+                                    .font(Theme.Typography.headlineFont)
                                     .foregroundColor(Theme.foreground)
                                 
                                 VStack(spacing: ThemeSpacing.sm) {
@@ -620,7 +620,7 @@ struct ProjectDetailView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                             }
-                            .font(Theme.Typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(.white)
                             .padding(.horizontal, ThemeSpacing.xl)
                             .padding(.vertical, ThemeSpacing.md)
@@ -662,10 +662,10 @@ struct StatCard: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)
-                    .font(Theme.Typography.title2)
+                    .font(Theme.Typography.title2Font)
                     .foregroundColor(Theme.foreground)
                 Text(title)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -684,11 +684,11 @@ struct InfoRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(Theme.Typography.footnote)
+                .font(Theme.Typography.footnoteFont)
                 .foregroundColor(Theme.mutedForeground)
             Spacer()
             Text(value)
-                .font(Theme.Typography.footnote)
+                .font(Theme.Typography.footnoteFont)
                 .foregroundColor(Theme.foreground)
         }
     }

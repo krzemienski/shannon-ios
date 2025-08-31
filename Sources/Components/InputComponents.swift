@@ -50,7 +50,7 @@ struct EnhancedTextField: View {
             // Title
             if let title = title {
                 Text(title)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -73,7 +73,7 @@ struct EnhancedTextField: View {
                             .keyboardType(keyboardType)
                     }
                 }
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.foreground)
                 .tint(Theme.primary)
                 .onSubmit {
@@ -109,7 +109,7 @@ struct EnhancedTextField: View {
             // Validation message
             if case .invalid(let message) = validationResult {
                 Text(message)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.destructive)
             }
         }
@@ -177,7 +177,7 @@ struct SearchField: View {
                 .foregroundColor(isFocused ? Theme.primary : Theme.mutedForeground)
             
             TextField(placeholder, text: $text)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.foreground)
                 .tint(Theme.primary)
                 .onSubmit {
@@ -227,7 +227,7 @@ struct CustomTextEditor: View {
         placeholder: String = "",
         minHeight: CGFloat = 100,
         maxHeight: CGFloat? = nil,
-        font: Font = Theme.Typography.body
+        font: Font = Theme.Typography.bodyFont
     ) {
         self.title = title
         self._text = text
@@ -242,7 +242,7 @@ struct CustomTextEditor: View {
             // Title
             if let title = title {
                 Text(title)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -302,12 +302,12 @@ struct CustomToggle: View {
             // Text
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.mutedForeground)
                 }
             }
@@ -339,7 +339,7 @@ struct CustomSegmentedControl<T: Hashable>: View {
             // Title
             if let title = title {
                 Text(title)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -352,7 +352,7 @@ struct CustomSegmentedControl<T: Hashable>: View {
                         }
                     } label: {
                         Text(option.1)
-                            .font(Theme.Typography.callout)
+                            .font(Theme.Typography.calloutFont)
                             .foregroundColor(selection == option.0 ? Theme.background : Theme.foreground)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, ThemeSpacing.sm)
@@ -406,14 +406,14 @@ struct CustomSlider: View {
             // Header
             HStack {
                 Text(title)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                 
                 Spacer()
                 
                 if showValue {
                     Text("\(Int(value))")
-                        .font(Theme.Typography.callout)
+                        .font(Theme.Typography.calloutFont)
                         .foregroundColor(Theme.primary)
                         .padding(.horizontal, ThemeSpacing.sm)
                         .padding(.vertical, 2)

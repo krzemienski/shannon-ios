@@ -47,7 +47,7 @@ struct ChatSettingsView: View {
                         Spacer()
                         
                         Text(String(format: "%.1f", settingsStore.temperature))
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.mutedForeground)
                             .monospacedDigit()
                     }
@@ -60,11 +60,11 @@ struct ChatSettingsView: View {
                     
                     HStack {
                         Text("Focused")
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.muted)
                         Spacer()
                         Text("Creative")
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.muted)
                     }
                 }
@@ -83,7 +83,7 @@ struct ChatSettingsView: View {
                         Spacer()
                         
                         Text("\(settingsStore.maxTokens)")
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.mutedForeground)
                             .monospacedDigit()
                     }
@@ -99,17 +99,17 @@ struct ChatSettingsView: View {
                     
                     HStack {
                         Text("256")
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.muted)
                         Spacer()
                         Text("8192")
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.muted)
                     }
                 }
             } header: {
                 Text("MODEL CONFIGURATION")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -145,7 +145,7 @@ struct ChatSettingsView: View {
                 )
             } header: {
                 Text("BEHAVIOR")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -163,7 +163,7 @@ struct ChatSettingsView: View {
                     }
                     
                     TextEditor(text: $settingsStore.systemPrompt)
-                        .font(Theme.Typography.footnote)
+                        .font(Theme.Typography.footnoteFont)
                         .foregroundColor(Theme.foreground)
                         .scrollContentBackground(.hidden)
                         .padding(8)
@@ -194,11 +194,11 @@ struct ChatSettingsView: View {
                 }
             } header: {
                 Text("SYSTEM PROMPTS")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             } footer: {
                 Text("System prompts help guide the AI's behavior and responses")
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.muted)
             }
             .listRowBackground(Theme.card)
@@ -232,7 +232,7 @@ struct ChatSettingsView: View {
                 }
             } header: {
                 Text("DATA MANAGEMENT")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -328,13 +328,13 @@ struct PromptTemplatesSheet: View {
                     VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                         HStack {
                             Text(template.name)
-                                .font(Theme.Typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                             
                             Spacer()
                             
                             Text(template.category)
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.primary)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
@@ -343,11 +343,11 @@ struct PromptTemplatesSheet: View {
                         }
                         
                         Text(template.description)
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                             .foregroundColor(Theme.mutedForeground)
                         
                         Text(template.prompt)
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.muted)
                             .lineLimit(2)
                             .padding(.top, 4)

@@ -174,7 +174,7 @@ extension CodeEditorView {
                         Image(systemName: iconForMode(voiceMode))
                             .font(.system(size: 16))
                         Text(voiceMode.displayName)
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                     }
                     .padding(.horizontal, ThemeSpacing.sm)
                     .padding(.vertical, ThemeSpacing.xs)
@@ -191,11 +191,11 @@ extension CodeEditorView {
                         
                         if isVoiceInputActive {
                             Text("Listening...")
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(.red)
                         } else {
                             Text("Start Voice")
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.primary)
                         }
                     }
@@ -338,7 +338,7 @@ struct CodeVoiceInputView: View {
             Spacer()
             
             Text("Voice Input - \(mode.displayName)")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             Spacer()
@@ -356,11 +356,11 @@ struct CodeVoiceInputView: View {
     private var dictationView: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
             Text("Code Dictation")
-                .font(Theme.Typography.title3)
+                .font(Theme.Typography.title3Font)
                 .foregroundColor(Theme.foreground)
             
             Text("Speak your code naturally. Say 'new line' for line breaks, 'tab' for indentation.")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
             
             // Transcribed code
@@ -384,7 +384,7 @@ struct CodeVoiceInputView: View {
     private var commandsView: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
             Text("Voice Commands")
-                .font(Theme.Typography.title3)
+                .font(Theme.Typography.title3Font)
                 .foregroundColor(Theme.foreground)
             
             // Available commands
@@ -412,7 +412,7 @@ struct CodeVoiceInputView: View {
                     Image(systemName: "chevron.right.circle")
                         .foregroundColor(Theme.primary)
                     Text(transcribedCode)
-                        .font(Theme.Typography.body)
+                        .font(Theme.Typography.bodyFont)
                         .foregroundColor(Theme.foreground)
                 }
                 .padding()
@@ -425,17 +425,17 @@ struct CodeVoiceInputView: View {
     private var codeCompletionView: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
             Text("Code Completion")
-                .font(Theme.Typography.title3)
+                .font(Theme.Typography.title3Font)
                 .foregroundColor(Theme.foreground)
             
             Text("Describe what you want to code, and it will be generated for you.")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
             
             // Description input
             ScrollView {
                 Text(transcribedCode.isEmpty ? "Describe your code..." : transcribedCode)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
@@ -447,7 +447,7 @@ struct CodeVoiceInputView: View {
             // Generated code preview
             if !formattedCode.isEmpty {
                 Text("Generated Code:")
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
                 
                 ScrollView {
@@ -473,7 +473,7 @@ struct CodeVoiceInputView: View {
             // Clear button
             Button(action: clear) {
                 Label("Clear", systemImage: "trash")
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -482,14 +482,14 @@ struct CodeVoiceInputView: View {
             // Cancel button
             Button(action: cancel) {
                 Text("Cancel")
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
             // Insert button
             Button(action: insertCode) {
                 Text("Insert")
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(.white)
                     .padding(.horizontal, ThemeSpacing.lg)
                     .padding(.vertical, ThemeSpacing.sm)
@@ -596,10 +596,10 @@ struct CommandRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(command)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.foreground)
             Text(example)
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
         }
     }

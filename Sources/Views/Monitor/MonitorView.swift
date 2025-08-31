@@ -145,17 +145,17 @@ struct QuickStatCard: View {
                     Image(systemName: isPositive ? "arrow.up.right" : "arrow.down.right")
                         .font(.system(size: 10))
                     Text(change)
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                 }
                 .foregroundColor(isPositive ? Theme.success : Theme.destructive)
             }
             
             Text(value)
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             Text(title)
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
         }
         .padding(ThemeSpacing.md)
@@ -181,7 +181,7 @@ struct MetricsChartView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
             Text(metric.title)
-                .font(Theme.Typography.headline)
+                .font(Theme.Typography.headlineFont)
                 .foregroundColor(Theme.foreground)
                 .padding(.horizontal)
             
@@ -317,7 +317,7 @@ struct SSHMonitorSection: View {
             // Header
             HStack {
                 Label("SSH Monitor", systemImage: "terminal")
-                    .font(Theme.Typography.headline)
+                    .font(Theme.Typography.headlineFont)
                     .foregroundColor(Theme.foreground)
                 
                 Spacer()
@@ -328,7 +328,7 @@ struct SSHMonitorSection: View {
                         .fill(isConnected ? Theme.success : Theme.muted)
                         .frame(width: 8, height: 8)
                     Text(isConnected ? "Connected" : "Disconnected")
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(isConnected ? Theme.success : Theme.muted)
                 }
                 
@@ -340,7 +340,7 @@ struct SSHMonitorSection: View {
                     }
                 } label: {
                     Text(isConnected ? "Disconnect" : "Connect")
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                 }
                 .secondaryButton()
             }
@@ -363,7 +363,7 @@ struct SSHMonitorSection: View {
                 )
             } else {
                 Text("Connect to SSH to view live logs")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, ThemeSpacing.xl)
@@ -394,18 +394,18 @@ struct SSHLogRow: View {
     var body: some View {
         HStack(spacing: ThemeSpacing.sm) {
             Text(entry.formattedTimestamp)
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .foregroundColor(Theme.muted)
                 .frame(width: 60, alignment: .leading)
             
             Text(entry.level.rawValue.uppercased())
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .fontWeight(.medium)
                 .foregroundColor(entry.level.color)
                 .frame(width: 50)
             
             Text(entry.message)
-                .font(Theme.Typography.codeBlock)
+                .font(Theme.Typography.codeBlockFont)
                 .foregroundColor(Theme.foreground)
             
             Spacer()
@@ -424,7 +424,7 @@ struct RecentActivityView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.md) {
             Text("Recent Activity")
-                .font(Theme.Typography.headline)
+                .font(Theme.Typography.headlineFont)
                 .foregroundColor(Theme.foreground)
                 .padding(.horizontal)
             
@@ -495,18 +495,18 @@ struct ActivityRow: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(activity.title)
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.foreground)
                 
                 Text(activity.description)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
             Spacer()
             
             Text(activity.formattedTime)
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .foregroundColor(Theme.muted)
         }
         .padding(ThemeSpacing.sm)
@@ -525,7 +525,7 @@ struct MetricChip: View {
     var body: some View {
         Button(action: onTap) {
             Text(metric.rawValue)
-                .font(Theme.Typography.footnote)
+                .font(Theme.Typography.footnoteFont)
                 .foregroundColor(isSelected ? Theme.foreground : Theme.mutedForeground)
                 .padding(.horizontal, ThemeSpacing.md)
                 .padding(.vertical, ThemeSpacing.xs)

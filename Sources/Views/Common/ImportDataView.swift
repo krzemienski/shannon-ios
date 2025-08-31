@@ -19,11 +19,11 @@ struct ImportDataView: View {
                     .foregroundColor(Theme.primary)
                 
                 Text("Import Data")
-                    .font(Theme.Typography.title)
+                    .font(Theme.Typography.titleFont)
                     .foregroundColor(Theme.foreground)
                 
                 Text("Import functionality coming soon")
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                 
                 Spacer()

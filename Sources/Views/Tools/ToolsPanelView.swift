@@ -178,10 +178,10 @@ struct PanelCategoryChip: View {
         Button(action: action) {
             HStack(spacing: ThemeSpacing.xs) {
                 Text(title)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                 
                 Text("\(count)")
-                    .font(Theme.Typography.caption2)
+                    .font(Theme.Typography.caption2Font)
                     .padding(.horizontal, 4)
                     .padding(.vertical, 1)
                     .background(
@@ -231,13 +231,13 @@ struct PanelToolCard: View {
                 
                 // Title
                 Text(tool.name)
-                    .font(Theme.Typography.headline)
+                    .font(Theme.Typography.headlineFont)
                     .foregroundColor(Theme.foreground)
                     .lineLimit(1)
                 
                 // Description
                 Text(tool.description)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
@@ -247,7 +247,7 @@ struct PanelToolCard: View {
                 // Footer
                 HStack {
                     Text(tool.category)
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                         .foregroundColor(Theme.primary)
                         .padding(.horizontal, ThemeSpacing.xs)
                         .padding(.vertical, 2)
@@ -258,7 +258,7 @@ struct PanelToolCard: View {
                     
                     if let lastUsed = tool.lastUsed {
                         Text(formattedTime(lastUsed))
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.mutedForeground)
                     }
                 }
@@ -308,12 +308,12 @@ struct ToolDetailView: View {
                             
                             VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                                 Text(tool.name)
-                                    .font(Theme.Typography.title2)
+                                    .font(Theme.Typography.title2Font)
                                     .foregroundColor(Theme.foreground)
                                 
                                 HStack(spacing: ThemeSpacing.sm) {
                                     Text(tool.category)
-                                        .font(Theme.Typography.caption)
+                                        .font(Theme.Typography.captionFont)
                                         .foregroundColor(Theme.primary)
                                         .padding(.horizontal, ThemeSpacing.sm)
                                         .padding(.vertical, 2)
@@ -322,7 +322,7 @@ struct ToolDetailView: View {
                                     
                                     if let lastUsed = tool.lastUsed {
                                         Text("Used \(formattedTime(lastUsed))")
-                                            .font(Theme.Typography.caption)
+                                            .font(Theme.Typography.captionFont)
                                             .foregroundColor(Theme.mutedForeground)
                                     }
                                 }
@@ -334,18 +334,18 @@ struct ToolDetailView: View {
                         // Description
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text("Description")
-                                .font(Theme.Typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                             
                             Text(tool.description)
-                                .font(Theme.Typography.body)
+                                .font(Theme.Typography.bodyFont)
                                 .foregroundColor(Theme.mutedForeground)
                         }
                         
                         // Usage
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text("Usage")
-                                .font(Theme.Typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                             
                             CodeBlock(text: tool.usage)
@@ -354,7 +354,7 @@ struct ToolDetailView: View {
                         // Examples
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text("Examples")
-                                .font(Theme.Typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                             
                             ForEach(tool.examples, id: \.self) { example in
@@ -378,7 +378,7 @@ struct ToolDetailView: View {
                         if tool.lastUsed != nil {
                             VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
                                 Text("Statistics")
-                                    .font(Theme.Typography.headline)
+                                    .font(Theme.Typography.headlineFont)
                                     .foregroundColor(Theme.foreground)
                                 
                                 HStack(spacing: ThemeSpacing.md) {
@@ -448,7 +448,7 @@ struct CodeBlock: View {
     
     var body: some View {
         Text(text)
-            .font(Theme.Typography.code)
+            .font(Theme.Typography.codeFont)
             .foregroundColor(Theme.foreground)
             .padding(ThemeSpacing.sm)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -471,11 +471,11 @@ struct ToolStatCard: View {
                 .foregroundColor(Theme.primary)
             
             Text(value)
-                .font(Theme.Typography.headline)
+                .font(Theme.Typography.headlineFont)
                 .foregroundColor(Theme.foreground)
             
             Text(title)
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .foregroundColor(Theme.mutedForeground)
         }
         .frame(maxWidth: .infinity)

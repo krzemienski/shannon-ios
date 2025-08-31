@@ -106,7 +106,7 @@ struct ConsoleHeader: View {
                     .frame(width: 8, height: 8)
                 
                 Text(status.rawValue)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -114,7 +114,7 @@ struct ConsoleHeader: View {
             
             // Model selector
             Text(model)
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.primary)
                 .padding(.horizontal, ThemeSpacing.sm)
                 .padding(.vertical, 4)
@@ -171,7 +171,7 @@ struct ConsoleMessageView: View {
                     // Text content
                     if !message.content.isEmpty {
                         Text(message.content)
-                            .font(Theme.Typography.body)
+                            .font(Theme.Typography.bodyFont)
                             .foregroundColor(Theme.foreground)
                             .textSelection(.enabled)
                     }
@@ -190,7 +190,7 @@ struct ConsoleMessageView: View {
                     
                     // Timestamp
                     Text(message.formattedTime)
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                         .foregroundColor(Theme.mutedForeground)
                 }
                 
@@ -254,7 +254,7 @@ struct ToolExecutionCard: View {
                 
                 // Name
                 Text(tool.name)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.foreground)
                 
                 // Status
@@ -280,7 +280,7 @@ struct ToolExecutionCard: View {
                 // Duration
                 if let duration = tool.duration {
                     Text(formatDuration(duration))
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                         .foregroundColor(Theme.mutedForeground)
                 }
                 
@@ -331,7 +331,7 @@ struct ActiveToolsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
             Text("Executing tools...")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
             
             ForEach(tools) { tool in
@@ -341,7 +341,7 @@ struct ActiveToolsView: View {
                         .scaleEffect(0.7)
                     
                     Text(tool.name)
-                        .font(Theme.Typography.body)
+                        .font(Theme.Typography.bodyFont)
                         .foregroundColor(Theme.foreground)
                     
                     Spacer()
@@ -380,7 +380,7 @@ struct ThinkingView: View {
             }
             
             Text("Claude is thinking...")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.mutedForeground)
             
             Spacer()
@@ -422,13 +422,13 @@ struct ConsoleInputArea: View {
                 ZStack(alignment: .leading) {
                     if text.isEmpty {
                         Text("Type a message...")
-                            .font(Theme.Typography.body)
+                            .font(Theme.Typography.bodyFont)
                             .foregroundColor(Theme.mutedForeground)
                             .padding(.horizontal, 4)
                     }
                     
                     TextEditor(text: $text)
-                        .font(Theme.Typography.body)
+                        .font(Theme.Typography.bodyFont)
                         .foregroundColor(Theme.foreground)
                         .scrollContentBackground(.hidden)
                         .frame(minHeight: 36, maxHeight: 120)

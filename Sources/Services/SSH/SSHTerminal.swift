@@ -67,7 +67,4 @@ public class SSHTerminal: ObservableObject {
     }
 }
 
-struct TerminalSize: Equatable {
-    let columns: Int
-    let rows: Int
-}
+// TerminalSize moved to TerminalTypes.swift to avoid duplication

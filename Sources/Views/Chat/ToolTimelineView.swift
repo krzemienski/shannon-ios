@@ -120,7 +120,7 @@ struct ToolTimelineRow: View {
                 // Tool name and status
                 HStack {
                     Text(tool.name)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                     
                     Spacer()
@@ -128,7 +128,7 @@ struct ToolTimelineRow: View {
                     // Duration badge
                     if tool.duration > 0 {
                         Text(formatDuration(tool.duration))
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.mutedForeground)
                             .padding(.horizontal, ThemeSpacing.xs)
                             .padding(.vertical, 2)
@@ -139,19 +139,19 @@ struct ToolTimelineRow: View {
                 
                 // Description
                 Text(tool.description)
-                    .font(Theme.Typography.subheadline)
+                    .font(Theme.Typography.subheadlineFont)
                     .foregroundColor(Theme.mutedForeground)
                     .fixedSize(horizontal: false, vertical: true)
                 
                 // Timestamp
                 Text(formatTimestamp(tool.timestamp))
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.muted)
                 
                 // Tool details card
                 if tool.status == .error {
                     Text("Error: Failed to execute tool")
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.destructive)
                         .padding(ThemeSpacing.sm)
                         .frame(maxWidth: .infinity, alignment: .leading)

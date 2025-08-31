@@ -47,7 +47,7 @@ struct LoadingView: View {
             
             if let message = message {
                 Text(message)
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
         }

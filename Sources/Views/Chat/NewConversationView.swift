@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NewConversationView: View {
-    @ObservedObject var coordinator: ChatCoordinator
+    var coordinator: ChatCoordinator?
     @Environment(\.dismiss) private var dismiss
     @State private var conversationTitle = ""
     

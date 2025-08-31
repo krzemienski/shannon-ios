@@ -381,9 +381,9 @@ extension View {
             content: {
                 VStack {
                     Text("Interactive Card")
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                     Text("Tap, long press, or swipe")
-                        .font(Theme.Typography.footnote)
+                        .font(Theme.Typography.footnoteFont)
                         .foregroundColor(Theme.mutedForeground)
                 }
                 .padding()

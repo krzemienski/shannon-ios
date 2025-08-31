@@ -14,7 +14,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.callout)
+            .font(Theme.Typography.calloutFont)
             .fontWeight(.medium)
             .foregroundColor(Theme.foreground)
             .padding(.horizontal, ThemeSpacing.lg)
@@ -36,7 +36,7 @@ struct SecondaryButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.callout)
+            .font(Theme.Typography.calloutFont)
             .fontWeight(.medium)
             .foregroundColor(isEnabled ? Theme.foreground : Theme.mutedForeground)
             .padding(.horizontal, ThemeSpacing.lg)
@@ -62,7 +62,7 @@ struct DestructiveButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.callout)
+            .font(Theme.Typography.calloutFont)
             .fontWeight(.medium)
             .foregroundColor(Theme.foreground)
             .padding(.horizontal, ThemeSpacing.lg)
@@ -84,7 +84,7 @@ struct GhostButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.callout)
+            .font(Theme.Typography.calloutFont)
             .fontWeight(.medium)
             .foregroundColor(isEnabled ? Theme.primary : Theme.mutedForeground)
             .padding(.horizontal, ThemeSpacing.md)

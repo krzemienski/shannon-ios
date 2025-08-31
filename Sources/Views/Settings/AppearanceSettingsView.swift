@@ -45,7 +45,7 @@ struct AppearanceSettingsView: View {
                 }
             } header: {
                 Text("THEME")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -102,7 +102,7 @@ struct AppearanceSettingsView: View {
                 )
             } header: {
                 Text("TYPOGRAPHY")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -154,7 +154,7 @@ struct AppearanceSettingsView: View {
                 )
             } header: {
                 Text("COLORS")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -190,7 +190,7 @@ struct AppearanceSettingsView: View {
                             Spacer()
                             
                             Text(String(format: "%.1fx", settingsStore.animationSpeed))
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.mutedForeground)
                         }
                         
@@ -203,7 +203,7 @@ struct AppearanceSettingsView: View {
                 }
             } header: {
                 Text("ANIMATIONS")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -232,7 +232,7 @@ struct AppearanceSettingsView: View {
                 )
             } header: {
                 Text("ACCESSIBILITY")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -312,7 +312,7 @@ struct ThemeOptionCard: View {
                 }
                 
                 Text(theme.displayName)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(isSelected ? Theme.primary : Theme.mutedForeground)
             }
             .padding(8)
@@ -363,7 +363,7 @@ struct ColorSwatch: View {
                     )
                 
                 Text(label)
-                    .font(Theme.Typography.caption2)
+                    .font(Theme.Typography.caption2Font)
                     .foregroundColor(Theme.muted)
             }
         }

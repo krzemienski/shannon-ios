@@ -35,12 +35,12 @@ struct ErrorView: View {
             
             // Error title
             Text("Something went wrong")
-                .font(Theme.Typography.title3)
+                .font(Theme.Typography.title3Font)
                 .foregroundColor(Theme.foreground)
             
             // Error message
             Text(errorMessage)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -48,7 +48,7 @@ struct ErrorView: View {
             // Recovery suggestion if available
             if let suggestion = recoverySuggestion {
                 Text(suggestion)
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, ThemeSpacing.lg)
@@ -61,7 +61,7 @@ struct ErrorView: View {
                         Image(systemName: "arrow.clockwise")
                         Text("Try Again")
                     }
-                    .font(Theme.Typography.callout)
+                    .font(Theme.Typography.calloutFont)
                     .fontWeight(.medium)
                 }
                 .primaryButtonStyle()
@@ -89,12 +89,12 @@ struct StandardEmptyStateView: View {
                 .symbolRenderingMode(.hierarchical)
             
             Text(title)
-                .font(Theme.Typography.title3)
+                .font(Theme.Typography.title3Font)
                 .foregroundColor(Theme.foreground)
             
             if let message = message {
                 Text(message)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -103,7 +103,7 @@ struct StandardEmptyStateView: View {
             if let action = action {
                 Button(action: action.handler) {
                     Text(action.title)
-                        .font(Theme.Typography.callout)
+                        .font(Theme.Typography.calloutFont)
                         .fontWeight(.medium)
                 }
                 .primaryButtonStyle()

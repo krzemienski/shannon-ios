@@ -87,7 +87,7 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("ADVANCED")
-                        .font(Theme.Typography.footnote)
+                        .font(Theme.Typography.footnoteFont)
                         .foregroundColor(Theme.mutedForeground)
                 }
                 .listRowBackground(Theme.card)
@@ -107,7 +107,7 @@ struct SettingsView: View {
                         }
                     } header: {
                         Text("DEVELOPER")
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                             .foregroundColor(Theme.mutedForeground)
                     }
                     .listRowBackground(Theme.card)
@@ -137,7 +137,7 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("INFORMATION")
-                        .font(Theme.Typography.footnote)
+                        .font(Theme.Typography.footnoteFont)
                         .foregroundColor(Theme.mutedForeground)
                 }
                 .listRowBackground(Theme.card)
@@ -171,11 +171,11 @@ struct SettingsRowView: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                 
                 Text(subtitle)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -200,32 +200,14 @@ struct SSHSettingsView: View {
     }
 }
 
-struct NotificationSettingsView: View {
-    var body: some View {
-        Text("Notification Settings")
-            .navigationTitle("Notifications")
-    }
-}
-
-struct PrivacySettingsView: View {
-    var body: some View {
-        Text("Privacy Settings")
-            .navigationTitle("Privacy & Security")
-    }
-}
-
 struct DeveloperSettingsView: View {
     var body: some View {
         BackendTestView()
     }
 }
 
-struct AboutView: View {
-    var body: some View {
-        Text("About ClaudeCode")
-            .navigationTitle("About")
-    }
-}
+// Note: NotificationSettingsView, PrivacySettingsView, and AboutView
+// are implemented in their own separate files
 
 #Preview {
     SettingsView()

@@ -286,7 +286,7 @@ struct CircularProgressView: View {
             
             // Progress text
             Text("\(Int(progress * 100))%")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(Theme.foreground)
                 .monospacedDigit()
         }
@@ -337,11 +337,11 @@ struct SimpleEmptyStateView: View {
                 .foregroundColor(Theme.muted)
             
             Text("No Data")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             Text("There's nothing to show here yet")
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
         }
@@ -362,11 +362,11 @@ struct ErrorStateView: View {
                 .foregroundColor(Theme.destructive)
             
             Text("Error")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             Text(error)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
             
@@ -405,7 +405,7 @@ struct LoadingOverlay: View {
                 
                 if let message = message {
                     Text(message)
-                        .font(Theme.Typography.body)
+                        .font(Theme.Typography.bodyFont)
                         .foregroundColor(Theme.foreground)
                 }
             }
@@ -424,7 +424,7 @@ struct LoadingOverlay: View {
         VStack(spacing: 20) {
             // Skeleton examples
             Text("Skeleton Views")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             ChatMessageSkeleton(isUser: false)
@@ -436,7 +436,7 @@ struct LoadingOverlay: View {
             
             // Progress indicators
             Text("Progress Indicators")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
                 .padding(.top)
             
@@ -450,7 +450,7 @@ struct LoadingOverlay: View {
             
             // Loading states
             Text("Loading States")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
                 .padding(.top)
             

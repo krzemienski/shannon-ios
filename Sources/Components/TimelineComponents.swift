@@ -77,20 +77,20 @@ struct VerticalTimeline<Item: TimelineItem>: View {
                             // Header
                             HStack {
                                 Text(item.title)
-                                    .font(Theme.Typography.headline)
+                                    .font(Theme.Typography.headlineFont)
                                     .foregroundColor(Theme.foreground)
                                 
                                 Spacer()
                                 
                                 Text(item.formattedTime)
-                                    .font(Theme.Typography.caption)
+                                    .font(Theme.Typography.captionFont)
                                     .foregroundColor(Theme.mutedForeground)
                             }
                             
                             // Description
                             if let description = item.description {
                                 Text(description)
-                                    .font(Theme.Typography.body)
+                                    .font(Theme.Typography.bodyFont)
                                     .foregroundColor(Theme.mutedForeground)
                             }
                             
@@ -138,7 +138,7 @@ struct HorizontalTimeline<Item: TimelineItem>: View {
                     VStack(spacing: ThemeSpacing.sm) {
                         // Time label
                         Text(item.formattedTime)
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.mutedForeground)
                         
                         // Timeline line and node
@@ -168,13 +168,13 @@ struct HorizontalTimeline<Item: TimelineItem>: View {
                         // Content card
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text(item.title)
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.foreground)
                                 .lineLimit(2)
                             
                             if let description = item.description {
                                 Text(description)
-                                    .font(Theme.Typography.caption2)
+                                    .font(Theme.Typography.caption2Font)
                                     .foregroundColor(Theme.mutedForeground)
                                     .lineLimit(3)
                             }
@@ -209,7 +209,7 @@ struct CompactTimeline<Item: TimelineItem>: View {
                 HStack(spacing: ThemeSpacing.md) {
                     // Time
                     Text(item.formattedTime)
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                         .foregroundColor(Theme.mutedForeground)
                         .frame(width: 60, alignment: .trailing)
                     
@@ -223,13 +223,13 @@ struct CompactTimeline<Item: TimelineItem>: View {
                     // Content
                     VStack(alignment: .leading, spacing: 2) {
                         Text(item.title)
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.foreground)
                             .lineLimit(1)
                         
                         if let description = item.description {
                             Text(description)
-                                .font(Theme.Typography.caption2)
+                                .font(Theme.Typography.caption2Font)
                                 .foregroundColor(Theme.mutedForeground)
                                 .lineLimit(2)
                         }
@@ -343,11 +343,11 @@ struct MetadataBadge: View {
     var body: some View {
         HStack(spacing: 4) {
             Text(key)
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .foregroundColor(Theme.mutedForeground)
             
             Text(value)
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .fontWeight(.medium)
                 .foregroundColor(Theme.foreground)
         }

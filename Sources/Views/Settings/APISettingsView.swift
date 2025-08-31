@@ -51,11 +51,11 @@ struct APISettingsView: View {
                         
                         if let key = settingsStore.apiKey, !key.isEmpty {
                             Text("••••••" + String(key.suffix(4)))
-                                .font(Theme.Typography.footnote)
+                                .font(Theme.Typography.footnoteFont)
                                 .foregroundColor(Theme.mutedForeground)
                         } else {
                             Text("Not Set")
-                                .font(Theme.Typography.footnote)
+                                .font(Theme.Typography.footnoteFont)
                                 .foregroundColor(Theme.destructive)
                         }
                     }
@@ -64,17 +64,17 @@ struct APISettingsView: View {
                         showingAPIKeySheet = true
                     } label: {
                         Text(settingsStore.apiKey?.isEmpty ?? true ? "Set API Key" : "Update API Key")
-                            .font(Theme.Typography.callout)
+                            .font(Theme.Typography.calloutFont)
                     }
                     .primaryButton()
                 }
             } header: {
                 Text("CONNECTION")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             } footer: {
                 Text("Your API key is stored securely in the keychain and never leaves your device.")
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.muted)
             }
             .listRowBackground(Theme.card)
@@ -113,12 +113,12 @@ struct APISettingsView: View {
                 if let result = connectionTestResult {
                     VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                         Text(result.message)
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                             .foregroundColor(result.success ? Theme.success : Theme.destructive)
                         
                         if let details = result.details {
                             Text(details)
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.mutedForeground)
                         }
                     }
@@ -126,7 +126,7 @@ struct APISettingsView: View {
                 }
             } header: {
                 Text("DIAGNOSTICS")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -145,7 +145,7 @@ struct APISettingsView: View {
                     
                     HStack {
                         Text("\(Int(settingsStore.requestTimeout)) seconds")
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                             .foregroundColor(Theme.mutedForeground)
                         
                         Spacer()
@@ -174,7 +174,7 @@ struct APISettingsView: View {
                     
                     Stepper(value: $settingsStore.maxRetries, in: 0...5) {
                         Text("\(settingsStore.maxRetries) attempts")
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                             .foregroundColor(Theme.mutedForeground)
                     }
                 }
@@ -191,13 +191,13 @@ struct APISettingsView: View {
                     
                     Stepper(value: $settingsStore.maxConcurrentRequests, in: 1...10) {
                         Text("\(settingsStore.maxConcurrentRequests) requests")
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                             .foregroundColor(Theme.mutedForeground)
                     }
                 }
             } header: {
                 Text("ADVANCED")
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             .listRowBackground(Theme.card)
@@ -303,11 +303,11 @@ struct APIKeyInputSheet: View {
                         .foregroundColor(Theme.primary)
                     
                     Text("Enter API Key")
-                        .font(Theme.Typography.title2)
+                        .font(Theme.Typography.title2Font)
                         .foregroundColor(Theme.foreground)
                     
                     Text("Your API key will be stored securely in the keychain")
-                        .font(Theme.Typography.footnote)
+                        .font(Theme.Typography.footnoteFont)
                         .foregroundColor(Theme.mutedForeground)
                         .multilineTextAlignment(.center)
                 }
@@ -318,12 +318,12 @@ struct APIKeyInputSheet: View {
                     if isSecure {
                         SecureField("sk-ant-api03-...", text: $apiKey)
                             .textFieldStyle(.plain)
-                            .font(Theme.Typography.body)
+                            .font(Theme.Typography.bodyFont)
                             .foregroundColor(Theme.foreground)
                     } else {
                         TextField("sk-ant-api03-...", text: $apiKey)
                             .textFieldStyle(.plain)
-                            .font(Theme.Typography.body)
+                            .font(Theme.Typography.bodyFont)
                             .foregroundColor(Theme.foreground)
                     }
                     

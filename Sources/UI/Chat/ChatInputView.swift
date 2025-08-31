@@ -84,7 +84,7 @@ struct ChatInputView: View {
         HStack {
             Spacer()
             Text("\(charactersRemaining) characters remaining")
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .foregroundColor(charactersRemaining < 500 ? .orange : Theme.mutedForeground)
                 .padding(.horizontal, ThemeSpacing.md)
                 .padding(.vertical, ThemeSpacing.xs)
@@ -124,7 +124,7 @@ struct ChatInputView: View {
             // Placeholder text when empty
             if text.isEmpty && !isFocused {
                 Text("Message Claude...")
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 10)
@@ -133,7 +133,7 @@ struct ChatInputView: View {
             
             // Text editor with dynamic height
             TextEditor(text: $text)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.foreground)
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
@@ -235,7 +235,7 @@ struct AttachmentView: View {
                 .foregroundColor(type.color)
             
             Text(name)
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .lineLimit(1)
                 .foregroundColor(Theme.foreground)
             

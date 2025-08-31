@@ -109,9 +109,9 @@ struct ToolCategoryChip: View {
                 Image(systemName: category.icon)
                     .font(.system(size: 14))
                 Text(category.rawValue)
-                    .font(Theme.Typography.footnote)
+                    .font(Theme.Typography.footnoteFont)
                 Text("(\(count))")
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
             }
             .foregroundColor(isSelected ? Theme.foreground : Theme.mutedForeground)
             .padding(.horizontal, ThemeSpacing.md)
@@ -148,11 +148,11 @@ struct ToolCard: View {
                 // Tool info
                 VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                     Text(tool.name)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                     
                     Text(tool.description)
-                        .font(Theme.Typography.footnote)
+                        .font(Theme.Typography.footnoteFont)
                         .foregroundColor(Theme.mutedForeground)
                         .lineLimit(isExpanded ? nil : 2)
                     
@@ -163,7 +163,7 @@ struct ToolCard: View {
                             Label(tool.formattedLastUsed, systemImage: "clock")
                         }
                     }
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.muted)
                 }
                 
@@ -186,17 +186,17 @@ struct ToolCard: View {
                     if !tool.parameters.isEmpty {
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text("Parameters")
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.mutedForeground)
                             
                             ForEach(tool.parameters, id: \.name) { param in
                                 HStack {
                                     Text(param.name)
-                                        .font(Theme.Typography.footnote)
+                                        .font(Theme.Typography.footnoteFont)
                                         .foregroundColor(Theme.foreground)
                                     Spacer()
                                     Text(param.type)
-                                        .font(Theme.Typography.caption)
+                                        .font(Theme.Typography.captionFont)
                                         .foregroundColor(Theme.muted)
                                         .padding(.horizontal, ThemeSpacing.xs)
                                         .padding(.vertical, 2)
@@ -216,7 +216,7 @@ struct ToolCard: View {
                                 Image(systemName: "gear")
                                 Text("Configure")
                             }
-                            .font(Theme.Typography.footnote)
+                            .font(Theme.Typography.footnoteFont)
                         }
                         .secondaryButton()
                     }
@@ -331,7 +331,7 @@ struct AddToolView: View {
                         // Category picker
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text("Category")
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.mutedForeground)
                             
                             Picker("Category", selection: $selectedCategory) {
@@ -353,7 +353,7 @@ struct AddToolView: View {
                         )
                         
                         Text("Note: The tool will be configured after connecting to the MCP server.")
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.muted)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }

@@ -15,6 +15,20 @@ class SimpleChatViewModel: ObservableObject {
     @Published var streamingText = ""
     @Published var currentTool: String?
     @Published var toolExecutions: [ToolExecution] = []
+    @Published var tokenUsage = 0
+    @Published var toolUsages: [ToolUsage] = []
+    
+    var hasToolUsage: Bool {
+        !toolUsages.isEmpty
+    }
+    
+    var toolUsageCount: Int {
+        toolUsages.count
+    }
+    
+    init() {
+        // Initialize with empty state
+    }
     
     func sendMessage(_ text: String) {
         // Implementation pending
@@ -105,10 +119,10 @@ struct ChatView: View {
                                     Text("View Tool Timeline")
                                     Spacer()
                                     Text("\(viewModel.toolUsageCount) tools")
-                                        .font(Theme.Typography.caption)
+                                        .font(Theme.Typography.captionFont)
                                     Image(systemName: "chevron.right")
                                 }
-                                .font(Theme.Typography.footnote)
+                                .font(Theme.Typography.footnoteFont)
                                 .foregroundColor(Theme.primary)
                                 .padding(.horizontal, ThemeSpacing.md)
                                 .padding(.vertical, ThemeSpacing.sm)
@@ -133,7 +147,7 @@ struct ChatView: View {
                         
                         // Text field
                         TextField("Message Claude...", text: $messageText, axis: .vertical)
-                            .font(Theme.Typography.body)
+                            .font(Theme.Typography.bodyFont)
                             .foregroundColor(Theme.foreground)
                             .tint(Theme.primary)
                             .lineLimit(1...6)
@@ -166,7 +180,7 @@ struct ChatView: View {
                     // Token usage
                     if viewModel.tokenUsage > 0 {
                         Label("\(viewModel.tokenUsage)", systemImage: "cube")
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.mutedForeground)
                     }
                     
@@ -228,7 +242,7 @@ struct ChatMessageView: View {
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: ThemeSpacing.xs) {
                 // Message content
                 Text(message.content)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                     .padding(.horizontal, ThemeSpacing.md)
                     .padding(.vertical, ThemeSpacing.sm)
@@ -246,7 +260,7 @@ struct ChatMessageView: View {
                 
                 // Timestamp
                 Text(message.formattedTime)
-                    .font(Theme.Typography.caption2)
+                    .font(Theme.Typography.caption2Font)
                     .foregroundColor(Theme.mutedForeground)
             }
             .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: message.role == .user ? .trailing : .leading)
@@ -313,68 +327,7 @@ struct ThinkingIndicator: View {
     }
 }
 
-// MARK: - Chat View Model
-
-class SimpleChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessageUI] = []
-    @Published var isLoading = false
-    @Published var tokenUsage = 0
-    @Published var toolUsages: [ToolUsage] = []
-    
-    private let chatViewModel: ChatViewModel
-    private var cancellables = Set<AnyCancellable>()
-    
-    var hasToolUsage: Bool {
-        !toolUsages.isEmpty
-    }
-    
-    var toolUsageCount: Int {
-        toolUsages.count
-    }
-    
-    init() {
-        let container = DependencyContainer.shared
-        self.chatViewModel = ChatViewModel(
-            conversationId: nil,
-            chatStore: container.chatStore,
-            apiClient: container.apiClient,
-            appState: container.appState
-        )
-        
-        setupBindings()
-    }
-    
-    private func setupBindings() {
-        // Sync messages from real ChatViewModel
-        chatViewModel.$messages
-            .map { messages in
-                messages.map { message in
-                    ChatMessageUI(
-                        role: message.role == .user ? .user : (message.role == .assistant ? .assistant : .system),
-                        content: message.content,
-                        timestamp: message.timestamp
-                    )
-                }
-            }
-            .assign(to: &$messages)
-        
-        chatViewModel.$isLoading
-            .assign(to: &$isLoading)
-    }
-    
-    func sendMessage(_ text: String) {
-        chatViewModel.inputText = text
-        chatViewModel.sendMessage()
-    }
-    
-    func preloadMessageContent(_ message: ChatMessageUI) {
-        // Forward to real view model if needed
-    }
-    
-    func cleanupMessageResources(_ message: ChatMessageUI) {
-        // Forward to real view model if needed
-    }
-}
+// Note: Using the SimpleChatViewModel defined at the top of the file
 
 // MARK: - Chat Message Model
 

@@ -173,7 +173,7 @@ public class SSEClient: NSObject, @unchecked Sendable {
         }
         
         // Start connection
-        logger.debug("Connecting to SSE: \(url) [Compression: \(compressionEnabled)]")
+        logger.debug("Connecting to SSE: \(url) [Compression: \(self.compressionEnabled)]")
         streamMetrics.connectionStartTime = Date()
         dataTask = urlSession?.dataTask(with: request)
         dataTask?.resume()
@@ -285,7 +285,7 @@ public class SSEClient: NSObject, @unchecked Sendable {
         reconnectAttempts += 1
         
         if reconnectAttempts <= maxReconnectAttempts {
-            logger.info("Attempting reconnection \(reconnectAttempts)/\(maxReconnectAttempts)")
+            logger.info("Attempting reconnection \(self.reconnectAttempts)/\(self.maxReconnectAttempts)")
             scheduleReconnect()
         } else {
             logger.error("Max reconnection attempts reached")
@@ -450,7 +450,7 @@ public class SSEClient: NSObject, @unchecked Sendable {
 // MARK: - URLSessionDataDelegate
 
 extension SSEClient: URLSessionDataDelegate {
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         guard let httpResponse = response as? HTTPURLResponse else {
             completionHandler(.cancel)
             return
@@ -472,7 +472,7 @@ extension SSEClient: URLSessionDataDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         // Handle compression if enabled (Task 373)
         let processedData: Data
         if compressionEnabled, let decompressed = decompressor?.decompress(data) {
@@ -495,7 +495,7 @@ extension SSEClient: URLSessionDataDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         if let error = error {
             logger.error("SSE Error: \(error.localizedDescription)")
             DispatchQueue.main.async {
@@ -513,8 +513,9 @@ extension SSEClient: URLSessionDataDelegate {
     }
 }
 
-    // MARK: - Event Queue Processing (Task 372)
-    
+// MARK: - Event Queue Processing (Task 372)
+
+extension SSEClient {
     private func processEventQueue() {
         guard !isProcessingQueue else { return }
         isProcessingQueue = true
@@ -533,14 +534,15 @@ extension SSEClient: URLSessionDataDelegate {
     private func logStreamMetrics() {
         logger.info("""
             Stream Metrics:
-            - Duration: \(streamMetrics.duration)s
-            - Events Received: \(streamMetrics.eventsReceived)
-            - Bytes Received: \(streamMetrics.bytesReceived)
-            - Invalid Events: \(streamMetrics.invalidEvents)
-            - Dropped Events: \(streamMetrics.droppedEvents)
-            - Reconnections: \(reconnectAttempts)
+            - Duration: \(self.streamMetrics.duration)s
+            - Events Received: \(self.streamMetrics.eventsReceived)
+            - Bytes Received: \(self.streamMetrics.bytesReceived)
+            - Invalid Events: \(self.streamMetrics.invalidEvents)
+            - Dropped Events: \(self.streamMetrics.droppedEvents)
+            - Reconnections: \(self.reconnectAttempts)
         """)
     }
+}
 
 // MARK: - Supporting Types
 

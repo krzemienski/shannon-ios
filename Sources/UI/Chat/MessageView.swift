@@ -103,7 +103,7 @@ struct MessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Render text content (markdown rendering temporarily disabled)
             Text(displayContent)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .textSelection(.enabled)
                 .padding(ThemeSpacing.md)
             
@@ -138,14 +138,14 @@ struct MessageView: View {
                 .foregroundColor(.red)
             
             Text(displayContent)
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(.red)
             
             Spacer()
             
             Button(action: onResend) {
                 Label("Retry", systemImage: "arrow.clockwise")
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
@@ -165,20 +165,20 @@ struct MessageView: View {
         HStack(spacing: ThemeSpacing.sm) {
             // Timestamp
             Text(formatTimestamp(message.timestamp))
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
                 .foregroundColor(Theme.mutedForeground)
             
             // Model info
             if let model = message.metadata?.model {
                 Text("• \(model)")
-                    .font(Theme.Typography.caption2)
+                    .font(Theme.Typography.caption2Font)
                     .foregroundColor(Theme.mutedForeground)
             }
             
             // Token usage
             if let usage = message.metadata?.usage {
                 Text("• \(usage.totalTokens) tokens")
-                    .font(Theme.Typography.caption2)
+                    .font(Theme.Typography.caption2Font)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -242,13 +242,13 @@ struct MessageView: View {
                         .foregroundColor(toolCallColor(for: toolCall.status))
                     
                     Text(toolCall.name)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.mutedForeground)
                     
                     Spacer()
                     
                     Text(toolCall.status.rawValue.capitalized)
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                         .foregroundColor(toolCallColor(for: toolCall.status))
                 }
                 .padding(.horizontal, ThemeSpacing.md)

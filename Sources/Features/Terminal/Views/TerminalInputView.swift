@@ -320,67 +320,6 @@ struct AutoCompleteSuggestionRow: View {
     }
 }
 
-/// Command history manager
-public class CommandHistory: ObservableObject {
-    @Published private var commands: [String] = []
-    private let maxSize: Int
-    private let storageKey = "terminal_command_history"
-    
-    public var isEmpty: Bool { commands.isEmpty }
-    public var count: Int { commands.count }
-    
-    public init(maxSize: Int = 1000) {
-        self.maxSize = maxSize
-        loadHistory()
-    }
-    
-    public subscript(index: Int) -> String {
-        guard index >= 0 && index < commands.count else { return "" }
-        return commands[index]
-    }
-    
-    public func add(_ command: String) {
-        // Don't add duplicates of the last command
-        if let last = commands.last, last == command {
-            return
-        }
-        
-        commands.append(command)
-        
-        // Trim if exceeds max size
-        if commands.count > maxSize {
-            commands.removeFirst(commands.count - maxSize)
-        }
-        
-        saveHistory()
-    }
-    
-    public func search(_ query: String) -> [String] {
-        guard !query.isEmpty else { return commands }
-        
-        return commands.filter { command in
-            command.localizedCaseInsensitiveContains(query)
-        }.reversed()
-    }
-    
-    public func clear() {
-        commands.removeAll()
-        saveHistory()
-    }
-    
-    private func loadHistory() {
-        if let data = UserDefaults.standard.data(forKey: storageKey),
-           let decoded = try? JSONDecoder().decode([String].self, from: data) {
-            commands = decoded
-        }
-    }
-    
-    private func saveHistory() {
-        if let encoded = try? JSONEncoder().encode(commands) {
-            UserDefaults.standard.set(encoded, forKey: storageKey)
-        }
-    }
-}
 
 /// Terminal auto-complete provider
 class TerminalAutoCompleteProvider {

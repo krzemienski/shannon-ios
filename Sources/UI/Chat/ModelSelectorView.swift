@@ -160,7 +160,7 @@ struct ModelSelectorView: View {
     private var favoritesSection: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
             Text("Favorites")
-                .font(Theme.Typography.headline)
+                .font(Theme.Typography.headlineFont)
                 .foregroundColor(Theme.foreground)
             
             ForEach(models.filter { favoriteModels.contains($0.id) }) { model in
@@ -173,7 +173,7 @@ struct ModelSelectorView: View {
         VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
             HStack {
                 Text(provider)
-                    .font(Theme.Typography.headline)
+                    .font(Theme.Typography.headlineFont)
                     .foregroundColor(Theme.foreground)
                 
                 Spacer()
@@ -198,14 +198,14 @@ struct ModelSelectorView: View {
                     VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                         HStack {
                             Text(model.name)
-                                .font(Theme.Typography.body)
+                                .font(Theme.Typography.bodyFont)
                                 .foregroundColor(Theme.foreground)
                             
                             tierBadge(model.tier)
                         }
                         
                         Text(model.id)
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.mutedForeground)
                     }
                     
@@ -230,7 +230,7 @@ struct ModelSelectorView: View {
                     Image(systemName: "doc.text")
                         .font(.system(size: 10))
                     Text("\(formatTokenCount(model.contextWindow)) context")
-                        .font(Theme.Typography.caption2)
+                        .font(Theme.Typography.caption2Font)
                 }
                 .foregroundColor(Theme.mutedForeground)
                 
@@ -255,7 +255,7 @@ struct ModelSelectorView: View {
     private var customModelSection: some View {
         VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
             Text("Custom Model")
-                .font(Theme.Typography.headline)
+                .font(Theme.Typography.headlineFont)
                 .foregroundColor(Theme.foreground)
             
             if showCustomModel {
@@ -297,7 +297,7 @@ struct ModelSelectorView: View {
                         Image(systemName: "plus.circle")
                         Text("Add custom model")
                     }
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.primary)
                     .frame(maxWidth: .infinity)
                     .padding(ThemeSpacing.md)
@@ -312,7 +312,7 @@ struct ModelSelectorView: View {
     
     private func tierBadge(_ tier: ModelTier) -> some View {
         Text(tier.rawValue.uppercased())
-            .font(Theme.Typography.caption2)
+            .font(Theme.Typography.caption2Font)
             .fontWeight(.semibold)
             .padding(.horizontal, ThemeSpacing.xs)
             .padding(.vertical, 2)
@@ -326,7 +326,7 @@ struct ModelSelectorView: View {
             Image(systemName: capability.icon)
                 .font(.system(size: 10))
             Text(capability.rawValue)
-                .font(Theme.Typography.caption2)
+                .font(Theme.Typography.caption2Font)
         }
         .padding(.horizontal, ThemeSpacing.xs)
         .padding(.vertical, 2)

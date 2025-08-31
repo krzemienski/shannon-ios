@@ -47,7 +47,7 @@ public struct LoadingIndicator: View {
             
             if let message = message {
                 Text(message)
-                    .font(.callout)
+                    .font(Theme.Typography.calloutFont)
                     .foregroundColor(Theme.mutedForeground)
             }
         }
@@ -66,7 +66,7 @@ public struct LoadingIndicator: View {
                 
                 if let message = message {
                     Text(message)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                 }
             }
@@ -88,7 +88,7 @@ public struct LoadingIndicator: View {
             
             if let message = message {
                 Text(message)
-                    .font(.footnote)
+                    .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
             }
         }
@@ -104,7 +104,7 @@ public struct LoadingIndicator: View {
                 
                 if let message = message {
                     Text(message)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                 }
             }
@@ -172,11 +172,11 @@ public struct CommonErrorView: View {
                 .foregroundColor(Theme.destructive)
             
             Text("Something went wrong")
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             Text(error.localizedDescription)
-                .font(.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, ThemeSpacing.xl)
@@ -187,7 +187,7 @@ public struct CommonErrorView: View {
                         Image(systemName: "arrow.clockwise")
                         Text("Try Again")
                     }
-                    .font(Theme.Typography.headline)
+                    .font(Theme.Typography.headlineFont)
                     .foregroundColor(Theme.background)
                     .padding(.horizontal, ThemeSpacing.xl)
                     .padding(.vertical, ThemeSpacing.md)
@@ -231,12 +231,12 @@ public struct CommonEmptyStateView: View {
                 .foregroundColor(Theme.muted)
             
             Text(title)
-                .font(Theme.Typography.title2)
+                .font(Theme.Typography.title2Font)
                 .foregroundColor(Theme.foreground)
             
             if let message = message {
                 Text(message)
-                    .font(.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, ThemeSpacing.xl)
@@ -245,7 +245,7 @@ public struct CommonEmptyStateView: View {
             if let actionTitle = actionTitle, let action = action {
                 Button(action: action) {
                     Text(actionTitle)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.background)
                         .padding(.horizontal, ThemeSpacing.xl)
                         .padding(.vertical, ThemeSpacing.md)
@@ -266,7 +266,7 @@ public struct CommonPrimaryButtonStyle: ButtonStyle {
     
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.headline)
+            .font(Theme.Typography.headlineFont)
             .foregroundColor(isEnabled ? Theme.background : Theme.mutedForeground)
             .frame(maxWidth: .infinity)
             .padding(.vertical, ThemeSpacing.md)
@@ -284,7 +284,7 @@ public struct CommonSecondaryButtonStyle: ButtonStyle {
     
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.headline)
+            .font(Theme.Typography.headlineFont)
             .foregroundColor(isEnabled ? Theme.primary : Theme.mutedForeground)
             .frame(maxWidth: .infinity)
             .padding(.vertical, ThemeSpacing.md)
@@ -300,7 +300,7 @@ public struct CommonSecondaryButtonStyle: ButtonStyle {
 public struct CommonGhostButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Theme.Typography.headline)
+            .font(Theme.Typography.headlineFont)
             .foregroundColor(Theme.primary)
             .padding(.horizontal, ThemeSpacing.md)
             .padding(.vertical, ThemeSpacing.sm)
@@ -349,7 +349,7 @@ public struct BadgeView: View {
     
     public var body: some View {
         Text(text)
-            .font(Theme.Typography.caption)
+            .font(Theme.Typography.captionFont)
             .fontWeight(.semibold)
             .foregroundColor(style.foregroundColor)
             .padding(.horizontal, ThemeSpacing.sm)
@@ -395,12 +395,12 @@ public struct SectionHeader: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                 Text(title)
-                    .font(Theme.Typography.headline)
+                    .font(Theme.Typography.headlineFont)
                     .foregroundColor(Theme.foreground)
                 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.mutedForeground)
                 }
             }
@@ -410,7 +410,7 @@ public struct SectionHeader: View {
             if let actionTitle = actionTitle, let action = action {
                 Button(action: action) {
                     Text(actionTitle)
-                        .font(Theme.Typography.callout)
+                        .font(Theme.Typography.calloutFont)
                         .foregroundColor(Theme.primary)
                 }
             }

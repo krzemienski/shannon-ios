@@ -199,16 +199,16 @@ struct StatusCard: View {
                 // Content
                 VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                     Text(title)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.mutedForeground)
                     
                     Text(value)
-                        .font(Theme.Typography.title3)
+                        .font(Theme.Typography.title3Font)
                         .foregroundColor(Theme.foreground)
                     
                     if let subtitle = subtitle {
                         Text(subtitle)
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.mutedForeground)
                     }
                 }
@@ -261,7 +261,7 @@ struct LegacyMetricCard: View {
                 // Header
                 HStack {
                     Text(title)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                     
                     Spacer()
@@ -273,7 +273,7 @@ struct LegacyMetricCard: View {
                 
                 // Value
                 Text(value)
-                    .font(Theme.Typography.largeTitle)
+                    .font(Theme.Typography.largeTitleFont)
                     .foregroundColor(Theme.primary)
                 
                 // Sparkline
@@ -297,7 +297,7 @@ struct ChangeIndicator: View {
                 .font(.system(size: 10))
             
             Text("\(abs(value), specifier: "%.1f")%")
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
         }
         .foregroundColor(value >= 0 ? Theme.success : Theme.destructive)
         .padding(.horizontal, ThemeSpacing.xs)
@@ -350,7 +350,7 @@ struct CardView_Previews: PreviewProvider {
                     // Default card
                     CardView {
                         Text("Default Card")
-                            .font(Theme.Typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(Theme.foreground)
                     }
                     
@@ -358,10 +358,10 @@ struct CardView_Previews: PreviewProvider {
                     CardView(variant: .elevated) {
                         VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
                             Text("Elevated Card")
-                                .font(Theme.Typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                             Text("With shadow and gradient background")
-                                .font(Theme.Typography.body)
+                                .font(Theme.Typography.bodyFont)
                                 .foregroundColor(Theme.mutedForeground)
                         }
                     }
@@ -372,7 +372,7 @@ struct CardView_Previews: PreviewProvider {
                             Image(systemName: "hand.tap.fill")
                                 .foregroundColor(Theme.primary)
                             Text("Tap me!")
-                                .font(Theme.Typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                         }
                     }

@@ -139,15 +139,15 @@ public extension View {
     func errorBanner(_ error: Binding<Error?>) -> some View {
         self.overlay(
             Group {
-                if let error = error.wrappedValue {
+                if let errorValue = error.wrappedValue {
                     VStack {
-                        ErrorBanner(error: error) {
+                        ErrorBanner(error: errorValue) {
                             error.wrappedValue = nil
                         }
                         Spacer()
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
-                    .animation(.spring(), value: error.wrappedValue)
+                    .animation(.spring(), value: error.wrappedValue != nil)
                 }
             }
         )
@@ -164,7 +164,7 @@ struct ErrorBanner: View {
                 .foregroundColor(Theme.destructive)
             
             Text(error.localizedDescription)
-                .font(Theme.Typography.callout)
+                .font(Theme.Typography.calloutFont)
                 .foregroundColor(Theme.foreground)
                 .lineLimit(2)
             

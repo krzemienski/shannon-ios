@@ -258,7 +258,7 @@ struct SmartTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(Theme.Typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(isFocused ? Theme.primary : Theme.mutedForeground)
             
             HStack {

@@ -26,7 +26,7 @@ struct CustomTextField: View {
             // Title label
             if !title.isEmpty {
                 Text(title)
-                    .font(Theme.Typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
             
@@ -61,7 +61,7 @@ struct CustomTextField: View {
                             .focused($isFocused)
                     }
                 }
-                .font(Theme.Typography.body)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.foreground)
                 .tint(Theme.primary)
                 

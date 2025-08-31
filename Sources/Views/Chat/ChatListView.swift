@@ -118,19 +118,19 @@ struct ChatRowView: View {
             VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                 HStack {
                     Text(chat.title)
-                        .font(Theme.Typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                         .lineLimit(1)
                     
                     Spacer()
                     
                     Text(chat.formattedDate)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.mutedForeground)
                 }
                 
                 Text(chat.lastMessage)
-                    .font(Theme.Typography.subheadline)
+                    .font(Theme.Typography.subheadlineFont)
                     .foregroundColor(Theme.mutedForeground)
                     .lineLimit(2)
                 
@@ -138,7 +138,7 @@ struct ChatRowView: View {
                 HStack(spacing: ThemeSpacing.xs) {
                     ForEach(chat.tags, id: \.self) { tag in
                         Text(tag)
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.primary)
                             .padding(.horizontal, ThemeSpacing.xs)
                             .padding(.vertical, 2)
@@ -233,7 +233,7 @@ struct NewChatView: View {
                         // Model selection
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
                             Text("Model")
-                                .font(Theme.Typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.mutedForeground)
                             
                             Picker("Model", selection: $selectedModel) {

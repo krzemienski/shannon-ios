@@ -42,13 +42,13 @@ struct ListRow<Leading: View, Trailing: View>: View {
             // Text content
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                     .lineLimit(1)
                 
                 if let subtitle = subtitle {
                     Text(subtitle)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.mutedForeground)
                         .lineLimit(2)
                 }
@@ -125,7 +125,7 @@ struct ToolListItem: View {
                     
                     if let time = executionTime {
                         Text(time)
-                            .font(Theme.Typography.caption2)
+                            .font(Theme.Typography.caption2Font)
                             .foregroundColor(Theme.mutedForeground)
                     }
                 }
@@ -183,20 +183,20 @@ struct ConversationListItem: View {
                         }
                         
                         Text(title)
-                            .font(Theme.Typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(Theme.foreground)
                             .lineLimit(1)
                         
                         Spacer()
                         
                         Text(formattedTime)
-                            .font(Theme.Typography.caption)
+                            .font(Theme.Typography.captionFont)
                             .foregroundColor(Theme.mutedForeground)
                     }
                     
                     // Message preview
                     Text(lastMessage)
-                        .font(Theme.Typography.subheadline)
+                        .font(Theme.Typography.subheadlineFont)
                         .foregroundColor(Theme.mutedForeground)
                         .lineLimit(2)
                     
@@ -215,7 +215,7 @@ struct ConversationListItem: View {
                 // Unread indicator
                 if unreadCount > 0 {
                     Text("\(unreadCount)")
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(.white)
                         .padding(4)
                         .background(Theme.primary)
@@ -256,7 +256,7 @@ struct ListSectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(Theme.Typography.headline)
+                .font(Theme.Typography.headlineFont)
                 .foregroundColor(Theme.foreground)
             
             Spacer()
@@ -264,7 +264,7 @@ struct ListSectionHeader: View {
             if let action = action, let label = actionLabel {
                 Button(action: action) {
                     Text(label)
-                        .font(Theme.Typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.primary)
                 }
             }
@@ -295,11 +295,11 @@ struct EmptyStateView: View {
             // Text
             VStack(spacing: ThemeSpacing.sm) {
                 Text(title)
-                    .font(Theme.Typography.title3)
+                    .font(Theme.Typography.title3Font)
                     .foregroundColor(Theme.foreground)
                 
                 Text(message)
-                    .font(Theme.Typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -332,7 +332,7 @@ struct StatusBadge: View {
     
     var body: some View {
         Text(statusText)
-            .font(Theme.Typography.caption2)
+            .font(Theme.Typography.caption2Font)
             .foregroundColor(statusColor)
             .padding(.horizontal, ThemeSpacing.xs)
             .padding(.vertical, 2)
@@ -390,7 +390,7 @@ struct TagView: View {
     private var font: Font {
         switch style {
         case .small:
-            return Theme.Typography.caption2
+            return Theme.Typography.caption2Font
         case .medium:
             return Theme.Typography.caption
         case .large:

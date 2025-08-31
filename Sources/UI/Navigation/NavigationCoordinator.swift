@@ -364,13 +364,13 @@ public extension View {
     /// Apply navigation coordinator to view
     func withNavigationCoordinator(_ coordinator: NavigationCoordinator) -> some View {
         self
-            .sheet(item: coordinator.presentedSheet.asBinding()) { sheet in
+            .sheet(item: coordinator.$presentedSheet) { sheet in
                 sheetContent(for: sheet)
             }
-            .fullScreenCover(item: coordinator.presentedFullScreenCover.asBinding()) { cover in
+            .fullScreenCover(item: coordinator.$presentedFullScreenCover) { cover in
                 fullScreenCoverContent(for: cover)
             }
-            .alert(item: coordinator.alertItem.asBinding()) { alert in
+            .alert(item: coordinator.$alertItem) { alert in
                 Alert(
                     title: Text(alert.title),
                     message: alert.message.map { Text($0) },
@@ -383,7 +383,7 @@ public extension View {
     private func sheetContent(for sheet: NavigationCoordinator.SheetType) -> some View {
         switch sheet {
         case .newChat:
-            NewConversationView()
+            NewConversationView(coordinator: nil)
         case .newProject:
             NewProjectView()
         case .newTerminalSession:
@@ -405,7 +405,7 @@ public extension View {
     private func fullScreenCoverContent(for cover: NavigationCoordinator.FullScreenCoverType) -> some View {
         switch cover {
         case .onboarding:
-            OnboardingView()
+            OnboardingView(onComplete: {})
         case .authentication:
             AuthenticationView()
         case .projectWizard:
@@ -414,33 +414,7 @@ public extension View {
     }
 }
 
-// Helper to create binding from optional published property
-extension Published.Publisher where Value == NavigationCoordinator.SheetType? {
-    func asBinding() -> Binding<NavigationCoordinator.SheetType?> {
-        Binding(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
-    }
-}
-
-extension Published.Publisher where Value == NavigationCoordinator.FullScreenCoverType? {
-    func asBinding() -> Binding<NavigationCoordinator.FullScreenCoverType?> {
-        Binding(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
-    }
-}
-
-extension Published.Publisher where Value == NavigationCoordinator.AlertItem? {
-    func asBinding() -> Binding<NavigationCoordinator.AlertItem?> {
-        Binding(
-            get: { self.wrappedValue },
-            set: { self.wrappedValue = $0 }
-        )
-    }
-}
+// Note: Bindings are now created directly using $ syntax on @Published properties
 
 // MARK: - Helper Views
 

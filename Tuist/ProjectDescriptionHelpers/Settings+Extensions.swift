@@ -23,10 +23,10 @@ public extension Settings {
                 "SWIFT_SUPPRESS_WARNINGS": "NO",
                 "SWIFT_EMIT_LOC_STRINGS": "YES",
                 
-                // Code Signing
+                // Code Signing - Use automatic development signing
                 "DEVELOPMENT_TEAM": "",
                 "CODE_SIGN_STYLE": "Automatic",
-                "CODE_SIGN_IDENTITY": "-",
+                "CODE_SIGN_IDENTITY": "Apple Development",
                 
                 // App Info
                 "MARKETING_VERSION": "1.0.0",
@@ -97,10 +97,12 @@ public extension Settings {
                 "INFOPLIST_OUTPUT_FORMAT": "xml",
                 "INFOPLIST_PREPROCESS": "NO",
                 
-                // Code signing for simulator (ad-hoc signing)
+                // Entitlements
+                "CODE_SIGN_ENTITLEMENTS": "ClaudeCode.entitlements",
+                
+                // Code signing for development
                 "CODE_SIGNING_REQUIRED": "YES",
                 "CODE_SIGNING_ALLOWED": "YES",
-                "CODE_SIGN_IDENTITY": "-",
                 
                 // UI Settings
                 "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES",
@@ -123,8 +125,32 @@ public extension Settings {
                 "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
             ],
             configurations: [
-                .debug(name: .debug),
-                .release(name: .release)
+                .debug(name: .debug, settings: [
+                    // Debug-specific settings
+                    "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "DEBUG",
+                    "ENABLE_TESTABILITY": "YES",
+                    "GCC_OPTIMIZATION_LEVEL": "0",
+                    "SWIFT_OPTIMIZATION_LEVEL": "-Onone",
+                    
+                    // For simulator, allow automatic signing to work
+                    "CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]": "NO",
+                    "CODE_SIGN_IDENTITY[sdk=iphonesimulator*]": "-",
+                    
+                    // For device, use development signing
+                    "CODE_SIGNING_REQUIRED[sdk=iphoneos*]": "YES",
+                    "CODE_SIGN_IDENTITY[sdk=iphoneos*]": "Apple Development"
+                ]),
+                .release(name: .release, settings: [
+                    // Release-specific settings
+                    "SWIFT_ACTIVE_COMPILATION_CONDITIONS": "RELEASE",
+                    "ENABLE_TESTABILITY": "NO",
+                    "GCC_OPTIMIZATION_LEVEL": "s",
+                    "SWIFT_OPTIMIZATION_LEVEL": "-O",
+                    
+                    // Release builds require proper signing
+                    "CODE_SIGNING_REQUIRED": "YES",
+                    "CODE_SIGN_IDENTITY": "Apple Development"
+                ])
             ]
         )
     }

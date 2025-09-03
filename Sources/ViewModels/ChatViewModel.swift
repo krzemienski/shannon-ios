@@ -478,6 +478,65 @@ public final class ChatViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Tool Execution
+    
+    /// Execute a tool with the given name and parameters
+    public func executeTool(name: String, parameters: [String: Any]) async {
+        isLoading = true
+        
+        // Create tool execution message
+        let toolMessage = Message(
+            role: .tool,
+            content: "Executing tool: \(name)",
+            toolCall: ToolCall(
+                id: UUID().uuidString,
+                name: name,
+                arguments: parameters
+            )
+        )
+        addMessage(toolMessage)
+        
+        do {
+            // Execute tool through API
+            let response = try await apiClient.executeTool(
+                name: name,
+                parameters: parameters
+            )
+            
+            // Add tool response message
+            let responseMessage = Message(
+                role: .toolResponse,
+                content: response.result
+            )
+            addMessage(responseMessage)
+            
+        } catch {
+            handleError(error)
+        }
+        
+        isLoading = false
+    }
+    
+    /// Retry sending the last failed message
+    public func retry() {
+        // Find the last user message before an error
+        guard let lastUserMessageIndex = messages.lastIndex(where: { $0.role == .user }) else {
+            return
+        }
+        
+        // Remove any error messages after the last user message
+        let messagesToKeep = Array(messages.prefix(lastUserMessageIndex + 1))
+        messages = messagesToKeep
+        
+        // Resend the last user message
+        let lastUserMessage = messages[lastUserMessageIndex]
+        inputText = lastUserMessage.content
+        
+        Task {
+            await sendMessage()
+        }
+    }
+    
     // MARK: - Error Handling
     
     private func handleAPIError(_ apiError: APIError) {

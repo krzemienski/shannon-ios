@@ -109,7 +109,9 @@ final class PerformanceProfiler: ObservableObject {
     
     private func startMemoryMonitoring() {
         memoryTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.updateMemoryUsage()
+            Task { @MainActor in
+                self?.updateMemoryUsage()
+            }
         }
     }
     
@@ -140,7 +142,9 @@ final class PerformanceProfiler: ObservableObject {
     
     private func startCPUMonitoring() {
         cpuTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.updateCPUUsage()
+            Task { @MainActor in
+                self?.updateCPUUsage()
+            }
         }
     }
     
@@ -258,7 +262,9 @@ final class PerformanceProfiler: ObservableObject {
     }
     
     deinit {
-        stopMonitoring()
+        MainActor.assumeIsolated {
+            stopMonitoring()
+        }
     }
 }
 

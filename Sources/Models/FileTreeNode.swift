@@ -59,7 +59,7 @@ public struct FileTreeNode: Identifiable, Codable, Hashable {
         self.createdDate = createdDate
         self.permissions = permissions
         self.mimeType = mimeType
-        self.extension = extension ?? URL(fileURLWithPath: name).pathExtension.isEmpty ? nil : URL(fileURLWithPath: name).pathExtension
+        self.`extension` = `extension` ?? (URL(fileURLWithPath: name).pathExtension.isEmpty ? nil : URL(fileURLWithPath: name).pathExtension)
         self.children = children
         self.gitStatus = gitStatus
         self.isSymlink = isSymlink

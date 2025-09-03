@@ -260,6 +260,70 @@ public final class ToolStore: ObservableObject {
         )
     }
     
+    // MARK: - Additional Methods for ToolsCoordinator
+    
+    /// Add to favorites
+    public func addToFavorites(_ toolId: String) {
+        favoriteTools.insert(toolId)
+        saveFavorites()
+    }
+    
+    /// Remove from favorites
+    public func removeFromFavorites(_ toolId: String) {
+        favoriteTools.remove(toolId)
+        saveFavorites()
+    }
+    
+    /// Get tool documentation
+    public func getToolDocumentation(_ toolId: String) -> String? {
+        guard let tool = availableTools.first(where: { $0.id == toolId }) else {
+            return nil
+        }
+        
+        var documentation = "# \(tool.name)\n\n"
+        documentation += "\(tool.description)\n\n"
+        documentation += "## Parameters\n\n"
+        
+        for param in tool.parameters {
+            let requiredText = param.required ? " (required)" : " (optional)"
+            documentation += "- **\(param.name)**\(requiredText): \(param.description)\n"
+            documentation += "  - Type: \(param.type.rawValue)\n"
+            if let defaultValue = param.defaultValue {
+                documentation += "  - Default: \(defaultValue)\n"
+            }
+        }
+        
+        return documentation
+    }
+    
+    /// Get tool parameters
+    public func getToolParameters(_ toolId: String) -> [ToolParameter]? {
+        availableTools.first(where: { $0.id == toolId })?.parameters
+    }
+    
+    /// Get execution history for a specific tool
+    public func getExecutionHistory(for toolId: String?) -> [ToolExecution] {
+        if let toolId = toolId {
+            return toolExecutions.filter { $0.toolId == toolId }
+        }
+        return toolExecutions
+    }
+    
+    /// Get all execution history
+    public var allExecutionHistory: [ToolExecution] {
+        toolExecutions
+    }
+    
+    /// Add to execution history
+    public func addToHistory(_ execution: ToolExecution) {
+        toolExecutions.insert(execution, at: 0)
+        
+        // Keep only last 100 executions
+        if toolExecutions.count > 100 {
+            toolExecutions.removeLast()
+        }
+    }
+    
     // MARK: - Missing Methods
     
     public func clearAll() {

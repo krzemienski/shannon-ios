@@ -622,7 +622,7 @@ public class NetworkMonitor: ObservableObject {
     
     private func testBackendConnectivity() async -> Bool {
         // Test backend connectivity
-        let url = URL(string: "http://localhost:8000/v1/health")!
+        let url = URL(string: "http://192.168.0.155:8000/health")!
         do {
             let (_, response) = try await URLSession.shared.data(from: url)
             return (response as? HTTPURLResponse)?.statusCode == 200

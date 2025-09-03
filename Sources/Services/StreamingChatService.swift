@@ -89,64 +89,67 @@ final class StreamingChatService {
             encoder.keyEncodingStrategy = .convertToSnakeCase
             urlRequest.httpBody = try encoder.encode(streamingRequest)
             
-            // Create SSE client
+            // Create SSE client with configuration
             let configuration = SSEConfiguration(
-                request: urlRequest,
-                reconnectionTime: .seconds(3),
-                maxRetries: 3
+                timeoutInterval: 300,
+                reconnectEnabled: true,
+                maxReconnectAttempts: 3
             )
             
             sseClient = SSEClient(configuration: configuration)
             
-            // Handle SSE events
-            await sseClient?.connect { [weak self] event in
+            // Setup SSE event handlers
+            sseClient?.onMessage = { [weak self] message in
                 guard let self = self else { return }
                 
-                switch event {
-                case .connected:
-                    self.logger.info("SSE connected for streaming")
-                    
-                case .message(let message):
-                    // Track first token time
-                    if firstTokenTime == nil {
-                        firstTokenTime = Date()
-                    }
-                    
-                    // Parse the SSE message
-                    if let token = self.parseSSEMessage(message) {
-                        tokenCount += 1
-                        accumulatedContent += token
-                        onToken(token)
-                    }
-                    
-                case .error(let error):
-                    self.logger.error("SSE error: \(error)")
-                    self.error = error
-                    self.isStreaming = false
-                    
-                    // Call completion with error metrics
-                    let metrics = StreamingMetrics(
-                        totalDuration: Date().timeIntervalSince(startTime),
-                        tokensReceived: tokenCount,
-                        timeToFirstToken: firstTokenTime?.timeIntervalSince(startTime) ?? 0,
-                        success: false
-                    )
-                    onComplete(metrics)
-                    
-                case .disconnected:
-                    self.logger.info("SSE disconnected")
-                    self.isStreaming = false
-                    
-                    // Call completion with final metrics
-                    let metrics = StreamingMetrics(
-                        totalDuration: Date().timeIntervalSince(startTime),
-                        tokensReceived: tokenCount,
-                        timeToFirstToken: firstTokenTime?.timeIntervalSince(startTime) ?? 0,
-                        success: true
-                    )
-                    onComplete(metrics)
+                // Track first token time
+                if firstTokenTime == nil {
+                    firstTokenTime = Date()
+                }
+                
+                // Parse the SSE message
+                if let token = self.parseSSEMessage(message) {
+                    tokenCount += 1
+                    accumulatedContent += token
+                    onToken(token)
                 }
             }
+            
+            sseClient?.onError = { [weak self] error in
+                guard let self = self else { return }
+                
+                self.logger.error("SSE error: \(error)")
+                self.error = error
+                self.isStreaming = false
+                
+                // Call completion with error metrics
+                let metrics = StreamingMetrics(
+                    totalDuration: Date().timeIntervalSince(startTime),
+                    tokensReceived: tokenCount,
+                    timeToFirstToken: firstTokenTime?.timeIntervalSince(startTime) ?? 0,
+                    success: false
+                )
+                onComplete(metrics)
+            }
+            
+            sseClient?.onComplete = { [weak self] in
+                guard let self = self else { return }
+                
+                self.logger.info("SSE stream completed")
+                self.isStreaming = false
+                
+                // Call completion with final metrics
+                let metrics = StreamingMetrics(
+                    totalDuration: Date().timeIntervalSince(startTime),
+                    tokensReceived: tokenCount,
+                    timeToFirstToken: firstTokenTime?.timeIntervalSince(startTime) ?? 0,
+                    success: true
+                )
+                onComplete(metrics)
+            }
+            
+            // Start connection
+            await sseClient?.connect(request: urlRequest)
             
         } catch {
             self.error = error
@@ -176,8 +179,12 @@ final class StreamingChatService {
         // SSE messages for chat completions come in the format:
         // data: {"choices":[{"delta":{"content":"token"},"index":0}],"id":"...","object":"chat.completion.chunk"}
         
-        guard message.event == nil || message.event == "message",
-              let data = message.data else {
+        guard message.event == "message" || message.event.isEmpty else {
+            return nil
+        }
+        
+        let data = message.data
+        guard !data.isEmpty else {
             return nil
         }
         

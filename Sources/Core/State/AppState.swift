@@ -18,7 +18,7 @@ public class AppState: ObservableObject {
     @Published var isConnected: Bool = false
     @Published var currentModel: String = "claude-3-5-haiku-20241022"
     @Published var apiKey: String = ""
-    @Published var baseURL: String = "http://localhost:8000/v1"
+    @Published var baseURL: String = "http://192.168.0.155:8000/v1"
     
     // MARK: - Published Properties (Enhanced)
     @Published var isActive = true

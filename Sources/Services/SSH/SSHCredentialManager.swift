@@ -148,15 +148,15 @@ public enum SSHKeyType: Codable {
 }
 
 public struct SSHKey: Identifiable, Codable {
-    let id: String
-    let name: String
-    let type: SSHKeyType
-    let publicKey: String
-    let privateKey: String
-    let passphrase: String?
-    let createdAt: Date
+    public let id: String
+    public let name: String
+    public let type: SSHKeyType
+    public let publicKey: String
+    public let privateKey: String
+    public let passphrase: String?
+    public let createdAt: Date
     
-    init(id: String = UUID().uuidString, name: String, type: SSHKeyType = .ed25519, publicKey: String, privateKey: String, passphrase: String? = nil, createdAt: Date = Date()) {
+    public init(id: String = UUID().uuidString, name: String, type: SSHKeyType = .ed25519, publicKey: String, privateKey: String, passphrase: String? = nil, createdAt: Date = Date()) {
         self.id = id
         self.name = name
         self.type = type

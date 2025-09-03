@@ -134,7 +134,7 @@ public final class ToolsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    private func loadTools() {
+    public func loadTools() {
         availableTools = toolStore.availableTools
         recentTools = toolStore.recentTools
         updateFavoriteTools(toolStore.favoriteTools)

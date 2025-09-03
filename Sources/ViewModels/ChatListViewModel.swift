@@ -15,11 +15,11 @@ public final class ChatListViewModel: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var public sessions: [ChatSession] = []
-    @Published var public isLoading = false
-    @Published var public error: Error?
-    @Published var public showError = false
-    @Published var public connectionStatus: ConnectionStatus = .disconnected
+    @Published public var sessions: [ChatSession] = []
+    @Published public var isLoading = false
+    @Published public var error: Error?
+    @Published public var showError = false
+    @Published public var connectionStatus: ConnectionStatus = .disconnected
     
     // MARK: - Private Properties
     
@@ -30,7 +30,7 @@ public final class ChatListViewModel: ObservableObject {
     
     // MARK: - Initialization
     
-    public     init(apiClient: APIClient, appState: AppState) {
+    public init(apiClient: APIClient, appState: AppState) {
         self.apiClient = apiClient
         self.appState = appState
         

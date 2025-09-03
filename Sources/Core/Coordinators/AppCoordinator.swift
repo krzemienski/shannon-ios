@@ -85,6 +85,7 @@ public final class AppCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Coordinator Lifecycle
     
+    @MainActor
     override func start() {
         // Check if onboarding is needed
         if dependencyContainer.appState.isFirstLaunch {

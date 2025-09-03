@@ -117,7 +117,10 @@ public class APIClient: ObservableObject {
     func checkHealth() async -> Bool {
         do {
             // Health endpoint is at /health (not /v1/health)
-            let healthURL = URL(string: "http://localhost:8000/health")!
+            guard let healthURL = APIConfig.healthCheckURL(for: APIConfig.defaultBaseURL) else {
+                logger.error("Invalid health check URL")
+                return false
+            }
             let (_, response) = try await session.data(from: healthURL)
             
             if let httpResponse = response as? HTTPURLResponse {
@@ -1084,5 +1087,39 @@ struct ErrorResponse: Codable {
         let message: String
         let type: String?
         let code: String?
+    }
+}
+
+// MARK: - APIClient Extension for Request Building
+
+extension APIClient {
+    /// Build a URLRequest for the given endpoint
+    public func buildRequest(
+        endpoint: String,
+        method: String,
+        body: Data? = nil,
+        queryParams: [String: String]? = nil
+    ) throws -> URLRequest {
+        // Build URL with query parameters
+        var urlComponents = URLComponents(string: "https://api.example.com\(endpoint)")!
+        if let queryParams = queryParams {
+            urlComponents.queryItems = queryParams.map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
+        
+        guard let url = urlComponents.url else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.httpBody = body
+        
+        // Add headers
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let apiKey = self.apiKey {
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        }
+        
+        return request
     }
 }

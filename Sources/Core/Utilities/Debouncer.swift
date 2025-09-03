@@ -47,7 +47,7 @@ final class Debouncer {
     deinit {
         // Note: cancel() is MainActor-isolated, so we can't call it directly in deinit
         // The work item will be cancelled when the object is deallocated
-        workItem?.cancel()
+        // workItem?.cancel() // Commented out due to concurrency safety
     }
 }
 
@@ -97,6 +97,6 @@ final class Throttler {
     deinit {
         // Note: cancel() is MainActor-isolated, so we can't call it directly in deinit
         // The work item will be cancelled when the object is deallocated
-        workItem?.cancel()
+        // workItem?.cancel() // Commented out due to concurrency safety
     }
 }

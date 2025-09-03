@@ -16,6 +16,7 @@ public final class ChatStore: ObservableObject {
     
     @Published public var conversations: [Conversation] = []
     @Published public var currentConversation: Conversation?
+    @Published public var activeConversationId: String?
     @Published public var isLoading = false
     @Published public var error: ChatError?
     @Published public var searchText = ""
@@ -242,6 +243,90 @@ public final class ChatStore: ObservableObject {
             
             pendingChanges = true
         }
+    }
+    
+    // MARK: - Public Methods - Additional Features
+    
+    /// Set the active conversation
+    public func setActiveConversation(_ conversationId: String?) {
+        activeConversationId = conversationId
+        if let id = conversationId {
+            currentConversation = conversations.first { $0.id == id }
+        } else {
+            currentConversation = nil
+        }
+    }
+    
+    /// Rename a conversation
+    public func renameConversation(_ conversationId: String, to newTitle: String) {
+        if let index = conversations.firstIndex(where: { $0.id == conversationId }) {
+            conversations[index].title = newTitle
+            conversations[index].updatedAt = Date()
+            
+            if currentConversation?.id == conversationId {
+                currentConversation?.title = newTitle
+            }
+            
+            pendingChanges = true
+        }
+    }
+    
+    /// Duplicate a conversation
+    public func duplicateConversation(_ conversationId: String) -> Conversation? {
+        guard let original = conversations.first(where: { $0.id == conversationId }) else {
+            return nil
+        }
+        
+        let duplicate = Conversation(
+            title: "\(original.title) (Copy)",
+            messages: original.messages.map { message in
+                Message(
+                    role: message.role,
+                    content: message.content
+                )
+            },
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        
+        conversations.insert(duplicate, at: 0)
+        pendingChanges = true
+        return duplicate
+    }
+    
+    /// Search conversations
+    public func searchConversations(query: String) -> [Conversation] {
+        guard !query.isEmpty else { return conversations }
+        
+        return conversations.filter { conversation in
+            conversation.title.localizedCaseInsensitiveContains(query) ||
+            conversation.messages.contains { $0.content.localizedCaseInsensitiveContains(query) }
+        }
+    }
+    
+    /// Export all conversations
+    public func exportAllConversations() async throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        return try encoder.encode(conversations)
+    }
+    
+    /// Import conversations
+    public func importConversations(from data: Data) async throws {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let imported = try decoder.decode([Conversation].self, from: data)
+        
+        // Merge with existing conversations, avoiding duplicates
+        for conversation in imported {
+            if !conversations.contains(where: { $0.id == conversation.id }) {
+                conversations.append(conversation)
+            }
+        }
+        
+        pendingChanges = true
+        await saveConversations()
     }
     
     // MARK: - Public Methods - Persistence

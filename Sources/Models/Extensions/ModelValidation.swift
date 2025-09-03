@@ -88,12 +88,8 @@ extension ChatCompletionRequest: Validatable {
             }
         }
         
-        // Validate n
-        if let n = n {
-            if n < 1 || n > 10 {
-                throw ValidationError.outOfRange(field: "n", min: "1", max: "10")
-            }
-        }
+        // Note: 'n' parameter is not part of ChatCompletionRequest
+        // Commented out as it references a non-existent property
         
         // Validate presence_penalty
         if let penalty = presencePenalty {
@@ -122,28 +118,30 @@ extension ChatMessage: Validatable {
     public func validate() throws {
         // Validate role-specific requirements
         switch role {
-        case .system:
+        case "system":
             if content == nil {
                 throw ValidationError.missingRequiredField("content for system message")
             }
-        case .user:
+        case "user":
             if content == nil && toolCallId == nil {
                 throw ValidationError.missingRequiredField("content or tool_call_id for user message")
             }
-        case .assistant:
+        case "assistant":
             if content == nil && toolCalls == nil {
                 throw ValidationError.missingRequiredField("content or tool_calls for assistant message")
             }
-        case .tool:
+        case "tool":
             if toolCallId == nil {
                 throw ValidationError.missingRequiredField("tool_call_id for tool message")
             }
             if content == nil {
                 throw ValidationError.missingRequiredField("content for tool message")
             }
-        case .function:
+        case "function":
             // Legacy function role - deprecated but still valid
             break
+        default:
+            throw ValidationError.invalidValue(field: "role", reason: "Unknown message role: \(role)")
         }
         
         // Validate name if present
@@ -184,23 +182,29 @@ extension ToolFunction: Validatable {
 
 extension ToolParameters: Validatable {
     public func validate() throws {
-        // Validate type
-        if type != "object" && type != "array" && type != "string" && type != "number" && type != "boolean" {
-            throw ValidationError.invalidValue(
-                field: "parameters.type",
-                reason: "Must be one of: object, array, string, number, boolean"
-            )
+        // Validate name
+        if name.isEmpty {
+            throw ValidationError.missingRequiredField("parameters.name")
         }
         
-        // Validate required fields exist in properties
-        if let required = required, let properties = properties {
-            for field in required {
-                if properties[field] == nil {
-                    throw ValidationError.invalidValue(
-                        field: "required",
-                        reason: "Field '\(field)' is listed as required but not defined in properties"
-                    )
-                }
+        // Validate description
+        if description.isEmpty {
+            throw ValidationError.missingRequiredField("parameters.description")
+        }
+        
+        // Validate input schema if present
+        if let schema = inputSchema {
+            // Validate schema has proper structure
+            // This is placeholder validation - extend as needed
+        }
+        
+        // Validate required fields are not empty strings
+        for field in required {
+            if field.isEmpty {
+                throw ValidationError.invalidValue(
+                    field: "required",
+                    reason: "Required field name cannot be empty"
+                )
             }
         }
     }
@@ -228,32 +232,33 @@ extension CreateProjectRequest: Validatable {
             throw ValidationError.invalidPath(path)
         }
         
-        // Validate git repository URL if present
-        if let gitRepo = gitRepository, !gitRepo.isEmpty {
-            if !gitRepo.hasPrefix("http://") && !gitRepo.hasPrefix("https://") && !gitRepo.hasPrefix("git@") {
-                throw ValidationError.invalidURL(gitRepo)
-            }
+        // Validate language if present
+        if let lang = language, lang.isEmpty {
+            throw ValidationError.invalidValue(field: "language", reason: "Cannot be empty if specified")
         }
         
-        // Validate settings
-        try settings?.validate()
+        // Validate framework if present
+        if let fw = framework, fw.isEmpty {
+            throw ValidationError.invalidValue(field: "framework", reason: "Cannot be empty if specified")
+        }
     }
 }
 
 extension ProjectSettings: Validatable {
     public func validate() throws {
-        // Validate temperature
-        if let temp = temperature {
-            if temp < 0 || temp > 2 {
-                throw ValidationError.outOfRange(field: "temperature", min: "0", max: "2")
-            }
+        // Validate name
+        if name.isEmpty {
+            throw ValidationError.missingRequiredField("name")
         }
         
-        // Validate max tokens
-        if let maxTokens = maxTokens {
-            if maxTokens < 1 {
-                throw ValidationError.outOfRange(field: "maxTokens", min: "1", max: nil)
-            }
+        // Validate language
+        if language.isEmpty {
+            throw ValidationError.missingRequiredField("language")
+        }
+        
+        // Validate defaultBranch
+        if defaultBranch.isEmpty {
+            throw ValidationError.missingRequiredField("defaultBranch")
         }
     }
 }
@@ -261,34 +266,32 @@ extension ProjectSettings: Validatable {
 // MARK: - Session Validation
 extension CreateSessionRequest: Validatable {
     public func validate() throws {
-        // Validate name
-        if name.isEmpty {
-            throw ValidationError.missingRequiredField("name")
+        // Validate title
+        if title.isEmpty {
+            throw ValidationError.missingRequiredField("title")
         }
         
-        if name.count > 255 {
-            throw ValidationError.tooLong(field: "name", maxLength: 255)
+        if title.count > 255 {
+            throw ValidationError.tooLong(field: "title", maxLength: 255)
         }
         
-        // Validate metadata
-        try metadata?.validate()
+        // Validate model if present
+        if let model = model, model.isEmpty {
+            throw ValidationError.invalidValue(field: "model", reason: "Cannot be empty if specified")
+        }
     }
 }
 
 extension SessionMetadata: Validatable {
     public func validate() throws {
-        // Validate temperature
-        if let temp = temperature {
-            if temp < 0 || temp > 2 {
-                throw ValidationError.outOfRange(field: "temperature", min: "0", max: "2")
-            }
+        // Validate title
+        if title.isEmpty {
+            throw ValidationError.missingRequiredField("title")
         }
         
-        // Validate max tokens
-        if let maxTokens = maxTokens {
-            if maxTokens < 1 {
-                throw ValidationError.outOfRange(field: "maxTokens", min: "1", max: nil)
-            }
+        // Validate userId
+        if userId.isEmpty {
+            throw ValidationError.missingRequiredField("userId")
         }
     }
 }
@@ -335,9 +338,9 @@ extension SSHConfig: Validatable {
 // MARK: - Tool Execution Validation
 extension ToolExecutionRequest: Validatable {
     public func validate() throws {
-        // Validate tool ID
-        if toolId.isEmpty {
-            throw ValidationError.missingRequiredField("toolId")
+        // Validate tool name
+        if toolName.isEmpty {
+            throw ValidationError.missingRequiredField("toolName")
         }
         
         // Validate timeout

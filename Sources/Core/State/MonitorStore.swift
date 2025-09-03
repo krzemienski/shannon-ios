@@ -233,6 +233,111 @@ public final class MonitorStore: ObservableObject {
         }
     }
     
+    // MARK: - Additional Public Methods for MonitorCoordinator
+    
+    /// Export current monitoring data
+    public func exportData(for timeRange: TimeRange) async throws -> Data {
+        let exportData = MonitoringExport(
+            timestamp: Date(),
+            cpuUsage: cpuUsage,
+            memoryUsage: memoryUsage,
+            diskUsage: diskUsage,
+            networkStats: networkStats,
+            activeConnections: activeConnections.map { ConnectionExport(from: $0) }
+        )
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        
+        guard let data = try? encoder.encode(exportData) else {
+            throw MonitorError.exportFailed
+        }
+        return data
+    }
+    
+    /// Export all monitoring data
+    public func exportAllData() async throws -> Data {
+        return try await exportData(for: .oneWeek)  // Export last week's data as "all"
+    }
+    
+    /// Get current system metrics
+    public var currentSystemMetrics: SystemMetrics {
+        SystemMetrics(
+            cpu: CPUMetrics(usage: cpuUsage),
+            memory: MemoryMetrics(
+                total: Int64(memoryUsage.total),
+                used: Int64(memoryUsage.used),
+                free: Int64(memoryUsage.available),
+                cached: 0
+            ),
+            disk: DiskMetrics(
+                total: Int64(diskUsage.total),
+                used: Int64(diskUsage.used),
+                free: Int64(diskUsage.available),
+                readBytes: 0,
+                writeBytes: 0
+            ),
+            network: NetworkMetrics()
+        )
+    }
+    
+    /// Get current network metrics
+    public var currentNetworkMetrics: NetworkMetrics {
+        NetworkMetrics(
+            bytesIn: Int64(networkStats.totalBytesReceived),
+            bytesOut: Int64(networkStats.totalBytesSent),
+            packetsIn: 0,  // Not currently tracked
+            packetsOut: 0,  // Not currently tracked
+            errors: 0  // Not currently tracked
+        )
+    }
+    
+    /// Get current SSH metrics
+    public var currentSSHMetrics: SSHMetrics {
+        SSHMetrics(
+            connectedSessions: activeConnections.count,
+            totalBytesReceived: Int64(activeConnections.reduce(0) { $0 + $1.bytesTransferred / 2 }),
+            totalBytesSent: Int64(activeConnections.reduce(0) { $0 + $1.bytesTransferred / 2 }),
+            averageLatency: 0,  // Would need actual measurement
+            sessionDurations: []  // Would need tracking
+        )
+    }
+    
+    /// Get current performance metrics
+    public var currentPerformanceMetrics: PerformanceMetrics {
+        PerformanceMetrics(
+            latency: 0, // Would need actual measurement
+            throughput: Double(networkStats.currentDownloadSpeed + networkStats.currentUploadSpeed),
+            requestsPerSecond: 0 // Would need actual measurement
+        )
+    }
+    
+    /// Get historical data for a specific time range
+    public func getHistoricalData(for timeRange: TimeRange) -> [MetricDataPoint] {
+        // For now, return empty array. Would need to implement data storage
+        return []
+    }
+    
+    /// Configure an alert
+    public func configureAlert(_ alert: MonitoringAlert) {
+        // Store alert configuration
+        // Would need to implement alert storage and checking
+    }
+    
+    /// Remove an alert
+    public func removeAlert(id: String) {
+        // Remove alert by ID
+        // Would need to implement alert storage
+    }
+    
+    /// Get active alerts
+    public var activeAlerts: [MonitoringAlert] {
+        // Return currently active alerts
+        // Would need to implement alert checking
+        return []
+    }
+    
     /// Clear all monitoring data and reset to defaults
     public func clearAll() async {
         cpuUsage = 0
@@ -405,3 +510,45 @@ public struct ConnectionExport: Codable {
 extension MemoryUsage: Codable {}
 extension DiskUsage: Codable {}
 extension NetworkStats: Codable {}
+
+// MARK: - Additional Types for MonitorCoordinator
+
+// Note: TimeRange, SystemMetrics, NetworkMetrics, SSHMetrics, MetricDataPoint, and PerformanceMetrics
+// are imported from the Models module where they are defined with Codable conformance
+
+public struct MonitoringAlert: Identifiable {
+    public let id: String
+    public let type: AlertType
+    public let threshold: Double
+    public let action: AlertAction
+    
+    public enum AlertType {
+        case cpuUsage
+        case memoryUsage
+        case diskUsage
+        case networkUsage
+    }
+    
+    public enum AlertAction {
+        case notify
+        case email
+        case log
+    }
+}
+
+public enum MonitorError: LocalizedError {
+    case exportFailed
+    case importFailed
+    case metricsUnavailable
+    
+    public var errorDescription: String? {
+        switch self {
+        case .exportFailed:
+            return "Failed to export monitoring data"
+        case .importFailed:
+            return "Failed to import monitoring data"
+        case .metricsUnavailable:
+            return "Metrics are currently unavailable"
+        }
+    }
+}

@@ -17,7 +17,7 @@ struct EnhancedOnboardingView: View {
     @State private var animateContent = false
     @State private var selectedPreferences = OnboardingUserPreferences()
     @State private var apiKey = ""
-    @State private var baseURL = "http://localhost:8000/v1"
+    @State private var baseURL = "http://192.168.0.155:8000/v1"
     @Environment(\.dismiss) private var dismiss
     
     let onComplete: () -> Void

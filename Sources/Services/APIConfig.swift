@@ -1,19 +1,59 @@
 import Foundation
 
 /// API configuration for Claude Code backend
-public enum APIConfig {
+struct APIConfig {
     // MARK: - Base Configuration
     
+    /// Host machine IP address for simulator connectivity
+    /// This is the IP address of your Mac on the local network
+    private static let hostMachineIP = "192.168.0.155"
+    
+    /// Determine the correct base URL based on the runtime environment
+    private static var localhostURL: String {
+        #if targetEnvironment(simulator)
+        // iOS Simulator needs to use host machine IP, not localhost
+        return "http://\(hostMachineIP):8000/v1"
+        #else
+        // On device, use actual IP or configured URL
+        return "http://\(hostMachineIP):8000/v1"
+        #endif
+    }
+    
     /// Base URL for the Claude Code API Gateway
-    /// Should be running at localhost:8000 in development
-    public static let baseURL = URL(string: "http://localhost:8000/v1")!
+    /// Automatically configures for simulator vs device
+    public static let baseURL = URL(string: localhostURL)!
     
     /// Default base URL string for settings
-    public static let defaultBaseURL = "http://localhost:8000/v1"
+    public static let defaultBaseURL = localhostURL
+    
+    /// Alternative localhost configurations
+    public static let localhostVariants = [
+        "http://localhost:8000/v1",          // Standard localhost
+        "http://127.0.0.1:8000/v1",          // Loopback address
+        "http://\(hostMachineIP):8000/v1",   // Host machine IP
+        "http://0.0.0.0:8000/v1"             // All interfaces
+    ]
     
     /// Alternative base URLs for different environments
     static let productionURL = URL(string: "https://api.claudecode.com/v1")!
     static let stagingURL = URL(string: "https://staging-api.claudecode.com/v1")!
+    
+    /// Check if URL is localhost variant
+    public static func isLocalhost(_ url: String) -> Bool {
+        return url.contains("localhost") || 
+               url.contains("127.0.0.1") || 
+               url.contains(hostMachineIP) ||
+               url.contains("0.0.0.0")
+    }
+    
+    /// Get the appropriate health check URL
+    public static func healthCheckURL(for baseURL: String = defaultBaseURL) -> URL? {
+        // Health endpoint is at root /health, not under /v1
+        let urlString = baseURL
+            .replacingOccurrences(of: "/v1", with: "")
+            .appending("/health")
+        return URL(string: urlString)
+    }
     
     // MARK: - Endpoints
     
@@ -82,8 +122,16 @@ public enum APIConfig {
         var headers = [
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "ClaudeCode-iOS/1.0"
+            "User-Agent": "ClaudeCode-iOS/1.0",
+            "X-Client-Platform": "iOS",
+            "X-Client-Version": "1.0"
         ]
+        
+        // Add simulator identifier for debugging
+        #if targetEnvironment(simulator)
+        headers["X-Client-Environment"] = "simulator"
+        headers["X-Client-Host-IP"] = hostMachineIP
+        #endif
         
         if let apiKey = apiKey {
             headers["Authorization"] = "Bearer \(apiKey)"
@@ -96,7 +144,26 @@ public enum APIConfig {
         var headers = defaultHeaders(apiKey: apiKey)
         headers["Accept"] = "text/event-stream"
         headers["Cache-Control"] = "no-cache"
+        headers["Connection"] = "keep-alive"
         return headers
+    }
+    
+    // MARK: - Network Configuration
+    
+    /// Network timeout configurations for different scenarios
+    struct NetworkTimeouts {
+        static let standard: TimeInterval = 30
+        static let streaming: TimeInterval = 300  // 5 minutes
+        static let upload: TimeInterval = 600     // 10 minutes
+        static let healthCheck: TimeInterval = 5
+    }
+    
+    /// Connection quality thresholds
+    struct ConnectionQuality {
+        static let excellentLatency: TimeInterval = 0.05  // 50ms
+        static let goodLatency: TimeInterval = 0.1        // 100ms
+        static let fairLatency: TimeInterval = 0.3        // 300ms
+        static let poorLatency: TimeInterval = 1.0        // 1 second
     }
     
     // MARK: - Available Models
@@ -143,13 +210,13 @@ public enum APIConfig {
         let retryDelay: TimeInterval
         
         static let `default` = RequestConfig(
-            timeout: 30,
+            timeout: NetworkTimeouts.standard,
             maxRetries: 3,
             retryDelay: 1.0
         )
         
         static let streaming = RequestConfig(
-            timeout: 300,  // 5 minutes for streaming
+            timeout: NetworkTimeouts.streaming,
             maxRetries: 1,
             retryDelay: 0
         )
@@ -158,6 +225,12 @@ public enum APIConfig {
             timeout: 120,
             maxRetries: 2,
             retryDelay: 2.0
+        )
+        
+        static let healthCheck = RequestConfig(
+            timeout: NetworkTimeouts.healthCheck,
+            maxRetries: 1,
+            retryDelay: 0
         )
     }
     
@@ -174,6 +247,8 @@ public enum APIConfig {
         case unauthorized
         case rateLimited(retryAfter: TimeInterval?)
         case backendNotRunning
+        case connectionTimeout
+        case noInternetConnection
         
         var errorDescription: String? {
             switch self {
@@ -195,7 +270,24 @@ public enum APIConfig {
                 }
                 return "Rate limited - please try again later"
             case .backendNotRunning:
-                return "Backend API is not running at \(baseURL.absoluteString)"
+                return "Backend API is not running. Please ensure the backend is started at \(baseURL.absoluteString)"
+            case .connectionTimeout:
+                return "Connection timed out. Please check your network connection."
+            case .noInternetConnection:
+                return "No internet connection available"
+            }
+        }
+        
+        var recoverySuggestion: String? {
+            switch self {
+            case .backendNotRunning:
+                return "Start the backend with: cd claude-code-api && make start"
+            case .connectionTimeout:
+                return "Check if the backend is running and accessible at \(baseURL.absoluteString)"
+            case .unauthorized:
+                return "Verify your API key in Settings"
+            default:
+                return nil
             }
         }
     }

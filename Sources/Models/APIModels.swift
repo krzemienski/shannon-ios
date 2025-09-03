@@ -353,6 +353,7 @@ public enum APIError: LocalizedError {
     case serverError(Int, String?)
     case rateLimitExceeded
     case unauthorized
+    case authenticationFailed
     case invalidRequest(String)
     case timeout
     case unknown(String)
@@ -373,6 +374,8 @@ public enum APIError: LocalizedError {
             return "Rate limit exceeded"
         case .unauthorized:
             return "Unauthorized access"
+        case .authenticationFailed:
+            return "Authentication failed"
         case .invalidRequest(let message):
             return "Invalid request: \(message)"
         case .timeout:

@@ -8,6 +8,90 @@
 - App Design: @.taskmaster/docs/app-design-document.md
 - Tech Stack: @.taskmaster/docs/tech-stack.md
 
+## 🚀 Build System: Tuist
+
+This project uses **Tuist** for build management and project generation. Tuist provides:
+- Declarative project configuration in Swift
+- Reproducible builds across team members
+- Dependency management via Swift Package Manager
+- Automatic project generation from manifest files
+
+### Required Tuist Files
+- `Tuist.swift` - Root configuration for Tuist
+- `Project.swift` - Project definition with targets and dependencies
+- `Tuist/ProjectDescriptionHelpers/` - Shared build settings and helpers
+
+## Build Instructions (Tuist)
+
+### Prerequisites
+```bash
+# Install Tuist (if not already installed)
+curl -Ls https://install.tuist.io | bash
+
+# Or via Homebrew
+brew install tuist
+```
+
+### Primary Build Workflow
+```bash
+# 1. Generate Xcode project from Tuist manifests
+tuist generate
+
+# 2. Build the project
+tuist build
+
+# 3. Run on simulator
+tuist build --open
+
+# Alternative: Build with specific configuration
+tuist build --configuration Debug
+tuist build --configuration Release
+
+# Clean build
+tuist clean
+tuist build --clean
+```
+
+### Common Tuist Commands
+```bash
+# Edit Tuist manifests in Xcode
+tuist edit
+
+# Install dependencies
+tuist install
+
+# Graph visualization
+tuist graph
+
+# Run tests
+tuist test
+
+# Focus on specific targets (faster generation)
+tuist generate ClaudeCodeSwift
+
+# Cache management
+tuist cache warm  # Pre-build dependencies
+tuist cache print # Show cache status
+```
+
+### Troubleshooting Tuist Builds
+```bash
+# Clear all caches and regenerate
+tuist clean
+rm -rf Derived/
+rm -rf .build/
+tuist generate
+
+# Verbose output for debugging
+tuist build --verbose
+
+# Check Tuist version
+tuist version
+
+# Update Tuist
+tuist update
+```
+
 ## Simulator Configuration
 
 ### iPhone 16 Pro Max (iOS 18.6)
@@ -15,50 +99,27 @@
 - **Logs Path**: `logs/simulator_*.log`
 - **Build Destination**: `platform=iOS Simulator,id=50523130-57AA-48B0-ABD0-4D59CE455F14`
 
-### REQUIRED: Use Simulator Automation Script
-**CRITICAL - MANDATORY**: You MUST ALWAYS use the `Scripts/simulator_automation.sh` script for ALL building, testing, and launching operations. NEVER use manual xcodebuild or xcrun commands directly. This script handles all the complexity of simulator management, logging, and build configuration.
-
-**DO NOT USE MANUAL COMMANDS - USE THE SCRIPT!**
-
-#### Available Commands:
+### Automated Build & Launch with Tuist
 ```bash
-# Complete workflow (recommended)
-./Scripts/simulator_automation.sh all
+# Complete workflow using Tuist
+tuist generate && tuist build --open
 
-# Individual commands
-./Scripts/simulator_automation.sh build    # Build with logging
-./Scripts/simulator_automation.sh launch   # Install and launch
-./Scripts/simulator_automation.sh logs     # Capture logs only
-./Scripts/simulator_automation.sh status   # Check simulator status
-./Scripts/simulator_automation.sh clean    # Clean build artifacts
-./Scripts/simulator_automation.sh help     # Show all options
+# Or use the automation script (legacy, pre-Tuist)
+./Scripts/simulator_automation.sh all
 ```
 
-#### Key Features:
-- Automatic simulator boot if needed
-- Log capture with filtering for ClaudeCode
-- Proper PKG_CONFIG_PATH for libssh2 (Citadel/SSH dependencies)
-- XcodeGen project generation if missing
-- Clean build and installation
-- Color-coded output for easy debugging
-
-### Manual Build & Launch (Fallback Only)
+### Manual Simulator Operations (Fallback Only)
 ```bash
-# Only use if automation script fails
+# Only use if Tuist and automation script fail
 export SIMULATOR_UUID="50523130-57AA-48B0-ABD0-4D59CE455F14"
 export APP_BUNDLE_ID="com.claudecode.ios"
 
-# 1. Start log capture (background)
+# Start log capture (background)
 xcrun simctl spawn $SIMULATOR_UUID log stream \
     --level=debug --style=syslog > logs/simulator_$(date +%Y%m%d_%H%M%S).log 2>&1 &
 
-# 2. Build with Xcode
-xcodebuild -scheme ClaudeCode \
-    -destination "platform=iOS Simulator,id=$SIMULATOR_UUID" \
-    build
-
-# 3. Install and launch
-xcrun simctl install $SIMULATOR_UUID path/to/ClaudeCode.app
+# Install and launch (after Tuist build)
+xcrun simctl install $SIMULATOR_UUID Derived/Build/Products/Debug-iphonesimulator/ClaudeCode.app
 xcrun simctl launch $SIMULATOR_UUID $APP_BUNDLE_ID
 ```
 

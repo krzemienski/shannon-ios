@@ -392,9 +392,9 @@ struct TagView: View {
         case .small:
             return Theme.Typography.caption2Font
         case .medium:
-            return Theme.Typography.caption
+            return Theme.Typography.captionFont
         case .large:
-            return Theme.Typography.footnote
+            return Theme.Typography.footnoteFont
         }
     }
     

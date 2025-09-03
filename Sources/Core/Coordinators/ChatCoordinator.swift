@@ -97,7 +97,9 @@ public final class ChatCoordinator: BaseCoordinator, ObservableObject {
     
     func deleteConversation(id: String) {
         Task {
-            await dependencyContainer.chatStore.deleteConversation(id: id)
+            if let conversation = dependencyContainer.chatStore.conversations.first(where: { $0.id == id }) {
+                dependencyContainer.chatStore.deleteConversation(conversation)
+            }
             
             // If deleted conversation was selected, select another
             if selectedConversationId == id {
@@ -148,15 +150,29 @@ public final class ChatCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func exportConversation(id: String) async throws -> URL {
-        try await dependencyContainer.chatStore.exportConversation(id: id)
+        guard let conversation = dependencyContainer.chatStore.conversations.first(where: { $0.id == id }) else {
+            throw ChatError.conversationNotFound
+        }
+        let data = try await dependencyContainer.chatStore.exportConversation(conversation)
+        
+        let fileName = "conversation-\(id).json"
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        try data.write(to: tempURL)
+        return tempURL
     }
     
     func exportAllConversations() async throws -> URL {
-        try await dependencyContainer.chatStore.exportAllConversations()
+        let data = try await dependencyContainer.chatStore.exportAllConversations()
+        
+        let fileName = "all-conversations-\(Date().timeIntervalSince1970).json"
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        try data.write(to: tempURL)
+        return tempURL
     }
     
     func importConversations(from url: URL) async throws {
-        try await dependencyContainer.chatStore.importConversations(from: url)
+        let data = try Data(contentsOf: url)
+        try await dependencyContainer.chatStore.importConversations(from: data)
     }
     
     // MARK: - Tool Execution

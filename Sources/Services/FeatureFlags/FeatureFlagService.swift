@@ -92,7 +92,7 @@ public struct ExperimentConfig: Codable {
 
 /// Main service for managing feature flags
 @MainActor
-public class FeatureFlagService: ObservableObject {
+public final class FeatureFlagService: ObservableObject {
     public static let shared = FeatureFlagService()
     
     @Published public private(set) var flags: [String: FeatureFlag] = [:]
@@ -409,14 +409,13 @@ public class FeatureFlagService: ObservableObject {
 // MARK: - SwiftUI Environment
 
 private struct FeatureFlagEnvironmentKey: EnvironmentKey {
-    static var defaultValue: FeatureFlagService {
-        FeatureFlagService.shared
-    }
+    static let defaultValue: FeatureFlagService? = nil
 }
 
 public extension EnvironmentValues {
+    @MainActor
     var featureFlags: FeatureFlagService {
-        get { self[FeatureFlagEnvironmentKey.self] }
+        get { self[FeatureFlagEnvironmentKey.self] ?? FeatureFlagService.shared }
         set { self[FeatureFlagEnvironmentKey.self] = newValue }
     }
 }

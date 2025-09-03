@@ -16,6 +16,7 @@ public final class ProjectStore: ObservableObject {
     
     @Published public var projects: [Project] = []
     @Published public var currentProject: Project?
+    @Published public var activeProjectId: String?
     @Published public var isLoading = false
     @Published public var error: ProjectError?
     @Published public var searchText = ""
@@ -156,6 +157,44 @@ public final class ProjectStore: ObservableObject {
         }
     }
     
+    /// Duplicate a project
+    public func duplicateProject(_ project: Project) -> Project {
+        let duplicated = Project(
+            name: "\(project.name) (Copy)",
+            path: project.path,
+            type: project.type,
+            description: project.description,
+            isActive: false,
+            sshConfig: project.sshConfig,
+            environmentVariables: project.environmentVariables,
+            createdAt: Date()
+        )
+        
+        projects.insert(duplicated, at: 0)
+        pendingChanges = true
+        
+        return duplicated
+    }
+    
+    /// Update SSH configuration
+    public func updateSSHConfig(for project: Project, config: AppSSHConfig) {
+        updateProject(project) { proj in
+            proj.sshConfig = config
+        }
+    }
+    
+    /// Get project by ID
+    public func getProject(by id: String) -> Project? {
+        projects.first { $0.id == id }
+    }
+    
+    /// Update environment variables
+    public func updateEnvironmentVariables(for project: Project, variables: [String: String]) {
+        updateProject(project) { proj in
+            proj.environmentVariables = variables
+        }
+    }
+    
     // MARK: - Persistence
     
     /// Load projects from disk
@@ -292,6 +331,7 @@ public enum ProjectError: LocalizedError {
     case sshConnectionFailed(String)
     case saveFailed(Error)
     case loadFailed(Error)
+    case noSSHConfiguration
     
     public var errorDescription: String? {
         switch self {
@@ -305,6 +345,8 @@ public enum ProjectError: LocalizedError {
             return "Failed to save: \(error.localizedDescription)"
         case .loadFailed(let error):
             return "Failed to load: \(error.localizedDescription)"
+        case .noSSHConfiguration:
+            return "No SSH configuration found for this project"
         }
     }
 }

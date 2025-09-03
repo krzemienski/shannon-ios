@@ -10,7 +10,7 @@ import SwiftUI
 struct APIConfigurationView: View {
     @EnvironmentObject var coordinator: SettingsCoordinator
     @State private var apiKey = ""
-    @State private var baseURL = "http://localhost:8000/v1"
+    @State private var baseURL = "http://192.168.0.155:8000/v1"
     @State private var timeout = 30.0
     @State private var maxRetries = 3
     @State private var isTestingConnection = false

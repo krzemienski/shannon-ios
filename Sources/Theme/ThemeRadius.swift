@@ -34,30 +34,30 @@ public struct ThemeRadius {
     
     /// Standard radii for components
     public struct Component {
-        public static let button: CGFloat = md
-        public static let buttonSmall: CGFloat = sm
-        public static let buttonLarge: CGFloat = lg
-        public static let buttonPill: CGFloat = full
+        public static let button: CGFloat = 8
+        public static let buttonSmall: CGFloat = 4
+        public static let buttonLarge: CGFloat = 12
+        public static let buttonPill: CGFloat = 9999
         
-        public static let card: CGFloat = lg
-        public static let cardSmall: CGFloat = md
-        public static let cardLarge: CGFloat = xl
+        public static let card: CGFloat = 12
+        public static let cardSmall: CGFloat = 8
+        public static let cardLarge: CGFloat = 16
         
-        public static let input: CGFloat = md
-        public static let inputSmall: CGFloat = sm
-        public static let inputLarge: CGFloat = lg
+        public static let input: CGFloat = 8
+        public static let inputSmall: CGFloat = 4
+        public static let inputLarge: CGFloat = 12
         
-        public static let chip: CGFloat = full
-        public static let badge: CGFloat = sm
-        public static let avatar: CGFloat = full
+        public static let chip: CGFloat = 9999
+        public static let badge: CGFloat = 4
+        public static let avatar: CGFloat = 9999
         
-        public static let dialog: CGFloat = xl
-        public static let popover: CGFloat = lg
-        public static let tooltip: CGFloat = sm
+        public static let dialog: CGFloat = 16
+        public static let popover: CGFloat = 12
+        public static let tooltip: CGFloat = 4
         
-        public static let codeBlock: CGFloat = md
-        public static let messageBubble: CGFloat = lg
-        public static let sidebar: CGFloat = none
+        public static let codeBlock: CGFloat = 8
+        public static let messageBubble: CGFloat = 12
+        public static let sidebar: CGFloat = 0
     }
     
     // MARK: - Shape Styles

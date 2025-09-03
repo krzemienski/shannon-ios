@@ -199,6 +199,26 @@ public final class MonitorViewModel: ObservableObject {
         monitorStore.updateRefreshInterval(interval)
     }
     
+    /// Start automatic updates
+    public func startUpdates() {
+        startMonitoring()
+    }
+    
+    /// Stop automatic updates
+    public func stopUpdates() {
+        stopMonitoring()
+    }
+    
+    /// Update time range for data display
+    public func updateTimeRange(_ range: TimeRange) {
+        // Update the displayed data based on time range
+        // This would filter historical data if we were storing it
+        // For now, just trigger a refresh
+        Task {
+            await refreshMetrics()
+        }
+    }
+    
     /// Refresh metrics manually
     public func refreshMetrics() async {
         // Trigger manual refresh

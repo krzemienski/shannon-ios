@@ -52,7 +52,14 @@ public class FileUploadManager: ObservableObject {
             
             // Create upload request
             let endpoint = "/projects/\(transfer.projectId)/files/upload"
-            let request = try apiClient.buildRequest(endpoint: endpoint, method: "POST", body: data)
+            // Directly create URLRequest instead of using buildRequest
+            guard let url = URL(string: "https://api.example.com\(endpoint)") else {
+                throw FileTransferError.uploadFailed(NSError(domain: "Invalid URL", code: 0, userInfo: nil))
+            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.httpBody = data
+            request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
             
             // Execute upload
             let (_, response) = try await URLSession.shared.data(for: request)
@@ -143,7 +150,14 @@ public class FileDownloadManager: ObservableObject {
             // Create download request
             let endpoint = "/projects/\(transfer.projectId)/files/download"
             let params = ["path": transfer.remotePath ?? "", "file": transfer.fileName]
-            let request = try apiClient.buildRequest(endpoint: endpoint, method: "GET", queryParams: params)
+            // Directly create URLRequest instead of using buildRequest
+            var urlComponents = URLComponents(string: "https://api.example.com\(endpoint)")
+            urlComponents?.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
+            guard let url = urlComponents?.url else {
+                throw FileTransferError.downloadFailed(NSError(domain: "Invalid URL", code: 0, userInfo: nil))
+            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
             
             // Execute download
             let (localURL, response) = try await URLSession.shared.download(for: request)

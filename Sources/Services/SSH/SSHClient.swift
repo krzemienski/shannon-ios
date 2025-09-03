@@ -7,7 +7,8 @@
 
 import Foundation
 import Combine
-import Citadel
+@preconcurrency import Citadel
+import CryptoKit
 
 /// SSH client for managing SSH connections
 @MainActor
@@ -32,26 +33,33 @@ public class SSHClient: ObservableObject {
             authMethod = .passwordBased(username: config.username, password: password)
             
         case .publicKey:
-            guard let privateKey = config.privateKey else {
+            guard let privateKeyString = config.privateKey else {
                 throw SSHError.authenticationFailed("Private key required")
             }
-            authMethod = .publicKeyBased(
-                username: config.username,
-                privateKey: privateKey,
-                publicKey: config.publicKey ?? "",
-                passphrase: config.passphrase
-            )
+            
+            // For now, assume Ed25519 keys (most common modern SSH keys)
+            // TODO: Add proper key type detection and parsing
+            guard let privateKeyData = Data(base64Encoded: privateKeyString),
+                  let privateKey = try? Curve25519.Signing.PrivateKey(rawRepresentation: privateKeyData) else {
+                throw SSHError.authenticationFailed("Invalid private key format")
+            }
+            
+            authMethod = .ed25519(username: config.username, privateKey: privateKey)
             
         case .keyboardInteractive:
             // Simplified - would need callback handling
             authMethod = .passwordBased(username: config.username, password: config.password ?? "")
+            
+        case .none:
+            // For servers that allow no authentication (rare)
+            authMethod = .passwordBased(username: config.username, password: "")
         }
         
         do {
             // Connect using Citadel
             self.client = try await Citadel.SSHClient.connect(
                 host: config.host,
-                port: config.port,
+                port: Int(config.port), // Convert UInt16 to Int
                 authenticationMethod: authMethod,
                 hostKeyValidator: .acceptAnything(), // For development - should validate in production
                 reconnect: .never

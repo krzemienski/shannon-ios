@@ -32,7 +32,7 @@ public class WebSocketService: ObservableObject {
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "WebSocketService")
     
     // Configuration
-    private var baseURL: String = "ws://localhost:8000/ws"
+    private var baseURL: String = "ws://192.168.0.155:8000/ws"
     private var authToken: String?
     
     // Event subjects

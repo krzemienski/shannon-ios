@@ -67,8 +67,7 @@ public class TerminalViewModel: ObservableObject {
         
         let session = TerminalSession(
             name: config.name,
-            config: config,
-            terminal: SSHTerminal()
+            config: config
         )
         
         sessions.append(session)
@@ -303,8 +302,11 @@ public class TerminalViewModel: ObservableObject {
 
 // MARK: - Terminal Session
 
-/// Terminal session model
-public class TerminalSession: ObservableObject, Identifiable {
+/// Terminal session model  
+public class TerminalSession: ObservableObject, Identifiable, Equatable {
+    public static func == (lhs: TerminalSession, rhs: TerminalSession) -> Bool {
+        lhs.id == rhs.id
+    }
     public let id = UUID().uuidString
     @Published public var name: String
     @Published public var config: SSHConfig?
@@ -317,12 +319,12 @@ public class TerminalSession: ObservableObject, Identifiable {
     public init(
         name: String,
         config: SSHConfig? = nil,
-        terminal: SSHTerminal = SSHTerminal(),
+        terminal: SSHTerminal? = nil,
         commandHistory: CommandHistory = CommandHistory()
     ) {
         self.name = name
         self.config = config
-        self.terminal = terminal
+        self.terminal = terminal ?? SSHTerminal()
         self.commandHistory = commandHistory
     }
 }

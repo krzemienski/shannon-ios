@@ -169,7 +169,7 @@ public struct TerminalCell: Equatable {
 public typealias TerminalAttributes = TerminalCharacter.TextAttributes
 
 // MVP: Add TerminalSettings for TerminalSettingsView
-public struct TerminalSettings: Codable, Equatable {
+public struct SSHTerminalSettings: Codable, Equatable {
     public var fontFamily: String
     public var fontSize: CGFloat
     public var colorScheme: String

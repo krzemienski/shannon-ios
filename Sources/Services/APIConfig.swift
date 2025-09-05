@@ -5,19 +5,15 @@ struct APIConfig {
     // MARK: - Base Configuration
     
     /// Host machine IP address for simulator connectivity
-    /// For simulator, we can use localhost directly since backend runs on same machine
-    /// For device testing, update this to your Mac's IP address
-    private static let hostMachineIP = "127.0.0.1"  // Changed to localhost for simulator
+    /// IMPORTANT: iOS Simulator needs the host machine's actual IP, not localhost
+    /// Update this to your Mac's IP address when it changes
+    private static let hostMachineIP = "192.168.0.155"  // Host machine IP for simulator
     
     /// Determine the correct base URL based on the runtime environment
     private static var localhostURL: String {
-        #if targetEnvironment(simulator)
-        // iOS Simulator can use localhost directly when backend is on same machine
-        return "http://localhost:8000/v1"
-        #else
-        // On device, use actual IP or configured URL (update hostMachineIP for device testing)
+        // Both simulator and device need the actual IP address
+        // iOS Simulator cannot access localhost of the host machine
         return "http://\(hostMachineIP):8000/v1"
-        #endif
     }
     
     /// Base URL for the Claude Code API Gateway

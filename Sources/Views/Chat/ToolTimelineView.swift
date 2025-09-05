@@ -7,6 +7,22 @@
 
 import SwiftUI
 
+// MVP: Stub implementation - Tool functionality to be implemented later
+struct ToolUsage: Identifiable {
+    let id = UUID().uuidString
+    let name: String
+    let description: String
+    let timestamp: Date
+    let duration: TimeInterval
+    let status: Status
+    
+    enum Status {
+        case success
+        case error
+        case running
+    }
+}
+
 struct ToolTimelineView: View {
     @Environment(\.dismiss) private var dismiss
     let tools: [ToolUsage]

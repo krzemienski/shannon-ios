@@ -8,60 +8,26 @@
 import SwiftUI
 import Combine
 
-// Temporary simple chat view model for compilation
-class SimpleChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessage] = []
-    @Published var isLoading = false
-    @Published var streamingText = ""
-    @Published var currentTool: String?
-    @Published var toolExecutions: [ToolExecution] = []
-    @Published var tokenUsage = 0
-    @Published var toolUsages: [ToolUsage] = []
-    
-    var hasToolUsage: Bool {
-        !toolUsages.isEmpty
-    }
-    
-    var toolUsageCount: Int {
-        toolUsages.count
-    }
-    
-    init() {
-        // Initialize with empty state
-    }
-    
-    func sendMessage(_ text: String) {
-        // Implementation pending
-    }
-    
-    func preloadMessageContent(_ message: ChatMessage) {
-        // Implementation pending
-    }
-    
-    func cleanupMessageResources(_ message: ChatMessage) {
-        // Implementation pending
-    }
-    
-    func clearChat() {
-        messages.removeAll()
-    }
-    
-    func cancelCurrentRequest() {
-        isLoading = false
-    }
-    
-    func retryLastMessage() {
-        // Implementation pending
-    }
-}
+// This file now uses the real ChatViewModel from Sources/ViewModels/ChatViewModel.swift
 
 struct ChatView: View {
     let session: ChatSession
     @EnvironmentObject private var appState: AppState
-    @StateObject private var viewModel = SimpleChatViewModel()
+    @StateObject private var viewModel: ChatViewModel
     @State private var messageText = ""
     @FocusState private var isInputFocused: Bool
     @State private var showingToolTimeline = false
+    
+    init(session: ChatSession) {
+        self.session = session
+        let container = DependencyContainer.shared
+        _viewModel = StateObject(wrappedValue: ChatViewModel(
+            conversationId: session.id,
+            chatStore: container.chatStore,
+            apiClient: container.apiClient,
+            appState: container.appState
+        ))
+    }
     
     // MARK: - View Components
     
@@ -81,7 +47,7 @@ struct ChatView: View {
                             }
                     }
                     
-                    if viewModel.isLoading {
+                    if viewModel.isLoading || viewModel.isStreaming {
                         ThinkingIndicator()
                     }
                 }
@@ -102,27 +68,8 @@ struct ChatView: View {
     
     @ViewBuilder
     private var toolTimelineButton: some View {
-        if viewModel.hasToolUsage {
-            HStack {
-                Button {
-                    showingToolTimeline = true
-                } label: {
-                    HStack(spacing: ThemeSpacing.xs) {
-                        Image(systemName: "timeline.selection")
-                        Text("View Tool Timeline")
-                        Spacer()
-                        Text("\(viewModel.toolUsageCount) tools")
-                            .font(Theme.Typography.captionFont)
-                        Image(systemName: "chevron.right")
-                    }
-                    .font(Theme.Typography.footnoteFont)
-                    .foregroundColor(Theme.primary)
-                    .padding(.horizontal, ThemeSpacing.md)
-                    .padding(.vertical, ThemeSpacing.sm)
-                }
-            }
-            .background(Theme.primary.opacity(0.1))
-        }
+        // Tool timeline can be added in future iteration
+        EmptyView()
     }
     
     @ViewBuilder
@@ -175,23 +122,22 @@ struct ChatView: View {
     @ViewBuilder
     private var toolbarContent: some View {
         HStack(spacing: ThemeSpacing.xs) {
-            if viewModel.tokenUsage > 0 {
-                Label("\(viewModel.tokenUsage)", systemImage: "cube")
-                    .font(Theme.Typography.captionFont)
-                    .foregroundColor(Theme.mutedForeground)
-            }
+            // Connection status indicator
+            Circle()
+                .fill(viewModel.connectionStatus.color)
+                .frame(width: 8, height: 8)
             
             Menu {
                 Button {
-                    // Clear chat
+                    viewModel.clearConversation()
                 } label: {
                     Label("Clear Chat", systemImage: "trash")
                 }
                 
                 Button {
-                    // Export chat
+                    viewModel.startNewConversation()
                 } label: {
-                    Label("Export", systemImage: "square.and.arrow.up")
+                    Label("New Chat", systemImage: "plus")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
@@ -217,33 +163,45 @@ struct ChatView: View {
                 toolbarContent
             }
         }
-        .sheet(isPresented: $showingToolTimeline) {
-            ToolTimelineView(tools: viewModel.toolUsages)
+        .onAppear {
+            // Subscribe to WebSocket updates for real-time streaming
+            viewModel.subscribeToWebSocketUpdates()
         }
+        .alert("Error", isPresented: $viewModel.showError) {
+            Button("OK") {
+                viewModel.showError = false
+            }
+            Button("Retry") {
+                viewModel.retry()
+            }
+        } message: {
+            Text(viewModel.error?.localizedDescription ?? "An error occurred")
+        }
+        // Tool timeline will be added in future iteration
     }
     
     private func sendMessage() {
         guard !messageText.isEmpty else { return }
         
-        let text = messageText
+        viewModel.inputText = messageText
         messageText = ""
         
-        viewModel.sendMessage(text)
+        viewModel.sendMessage()
     }
 }
 
 // MARK: - Message View
 
 struct ChatMessageView: View {
-    let message: ChatMessage
+    let message: Message
     
     var body: some View {
         HStack(alignment: .top, spacing: ThemeSpacing.md) {
             // Avatar
-            if message.role == "user" {
+            if message.role == .user {
                 Spacer()
-            } else {
-                Image(systemName: "brain")
+            } else if message.role != .error {
+                Image(systemName: message.role == .system ? "gear" : "brain")
                     .font(.system(size: 20))
                     .foregroundColor(Theme.primary)
                     .frame(width: 32, height: 32)
@@ -252,44 +210,110 @@ struct ChatMessageView: View {
             }
             
             // Message bubble
-            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: ThemeSpacing.xs) {
-                // Message content
-                Text(message.content ?? "")
-                    .font(Theme.Typography.bodyFont)
-                    .foregroundColor(Theme.foreground)
+            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: ThemeSpacing.xs) {
+                // Error messages
+                if message.role == .error {
+                    HStack(spacing: ThemeSpacing.xs) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                        Text(message.content)
+                            .font(Theme.Typography.bodyFont)
+                            .foregroundColor(.orange)
+                    }
                     .padding(.horizontal, ThemeSpacing.md)
                     .padding(.vertical, ThemeSpacing.sm)
-                    .background(
-                        message.role == "user" ? Theme.primary : Theme.card
-                    )
+                    .background(Color.orange.opacity(0.1))
                     .cornerRadius(Theme.CornerRadius.md)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
-                            .stroke(
-                                message.role == "user" ? Color.clear : Theme.border,
-                                lineWidth: 1
+                } else {
+                    // Regular message content with markdown support
+                    if message.isStreaming && !message.content.isEmpty {
+                        // Streaming message with animated cursor
+                        HStack(spacing: 0) {
+                            Text(message.content)
+                                .font(Theme.Typography.bodyFont)
+                                .foregroundColor(message.role == .user ? .white : Theme.foreground)
+                            
+                            if message.isStreaming {
+                                BlinkingCursor()
+                            }
+                        }
+                        .padding(.horizontal, ThemeSpacing.md)
+                        .padding(.vertical, ThemeSpacing.sm)
+                        .background(
+                            message.role == .user ? Theme.primary : Theme.card
+                        )
+                        .cornerRadius(Theme.CornerRadius.md)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
+                                .stroke(
+                                    message.role == .user ? Color.clear : Theme.border,
+                                    lineWidth: 1
+                                )
+                        )
+                    } else {
+                        Text(message.content)
+                            .font(Theme.Typography.bodyFont)
+                            .foregroundColor(message.role == .user ? .white : Theme.foreground)
+                            .padding(.horizontal, ThemeSpacing.md)
+                            .padding(.vertical, ThemeSpacing.sm)
+                            .background(
+                                message.role == .user ? Theme.primary : Theme.card
                             )
-                    )
+                            .cornerRadius(Theme.CornerRadius.md)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
+                                    .stroke(
+                                        message.role == .user ? Color.clear : Theme.border,
+                                        lineWidth: 1
+                                    )
+                            )
+                    }
+                }
                 
-                // Timestamp - MVP: Comment out for now
-                // Text(message.formattedTime)
-                //     .font(Theme.Typography.caption2Font)
-                //     .foregroundColor(Theme.mutedForeground)
+                // Token usage for assistant messages
+                if let usage = message.metadata?.usage,
+                   message.role == .assistant {
+                    HStack(spacing: ThemeSpacing.xs) {
+                        Image(systemName: "cube")
+                            .font(.system(size: 10))
+                        Text("\(usage.totalTokens) tokens")
+                            .font(Theme.Typography.caption2Font)
+                    }
+                    .foregroundColor(Theme.mutedForeground)
+                }
             }
-            .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: message.role == "user" ? .trailing : .leading)
+            .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: message.role == .user ? .trailing : .leading)
             
             // Avatar spacer
-            if message.role == "user" {
+            if message.role == .user {
                 Image(systemName: "person.fill")
                     .font(.system(size: 20))
                     .foregroundColor(Theme.foreground)
                     .frame(width: 32, height: 32)
                     .background(Theme.muted)
                     .cornerRadius(Theme.CornerRadius.full)
-            } else {
+            } else if message.role != .error {
                 Spacer()
             }
         }
+    }
+}
+
+// MARK: - Blinking Cursor
+
+struct BlinkingCursor: View {
+    @State private var isVisible = true
+    
+    var body: some View {
+        Text("▊")
+            .font(Theme.Typography.bodyFont)
+            .foregroundColor(Theme.primary)
+            .opacity(isVisible ? 1 : 0)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
+                    isVisible.toggle()
+                }
+            }
     }
 }
 
@@ -341,47 +365,9 @@ struct ThinkingIndicator: View {
     }
 }
 
-// Note: Using the SimpleChatViewModel defined at the top of the file
+// Models and types are now imported from ChatModels.swift and ChatViewModel.swift
 
-// MARK: - Chat Message Model
-
-struct ChatMessageUI: Identifiable {
-    let id = UUID().uuidString
-    let role: MessageRoleUI
-    let content: String
-    let timestamp: Date
-    
-    var formattedTime: String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter.string(from: timestamp)
-    }
-    
-    enum MessageRoleUI {
-        case user
-        case assistant
-        case system
-    }
-    
-    // Removed mock data - now using real data from ChatViewModel
-}
-
-// MARK: - Tool Usage Model
-
-struct ToolUsage: Identifiable {
-    let id = UUID().uuidString
-    let name: String
-    let description: String
-    let timestamp: Date
-    let duration: TimeInterval
-    let status: Status
-    
-    enum Status {
-        case success
-        case error
-        case running
-    }
-}
+// Tool usage and timeline functionality will be added in future iteration
 
 #Preview {
     NavigationStack {

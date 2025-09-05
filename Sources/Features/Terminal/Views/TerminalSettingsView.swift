@@ -88,9 +88,9 @@ public struct TerminalSettingsView: View {
             
             // Cursor style
             Picker("Cursor Style", selection: $settings.cursorStyle) {
-                Text("Block").tag(CursorStyle.block)
-                Text("Underline").tag(CursorStyle.underline)
-                Text("Bar").tag(CursorStyle.bar)
+                Text("Block").tag(TerminalSettings.CursorStyle.block)
+                Text("Underline").tag(TerminalSettings.CursorStyle.underline)
+                Text("Bar").tag(TerminalSettings.CursorStyle.bar)
             }
         }
     }

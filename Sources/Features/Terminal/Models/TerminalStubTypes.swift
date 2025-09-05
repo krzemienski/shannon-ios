@@ -15,13 +15,13 @@ import Foundation
 
 extension SSHSessionManager {
     public func getService(for sessionId: String) -> TerminalService? {
-        // MVP: Return stub service
-        return TerminalService()
+        // MVP: Return the existing TerminalService from TerminalSessionView.swift
+        return nil  // Will be properly implemented when refactoring
     }
 }
 
 // MVP: Simple stub for TerminalService
-public class TerminalService: ObservableObject {
+public class TerminalServiceStub: ObservableObject {
     @Published public var output: String = ""
     @Published public var isConnected: Bool = false
     

@@ -225,7 +225,7 @@ public class EnhancedTerminalViewModel: ObservableObject {
 // MARK: - Supporting Types
 
 /// Cursor style for enhanced terminal
-public enum CursorStyle: String, Codable, CaseIterable {
+public enum TerminalCursorStyle: String, Codable, CaseIterable {
     case block = "block"
     case underline = "underline"
     case bar = "bar"
@@ -236,7 +236,7 @@ public struct EnhancedTerminalSettings {
     public var fontSize: CGFloat = 14
     public var fontFamily = "SF Mono"
     public var colorScheme = "cyberpunk"
-    public var cursorStyle = CursorStyle.block
+    public var cursorStyle = TerminalCursorStyle.block
     public var bellSound = true
     public var scrollbackLines = 10000
     

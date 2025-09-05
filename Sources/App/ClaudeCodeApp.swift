@@ -18,6 +18,7 @@ struct ClaudeCodeApp: App {
     
     var body: some Scene {
         WindowGroup {
+            // MVP: Use simplified ContentView for initial build
             ContentView()
                 .environmentObject(appState)
         }

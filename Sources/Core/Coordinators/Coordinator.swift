@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 
 /// Base protocol for all coordinators
+@MainActor
 protocol Coordinator: AnyObject {
     /// Unique identifier for the coordinator
     var id: UUID { get }
@@ -52,6 +53,7 @@ extension Coordinator {
 }
 
 /// Base implementation of Coordinator protocol
+@MainActor
 public class BaseCoordinator: Coordinator {
     let id = UUID()
     weak var parent: Coordinator?

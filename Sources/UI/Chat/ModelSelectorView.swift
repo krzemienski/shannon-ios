@@ -318,12 +318,12 @@ struct ModelSelectorView: View {
             .padding(.vertical, 2)
             .background(tier.color.opacity(0.2))
             .foregroundColor(tier.color)
-            .cornerRadius(Theme.CornerRadius.xs)
+            .cornerRadius(Theme.CornerRadius.sm)
     }
     
-    private func capabilityBadge(_ capability: ModelCapability) -> some View {
+    private func capabilityBadge(_ capability: ModelFeature) -> some View {
         HStack(spacing: 2) {
-            Image(systemName: capability.icon)
+            Image(systemName: featureIcon(capability))
                 .font(.system(size: 10))
             Text(capability.rawValue)
                 .font(Theme.Typography.caption2Font)
@@ -332,14 +332,18 @@ struct ModelSelectorView: View {
         .padding(.vertical, 2)
         .background(Theme.card)
         .foregroundColor(Theme.mutedForeground)
-        .cornerRadius(Theme.CornerRadius.xs)
+        .cornerRadius(Theme.CornerRadius.sm)
         .overlay(
-            RoundedRectangle(cornerRadius: Theme.CornerRadius.xs)
+            RoundedRectangle(cornerRadius: Theme.CornerRadius.sm)
                 .stroke(Theme.border, lineWidth: 0.5)
         )
     }
     
     // MARK: - Helpers
+    
+    private func featureIcon(_ feature: ModelFeature) -> String {
+        return feature.icon
+    }
     
     private func providerIcon(for provider: String) -> String {
         switch provider {

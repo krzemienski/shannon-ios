@@ -70,6 +70,14 @@ public class CommandHistory: ObservableObject {
         
         return commands.filter { $0.localizedCaseInsensitiveContains(text) }
     }
+    
+    // MVP: Add properties/methods needed by TerminalInputView
+    public var isEmpty: Bool { commands.isEmpty }
+    public var count: Int { commands.count }
+    
+    public subscript(index: Int) -> String? {
+        get { commands[safe: index] }
+    }
 }
 
 // MARK: - Array Extension

@@ -86,9 +86,10 @@ public final class ProjectsViewModel: ObservableObject {
             // Create project request
             let request = CreateProjectRequest(
                 name: project.name,
-                description: project.description,
                 path: "/Users/\(NSUserName())/Projects/\(project.name.replacingOccurrences(of: " ", with: "_"))",
-                gitRemote: nil
+                language: "swift",
+                framework: "SwiftUI",
+                metadata: nil
             )
             
             // Call API
@@ -98,12 +99,10 @@ public final class ProjectsViewModel: ObservableObject {
             let newProject = Project(
                 id: projectInfo.id,
                 name: projectInfo.name,
-                description: projectInfo.description ?? project.description,
-                icon: project.icon,
+                path: projectInfo.path,
+                type: .general,
+                description: project.description,
                 isActive: projectInfo.isActive,
-                sessionCount: 0,
-                toolCount: 0,
-                lastUpdated: projectInfo.createdAt ?? Date(),
                 sshConfig: project.sshConfig
             )
             
@@ -127,7 +126,7 @@ public final class ProjectsViewModel: ObservableObject {
         error = nil
         
         do {
-            let success = try await apiClient.deleteProject(projectId: project.id)
+            let success = try await apiClient.deleteProject(id: project.id)
             
             if success {
                 projects.removeAll { $0.id == project.id }
@@ -149,17 +148,16 @@ public final class ProjectsViewModel: ObservableObject {
         error = nil
         
         do {
-            // Update project request
-            let request = UpdateProjectRequest(
-                name: project.name,
-                description: project.description,
-                isActive: project.isActive
-            )
-            
-            // Call API
+            // Call API with CreateProjectRequest
             let projectInfo = try await apiClient.updateProject(
-                projectId: project.id,
-                updates: request
+                id: project.id,
+                request: CreateProjectRequest(
+                    name: project.name,
+                    path: "/Users/\(NSUserName())/Projects/\(project.name.replacingOccurrences(of: " ", with: "_"))",
+                    language: "swift",
+                    framework: "SwiftUI",
+                    metadata: nil
+                )
             )
             
             // Update local project
@@ -167,12 +165,10 @@ public final class ProjectsViewModel: ObservableObject {
                 projects[index] = Project(
                     id: projectInfo.id,
                     name: projectInfo.name,
-                    description: projectInfo.description ?? project.description,
-                    icon: project.icon,
+                    path: projectInfo.path,
+                    type: .general,
+                    description: project.description,
                     isActive: projectInfo.isActive,
-                    sessionCount: project.sessionCount,
-                    toolCount: project.toolCount,
-                    lastUpdated: projectInfo.updatedAt ?? Date(),
                     sshConfig: project.sshConfig
                 )
             }
@@ -202,19 +198,20 @@ public final class ProjectsViewModel: ObservableObject {
                 Project(
                     id: projectInfo.id,
                     name: projectInfo.name,
+                    path: projectInfo.path,
+                    type: .general,
                     description: projectInfo.description ?? "",
-                    icon: iconForProject(projectInfo.name),
                     isActive: projectInfo.isActive,
-                    sessionCount: projectInfo.sessionCount ?? 0,
-                    toolCount: 0, // TODO: Get tool count from API
-                    lastUpdated: projectInfo.updatedAt ?? projectInfo.createdAt ?? Date(),
-                    sshConfig: nil // TODO: Get SSH config from API
+                    sshConfig: nil, // TODO: Get SSH config from API
+                    environmentVariables: nil,
+                    createdAt: projectInfo.createdAt ?? Date(),
+                    lastAccessedAt: projectInfo.updatedAt
                 )
             }
             
-            logger.info("Loaded \(projects.count) projects from backend")
-        } catch let apiError as APIConfig.APIError {
-            handleAPIError(apiError)
+            logger.info("Loaded \(self.projects.count) projects from backend")
+        } catch let configError as APIConfig.ConfigError {
+            handleConfigError(configError)
         } catch {
             logger.error("Failed to load projects: \(error)")
             self.error = error
@@ -244,6 +241,24 @@ public final class ProjectsViewModel: ObservableObject {
         }
     }
     
+    private func handleConfigError(_ configError: APIConfig.ConfigError) {
+        switch configError {
+        case .backendNotRunning:
+            logger.error("Backend server is not running")
+            showBackendError()
+        case .unauthorized:
+            error = configError
+            showError = true
+        case .networkError(let netError):
+            logger.error("Network error: \(netError)")
+            error = configError
+            showError = true
+        default:
+            error = configError
+            showError = true
+        }
+    }
+    
     private func handleAPIError(_ apiError: APIError) {
         switch apiError {
         case .backendNotRunning:
@@ -263,7 +278,7 @@ public final class ProjectsViewModel: ObservableObject {
     }
     
     private func showBackendError() {
-        error = APIConfig.APIError.backendNotRunning
+        error = APIConfig.ConfigError.backendNotRunning
         showError = true
         
         // Provide helpful message

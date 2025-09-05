@@ -8,7 +8,7 @@
 import Foundation
 
 /// A custom formatter for displaying dates in relative terms (e.g., "5 minutes ago", "Yesterday")
-public class RelativeDateFormatter {
+public final class RelativeDateFormatter: @unchecked Sendable {
     // MARK: - Shared Instance
     
     public static let shared = RelativeDateFormatter()
@@ -82,15 +82,3 @@ public extension Date {
     }
 }
 
-// MARK: - RelativeDateTimeFormatter Extension
-
-extension RelativeDateTimeFormatter {
-    /// Thread-safe shared instance for use in SwiftUI views
-    @MainActor
-    nonisolated(unsafe) public static let shared: RelativeDateTimeFormatter = {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        formatter.dateTimeStyle = .numeric
-        return formatter
-    }()
-}

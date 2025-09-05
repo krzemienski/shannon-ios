@@ -235,6 +235,7 @@ public class FileSearchEngine: ObservableObject {
     @Published public var searchResults: [FileTreeNode] = []
     @Published public var isSearching = false
     @Published public var searchQuery = ""
+    @Published public var searchText: String = ""  // Alias for searchQuery
     @Published public var searchScope: SearchScope = .currentDirectory
     @Published public var searchFilter: SearchFilter = .all
     
@@ -354,11 +355,27 @@ public class FileSearchEngine: ObservableObject {
         return results
     }
     
+    /// Search in a single tree node
+    public func searchInTree(_ root: FileTreeNode) async -> [FileTreeNode] {
+        // Update searchQuery from searchText if it was set
+        if !searchText.isEmpty {
+            searchQuery = searchText
+        }
+        
+        guard !searchQuery.isEmpty else {
+            return []
+        }
+        
+        // Search recursively starting from the root
+        return searchNode(root, query: searchQuery)
+    }
+    
     /// Clear search results
     public func clearSearch() {
         searchTask?.cancel()
         searchResults = []
         searchQuery = ""
+        searchText = ""
         isSearching = false
     }
 }

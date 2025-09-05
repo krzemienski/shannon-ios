@@ -45,11 +45,11 @@ struct ThemeSelectorView: View {
             Section("Preview") {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Sample Title")
-                        .font(Theme.title)
+                        .font(Theme.Typography.titleFont)
                         .foregroundColor(Theme.foreground)
                     
                     Text("This is sample body text to preview the theme.")
-                        .font(Theme.body)
+                        .font(Theme.Typography.bodyFont)
                         .foregroundColor(Theme.mutedForeground)
                     
                     Button("Sample Button") {}
@@ -58,7 +58,7 @@ struct ThemeSelectorView: View {
                 }
                 .padding()
                 .background(Theme.card)
-                .cornerRadius(Theme.smallRadius)
+                .cornerRadius(Theme.Radius.sm)
             }
         }
         .navigationTitle("Theme")

@@ -28,97 +28,126 @@ public struct TerminalEmulatorView: View {
     
     private let fontName = "SF Mono"
     
+    // MARK: - Body Sub-components (MVP: Breaking up complex expression for compiler)
+    
+    @ViewBuilder
+    private var terminalLines: some View {
+        ForEach(Array(terminal.getVisibleLines().enumerated()), id: \.offset) { index, line in
+            EmulatorLineView(
+                line: line,
+                lineNumber: index,
+                fontSize: fontSize,
+                fontName: fontName,
+                cursorPosition: terminal.cursorPosition,
+                selection: selection,
+                searchText: searchText,
+                onHover: { position in
+                    hoveredPosition = position
+                }
+            )
+            .id(index)
+        }
+    }
+    
+    @ViewBuilder
+    private var emptyCursor: some View {
+        if terminal.cursorPosition.row >= terminal.terminalBuffer.lines.count {
+            EmulatorCursorView(
+                position: terminal.cursorPosition,
+                fontSize: fontSize,
+                blink: cursorBlink
+            )
+        }
+    }
+    
+    @ViewBuilder
+    private func terminalContent(for geometry: GeometryProxy) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            terminalLines
+            emptyCursor
+        }
+        .background(
+            GeometryReader { contentGeometry in
+                Color.clear
+                    .onAppear {
+                        calculateCellSize()
+                        updateTerminalSize(geometry.frame(in: .local).size)
+                    }
+                    .onChange(of: geometry.frame(in: .local).size) { newSize in
+                        updateTerminalSize(newSize)
+                    }
+            }
+        )
+        .padding(8)
+    }
+    
+    @ViewBuilder
+    private func scrollContent(for geometry: GeometryProxy) -> some View {
+        ScrollView([.horizontal, .vertical], showsIndicators: showScrollbar) {
+            terminalContent(for: geometry)
+        }
+        .background(terminalBackground)
+        .onAppear {
+            fontSize = CGFloat(storedFontSize)
+        }
+        .onChange(of: scrollToBottom) { shouldScroll in
+            if shouldScroll {
+                scrollToBottom(animated: true)
+            }
+        }
+        .onChange(of: terminal.terminalBuffer) { _ in
+            if scrollToBottom {
+                scrollToBottom(animated: false)
+            }
+        }
+        .onTapGesture { location in
+            handleTap(at: location)
+        }
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    handleDragSelection(value)
+                }
+                .onEnded { _ in
+                    finalizeSelection()
+                }
+        )
+    }
+    
+    @ViewBuilder
+    private var scrollIndicatorOverlay: some View {
+        if !showScrollbar {
+            ScrollPositionIndicator(
+                visibleLines: terminal.getVisibleLines().count,
+                totalLines: terminal.terminalBuffer.lines.count + terminal.scrollbackBuffer.count
+            )
+            .padding()
+        }
+    }
+    
+    @ViewBuilder
+    private var sizeIndicatorOverlay: some View {
+        if viewSize != .zero {
+            TerminalSizeIndicator(size: terminal.terminalSize)
+                .padding()
+                .transition(.opacity)
+        }
+    }
+    
     public var body: some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
-                ScrollView([.horizontal, .vertical], showsIndicators: showScrollbar) {
-                    VStack(alignment: .leading, spacing: 0) {
-                        // Terminal content
-                        ForEach(Array(terminal.getVisibleLines().enumerated()), id: \.offset) { index, line in
-                            EmulatorLineView(
-                                line: line,
-                                lineNumber: index,
-                                fontSize: fontSize,
-                                fontName: fontName,
-                                cursorPosition: terminal.cursorPosition,
-                                selection: selection,
-                                searchText: searchText,
-                                onHover: { position in
-                                    hoveredPosition = position
-                                }
-                            )
-                            .id(index)
-                        }
-                        
-                        // Cursor on empty line
-                        if terminal.cursorPosition.row >= terminal.terminalBuffer.lines.count {
-                            EmulatorCursorView(
-                                position: terminal.cursorPosition,
-                                fontSize: fontSize,
-                                blink: cursorBlink
-                            )
-                        }
+                scrollContent(for: geometry)
+                    .onAppear {
+                        scrollViewProxy = proxy
                     }
-                    .background(
-                        GeometryReader { contentGeometry in
-                            Color.clear
-                                .onAppear {
-                                    calculateCellSize()
-                                    updateTerminalSize(geometry.size)
-                                }
-                                .onChange(of: geometry.size) { newSize in
-                                    updateTerminalSize(newSize)
-                                }
-                        }
-                    )
-                    .padding(8)
-                }
-                .background(terminalBackground)
-                .onAppear {
-                    scrollViewProxy = proxy
-                    fontSize = CGFloat(storedFontSize)
-                }
-                .onChange(of: scrollToBottom) { shouldScroll in
-                    if shouldScroll {
-                        scrollToBottom(animated: true)
-                    }
-                }
-                .onChange(of: terminal.terminalBuffer) { _ in
-                    if scrollToBottom {
-                        scrollToBottom(animated: false)
-                    }
-                }
-                .onTapGesture { location in
-                    handleTap(at: location)
-                }
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            handleDragSelection(value)
-                        }
-                        .onEnded { _ in
-                            finalizeSelection()
-                        }
-                )
             }
         }
         .overlay(alignment: .topTrailing) {
-            // Scroll position indicator
-            if !showScrollbar {
-                ScrollPositionIndicator(
-                    visibleLines: terminal.getVisibleLines().count,
-                    totalLines: terminal.terminalBuffer.lines.count + terminal.scrollbackBuffer.count
-                )
-                .padding()
-            }
+            scrollIndicatorOverlay
         }
         .overlay(alignment: .bottomTrailing) {
-            // Size indicator during resize
-            if viewSize != .zero {
-                TerminalSizeIndicator(size: terminal.terminalSize)
-                    .padding()
-                    .transition(.opacity)
-            }
+            sizeIndicatorOverlay
         }
         .contextMenu {
             terminalContextMenu
@@ -499,8 +528,10 @@ struct EmulatorCursorView: View {
     
     private func startBlinking() {
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-            withAnimation(.linear(duration: 0.1)) {
-                isVisible.toggle()
+            Task { @MainActor in
+                withAnimation(.linear(duration: 0.1)) {
+                    isVisible.toggle()
+                }
             }
         }
     }
@@ -548,11 +579,15 @@ struct TerminalSizeIndicator: View {
 
 // MARK: - Supporting Types
 
+// MVP: EmulatorPosition is defined in TerminalStubTypes.swift
+// Commenting out duplicate definition
+/*
 /// Terminal position
 struct EmulatorPosition: Equatable {
     let row: Int
     let column: Int
 }
+*/
 
 /// Terminal selection
 struct EmulatorSelection: Equatable {

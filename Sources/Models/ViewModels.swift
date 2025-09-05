@@ -110,7 +110,7 @@ public struct PerformanceSpan: Identifiable {
 
 // MARK: - Monitor Models
 
-public enum AlertMetricType: String {
+public enum AlertMetricType: String, Hashable {
     case cpu = "cpu"
     case memory = "memory"
     case network = "network"

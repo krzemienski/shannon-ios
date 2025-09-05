@@ -57,8 +57,10 @@ public final class MonitorCoordinator: BaseCoordinator, ObservableObject {
     
     override func start() {
         // Start monitoring if enabled
-        if dependencyContainer.settingsStore.monitoringEnabled {
-            startMonitoring()
+        Task { @MainActor in
+            if dependencyContainer.settingsStore.monitoringEnabled {
+                startMonitoring()
+            }
         }
     }
     
@@ -143,18 +145,23 @@ public final class MonitorCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func exportData(type: MonitorType, format: MonitorExportFormat) async throws -> URL {
-        try await dependencyContainer.monitorStore.exportData(
-            type: type,
-            format: format,
-            timeRange: timeRange
-        )
+        let data = try await dependencyContainer.monitorStore.exportData(for: timeRange)
+        
+        // Create temporary file with exported data
+        let fileName = "monitor_\(type.rawValue.lowercased())_\(Date().timeIntervalSince1970).\(format.fileExtension)"
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        try data.write(to: tempURL)
+        return tempURL
     }
     
     func exportAllData(format: MonitorExportFormat) async throws -> URL {
-        try await dependencyContainer.monitorStore.exportAllData(
-            format: format,
-            timeRange: timeRange
-        )
+        let data = try await dependencyContainer.monitorStore.exportAllData()
+        
+        // Create temporary file with exported data
+        let fileName = "monitor_all_\(Date().timeIntervalSince1970).\(format.fileExtension)"
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        try data.write(to: tempURL)
+        return tempURL
     }
     
     // MARK: - Metrics Access
@@ -176,32 +183,58 @@ public final class MonitorCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func getHistoricalData(for type: MonitorType, range: TimeRange) -> [MetricDataPoint] {
-        dependencyContainer.monitorStore.getHistoricalData(
-            for: type,
-            range: range
-        )
+        dependencyContainer.monitorStore.getHistoricalData(for: range)
     }
     
     // MARK: - Alerts
     
     func configureAlert(for metric: MonitorMetricType, threshold: Double, condition: AlertCondition) {
         Task {
-            await dependencyContainer.monitorStore.configureAlert(
-                metric: metric,
+            let alertType: MonitoringAlert.AlertType = switch metric {
+            case .cpuUsage: .cpuUsage
+            case .memoryUsage: .memoryUsage
+            case .diskUsage: .diskUsage
+            case .networkBandwidth: .networkUsage
+            case .responseTime: .cpuUsage  // fallback - AlertType doesn't have responseTime
+            case .errorRate: .cpuUsage  // fallback - AlertType doesn't have errorRate
+            }
+            
+            let alert = MonitoringAlert(
+                id: UUID().uuidString,
+                type: alertType,
                 threshold: threshold,
-                condition: condition
+                action: .notify
             )
+            await dependencyContainer.monitorStore.configureAlert(alert)
         }
     }
     
     func removeAlert(for metric: MonitorMetricType) {
         Task {
-            await dependencyContainer.monitorStore.removeAlert(for: metric)
+            // Generate a consistent ID based on metric type
+            let alertId = "alert_\(metric.rawValue)"
+            dependencyContainer.monitorStore.removeAlert(id: alertId)
         }
     }
     
     func getActiveAlerts() -> [MetricAlert] {
-        dependencyContainer.monitorStore.activeAlerts
+        // Convert MonitoringAlert to MetricAlert
+        return dependencyContainer.monitorStore.activeAlerts.map { alert in
+            MetricAlert(
+                type: convertAlertTypeToMetricType(alert.type),
+                severity: .warning,
+                message: "Alert for \(alert.type) - Threshold: \(alert.threshold)"
+            )
+        }
+    }
+    
+    private func convertAlertTypeToMetricType(_ alertType: MonitoringAlert.AlertType) -> MetricType {
+        switch alertType {
+        case .cpuUsage: return .cpu
+        case .memoryUsage: return .memory
+        case .diskUsage: return .disk
+        case .networkUsage: return .network
+        }
     }
     
     // MARK: - View Model Management

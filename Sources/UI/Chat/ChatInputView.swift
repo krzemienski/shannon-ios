@@ -34,7 +34,7 @@ struct ChatInputView: View {
     }
     
     private var shouldShowCharacterCount: Bool {
-        text.count > characterLimit * 0.8
+        text.count > Int(Double(characterLimit) * 0.8)
     }
     
     var body: some View {
@@ -66,6 +66,8 @@ struct ChatInputView: View {
             .background(Theme.card)
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: shouldShowCharacterCount)
+        // TODO: Implement VoiceInputView for voice transcription
+        /*
         .sheet(isPresented: $showVoiceInput) {
             VoiceInputView(
                 outputText: $text,
@@ -76,6 +78,7 @@ struct ChatInputView: View {
                 }
             )
         }
+        */
     }
     
     // MARK: - Subviews

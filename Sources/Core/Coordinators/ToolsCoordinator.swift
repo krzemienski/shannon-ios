@@ -53,10 +53,7 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     // MARK: - Coordinator Lifecycle
     
     override func start() {
-        // Load available tools
-        Task {
-            await dependencyContainer.toolStore.loadTools()
-        }
+        // Tools are already loaded in ToolStore init
     }
     
     // MARK: - Navigation
@@ -97,19 +94,27 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     private func performToolExecution(id: String, parameters: [String: Any]) async {
-        guard let viewModel = getToolsViewModel() else { return }
+        let viewModel = getToolsViewModel()
         
-        do {
-            let result = await viewModel.executeTool(id: id, parameters: parameters)
-            handleToolExecutionSuccess(toolId: id, result: result)
-        } catch {
-            handleToolExecutionError(error)
+        // Set the selected tool and parameters
+        if let tool = dependencyContainer.toolStore.availableTools.first(where: { $0.id == id }) {
+            viewModel.selectedTool = tool
+            viewModel.toolParameters = parameters.compactMapValues { "\($0)" }
+            
+            // Execute the tool
+            await viewModel.executeTool()
+            
+            if let result = viewModel.executionResult {
+                handleToolExecutionSuccess(toolId: id, result: result)
+            } else if let error = viewModel.error {
+                handleToolExecutionError(error)
+            }
         }
     }
     
     func cancelToolExecution(id: String) {
-        guard let viewModel = getToolsViewModel() else { return }
-        viewModel.cancelExecution(id: id)
+        let viewModel = getToolsViewModel()
+        viewModel.cancelExecution()
         isShowingToolExecution = false
     }
     
@@ -117,13 +122,13 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     
     func addToFavorites(toolId: String) {
         Task {
-            await dependencyContainer.toolStore.addToFavorites(toolId: toolId)
+            await dependencyContainer.toolStore.addToFavorites(toolId)
         }
     }
     
     func removeFromFavorites(toolId: String) {
         Task {
-            await dependencyContainer.toolStore.removeFromFavorites(toolId: toolId)
+            await dependencyContainer.toolStore.removeFromFavorites(toolId)
         }
     }
     
@@ -140,7 +145,7 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func getFavoriteTools() -> [Tool] {
-        dependencyContainer.toolStore.favoriteTools
+        dependencyContainer.toolStore.favoritedTools
     }
     
     // MARK: - Tool Details
@@ -151,11 +156,11 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func getToolDocumentation(for toolId: String) -> String? {
-        dependencyContainer.toolStore.getToolDocumentation(for: toolId)
+        dependencyContainer.toolStore.getToolDocumentation(toolId)
     }
     
     func getToolParameters(for toolId: String) -> [ToolParameter]? {
-        dependencyContainer.toolStore.getToolParameters(for: toolId)
+        dependencyContainer.toolStore.getToolParameters(toolId)
     }
     
     // MARK: - Execution History
@@ -170,11 +175,8 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     
     func clearExecutionHistory(for toolId: String? = nil) {
         Task {
-            if let toolId = toolId {
-                await dependencyContainer.toolStore.clearExecutionHistory(for: toolId)
-            } else {
-                await dependencyContainer.toolStore.clearAllExecutionHistory()
-            }
+            // Clear execution history
+            await dependencyContainer.toolStore.clearExecutionHistory()
         }
     }
     
@@ -192,15 +194,23 @@ public final class ToolsCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Success/Error Handling
     
-    private func handleToolExecutionSuccess(toolId: String, result: ToolExecutionResponse) {
+    private func handleToolExecutionSuccess(toolId: String, result: ToolResult) {
         isShowingToolExecution = false
         
         // Store execution in history
         Task {
-            await dependencyContainer.toolStore.addToHistory(
+            let execution = ToolExecution(
+                id: UUID().uuidString,
                 toolId: toolId,
-                result: result
+                toolName: dependencyContainer.toolStore.availableTools.first(where: { $0.id == toolId })?.name ?? toolId,
+                parameters: [:],
+                status: .completed,
+                startedAt: Date(),
+                completedAt: Date(),
+                result: result,
+                error: nil
             )
+            await dependencyContainer.toolStore.addToHistory(execution)
         }
         
         // Show success feedback

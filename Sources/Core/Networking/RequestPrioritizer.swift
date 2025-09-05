@@ -8,7 +8,7 @@
 import Foundation
 
 /// Priority levels for network requests
-enum RequestPriority: Int, Comparable, Codable {
+enum RequestPriority: Int, Comparable, Codable, Sendable {
     case low = 0
     case normal = 1
     case high = 2

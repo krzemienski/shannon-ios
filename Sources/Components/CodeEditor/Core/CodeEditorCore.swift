@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+#if os(iOS)
 import UIKit
 
 /// Core text storage and management for the code editor
@@ -451,3 +452,4 @@ enum ProgrammingLanguage: String, CaseIterable, Identifiable {
         return .plainText
     }
 }
+#endif // os(iOS)

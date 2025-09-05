@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 struct CustomTextField: View {
     let title: String
@@ -13,8 +16,10 @@ struct CustomTextField: View {
     var placeholder: String = ""
     var isSecure: Bool = false
     var icon: String? = nil
+    #if os(iOS)
     var keyboardType: UIKeyboardType = .default
     var textContentType: UITextContentType? = nil
+    #endif
     var submitLabel: SubmitLabel = .done
     var onSubmit: (() -> Void)? = nil
     
@@ -52,8 +57,10 @@ struct CustomTextField: View {
                             .focused($isFocused)
                     } else {
                         TextField(placeholder, text: $text)
+                            #if os(iOS)
                             .keyboardType(keyboardType)
                             .textContentType(textContentType)
+                            #endif
                             .submitLabel(submitLabel)
                             .onSubmit {
                                 onSubmit?()

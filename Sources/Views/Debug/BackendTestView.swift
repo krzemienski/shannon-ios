@@ -257,8 +257,8 @@ struct BackendTestView: View {
                 messages: [
                     ChatMessage(role: "user", content: "Say 'Hello, Claude Code!' in 5 words or less.")
                 ],
-                stream: true,
-                maxTokens: 50
+                maxTokens: 50,
+                stream: true
             )
             
             var chunks: [String] = []

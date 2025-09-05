@@ -37,7 +37,7 @@ struct FilePickerView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: Theme.largeSpacing) {
+                VStack(spacing: Theme.spacing.lg) {
                     // File source options
                     fileSourceSection
                     
@@ -124,12 +124,12 @@ struct FilePickerView: View {
     // MARK: - File Source Section
     
     private var fileSourceSection: some View {
-        VStack(alignment: .leading, spacing: Theme.mediumSpacing) {
+        VStack(alignment: .leading, spacing: Theme.spacing.md) {
             Text("Choose Files From")
-                .font(Theme.titleFont)
+                .font(Theme.Typography.titleFont)
                 .foregroundColor(Theme.foreground)
             
-            VStack(spacing: Theme.smallSpacing) {
+            VStack(spacing: Theme.spacing.sm) {
                 fileSourceButton(
                     title: "Files & Documents",
                     icon: "doc.fill",
@@ -193,7 +193,7 @@ struct FilePickerView: View {
                     .frame(width: 40)
                 
                 Text(title)
-                    .font(Theme.bodyFont)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                 
                 Spacer()
@@ -204,20 +204,20 @@ struct FilePickerView: View {
             }
             .padding()
             .background(Theme.card)
-            .cornerRadius(Theme.smallRadius)
+            .cornerRadius(Theme.Radius.sm)
         }
     }
     
     // MARK: - Recent Files Section
     
     private var recentFilesSection: some View {
-        VStack(alignment: .leading, spacing: Theme.mediumSpacing) {
+        VStack(alignment: .leading, spacing: Theme.spacing.md) {
             Text("Recent Files")
-                .font(Theme.titleFont)
+                .font(Theme.Typography.titleFont)
                 .foregroundColor(Theme.foreground)
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Theme.smallSpacing) {
+                HStack(spacing: Theme.spacing.sm) {
                     ForEach(viewModel.recentFiles, id: \.self) { file in
                         recentFileCard(file)
                     }
@@ -245,10 +245,10 @@ struct FilePickerView: View {
             }
             .frame(width: 100, height: 100)
             .background(Theme.card)
-            .cornerRadius(Theme.smallRadius)
+            .cornerRadius(Theme.Radius.sm)
             .overlay(
                 selectedFiles.contains(file) ?
-                RoundedRectangle(cornerRadius: Theme.smallRadius)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm)
                     .stroke(Theme.accent, lineWidth: 2) : nil
             )
         }
@@ -257,10 +257,10 @@ struct FilePickerView: View {
     // MARK: - Selected Files Section
     
     private var selectedFilesSection: some View {
-        VStack(alignment: .leading, spacing: Theme.mediumSpacing) {
+        VStack(alignment: .leading, spacing: Theme.spacing.md) {
             HStack {
                 Text("Selected Files (\(selectedFiles.count))")
-                    .font(Theme.titleFont)
+                    .font(Theme.Typography.titleFont)
                     .foregroundColor(Theme.foreground)
                 
                 Spacer()
@@ -272,7 +272,7 @@ struct FilePickerView: View {
                 .foregroundColor(Theme.destructive)
             }
             
-            VStack(spacing: Theme.smallSpacing) {
+            VStack(spacing: Theme.spacing.sm) {
                 ForEach(selectedFiles, id: \.self) { file in
                     selectedFileRow(file)
                 }
@@ -312,7 +312,7 @@ struct FilePickerView: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
         .background(Theme.card)
-        .cornerRadius(Theme.smallRadius)
+        .cornerRadius(Theme.Radius.sm)
     }
     
     // MARK: - Upload Button
@@ -327,12 +327,12 @@ struct FilePickerView: View {
                 Image(systemName: "arrow.up.circle.fill")
                 Text("Upload \(selectedFiles.count) File\(selectedFiles.count == 1 ? "" : "s")")
             }
-            .font(Theme.bodyFont.weight(.semibold))
+            .font(Theme.Typography.headlineFont)  // Use headline for semibold body
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Theme.accent)
-            .cornerRadius(Theme.mediumRadius)
+            .background(Theme.primary)
+            .cornerRadius(Theme.Radius.md)
         }
     }
     
@@ -586,11 +586,15 @@ struct DocumentScannerView: UIViewControllerRepresentable {
         }
         
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-            controller.dismiss(animated: true)
+            Task { @MainActor in
+                controller.dismiss(animated: true)
+            }
         }
         
         func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-            controller.dismiss(animated: true)
+            Task { @MainActor in
+                controller.dismiss(animated: true)
+            }
         }
     }
 }

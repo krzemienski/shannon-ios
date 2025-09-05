@@ -36,6 +36,8 @@ public enum MessageRole: String, Codable, CaseIterable {
     case user
     case assistant
     case error
+    case tool
+    case toolResponse = "tool_response"
     
     public var displayName: String {
         switch self {
@@ -43,6 +45,8 @@ public enum MessageRole: String, Codable, CaseIterable {
         case .user: return "You"
         case .assistant: return "Claude"
         case .error: return "Error"
+        case .tool: return "Tool"
+        case .toolResponse: return "Tool Response"
         }
     }
     
@@ -52,6 +56,8 @@ public enum MessageRole: String, Codable, CaseIterable {
         case .user: return "person.circle.fill"
         case .assistant: return "cpu"
         case .error: return "exclamationmark.triangle.fill"
+        case .tool: return "wrench.and.screwdriver"
+        case .toolResponse: return "checkmark.circle"
         }
     }
 }

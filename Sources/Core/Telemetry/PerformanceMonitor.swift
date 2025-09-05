@@ -4,6 +4,7 @@
 
 import Foundation
 import OSLog
+#if os(iOS)
 import UIKit
 import QuartzCore
 
@@ -450,3 +451,4 @@ public class SSHOperationMonitor {
         onComplete?(success, error)
     }
 }
+#endif // os(iOS)

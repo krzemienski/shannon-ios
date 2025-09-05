@@ -66,7 +66,8 @@ public struct ChatCompletionRequest: Codable {
 }
 
 /// Chat message in OpenAI format
-public struct ChatMessage: Codable {
+public struct ChatMessage: Codable, Identifiable {
+    public var id: String = UUID().uuidString  // MVP: Add ID for Identifiable conformance, not part of API
     public let role: String
     public let content: String?
     public let name: String?
@@ -74,6 +75,7 @@ public struct ChatMessage: Codable {
     public let toolCallId: String?
     
     enum CodingKeys: String, CodingKey {
+        // Note: id is not included - it's generated locally for Identifiable
         case role
         case content
         case name
@@ -82,12 +84,14 @@ public struct ChatMessage: Codable {
     }
     
     public init(
+        id: String? = nil,
         role: String,
         content: String? = nil,
         name: String? = nil,
         toolCalls: [ChatToolCall]? = nil,
         toolCallId: String? = nil
     ) {
+        self.id = id ?? UUID().uuidString
         self.role = role
         self.content = content
         self.name = name
@@ -272,11 +276,13 @@ public struct ChatUsage: Codable {
     public let promptTokens: Int
     public let completionTokens: Int
     public let totalTokens: Int
+    public let cachedTokens: Int?
     
     enum CodingKeys: String, CodingKey {
         case promptTokens = "prompt_tokens"
         case completionTokens = "completion_tokens"
         case totalTokens = "total_tokens"
+        case cachedTokens = "cached_tokens"
     }
 }
 
@@ -303,7 +309,7 @@ public struct APIModel: Codable, Identifiable {
 // MARK: - Session Management (Tasks 421-430)
 
 /// Session information
-public struct SessionInfo: Codable, Identifiable {
+public struct SessionInfo: Codable, Identifiable, Sendable {
     public let id: String
     public let title: String
     public let createdAt: Date
@@ -323,6 +329,35 @@ public struct SessionInfo: Codable, Identifiable {
     }
 }
 
+// MARK: - SessionInfo Extensions
+
+extension SessionInfo {
+    /// The project ID associated with this session (if any)
+    public var projectId: String? {
+        // Extract from metadata or use title as fallback
+        if let projectId = metadata?["project_id"]?.value as? String {
+            return projectId
+        }
+        // Use title if it looks like a project ID
+        return title.contains("/") ? title : nil
+    }
+    
+    /// Whether this session is currently active
+    public var isActive: Bool {
+        // Consider a session active if it was updated recently (within last hour)
+        let oneHourAgo = Date().addingTimeInterval(-3600)
+        return updatedAt > oneHourAgo
+    }
+    
+    /// The current model being used (alias for model property)
+    public var currentModel: String? {
+        return model
+    }
+}
+
+// MARK: - Additional SessionInfo Extensions
+
+
 /// Create session request
 public struct CreateSessionRequest: Codable {
     public let title: String
@@ -333,6 +368,28 @@ public struct CreateSessionRequest: Codable {
         self.title = title
         self.model = model
         self.metadata = metadata
+    }
+}
+
+// MARK: - ProjectInfo Extensions
+
+extension ProjectInfo {
+    /// Project description (derived from name for now)
+    public var description: String {
+        return "Project: \(name)"
+    }
+    
+    /// Whether the project is currently active
+    public var isActive: Bool {
+        // Consider a project active if updated within last 24 hours
+        let dayAgo = Date().addingTimeInterval(-86400)
+        return updatedAt > dayAgo
+    }
+    
+    /// Number of sessions associated with this project
+    public var sessionCount: Int {
+        // Default to 0, should be populated from backend
+        return 0
     }
 }
 

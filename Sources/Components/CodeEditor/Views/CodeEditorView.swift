@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+#if os(iOS)
 import UIKit
 
 /// Main code editor view with syntax highlighting and advanced features
@@ -381,3 +382,4 @@ struct EditorTheme {
         operatorColor: UIColor(white: 0.7, alpha: 1.0)
     )
 }
+#endif // os(iOS)

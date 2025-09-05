@@ -63,145 +63,158 @@ struct ChatView: View {
     @FocusState private var isInputFocused: Bool
     @State private var showingToolTimeline = false
     
+    // MARK: - View Components
+    
+    @ViewBuilder
+    private var messagesList: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: ThemeSpacing.md) {
+                    ForEach(viewModel.messages) { message in
+                        ChatMessageView(message: message)
+                            .id(message.id)
+                            .onAppear {
+                                viewModel.preloadMessageContent(message)
+                            }
+                            .onDisappear {
+                                viewModel.cleanupMessageResources(message)
+                            }
+                    }
+                    
+                    if viewModel.isLoading {
+                        ThinkingIndicator()
+                    }
+                }
+                .padding()
+            }
+            .onChange(of: viewModel.messages.count) { oldCount, newCount in
+                if newCount > oldCount {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                        }
+                    }
+                }
+            }
+            .scrollDismissesKeyboard(.interactively)
+        }
+    }
+    
+    @ViewBuilder
+    private var toolTimelineButton: some View {
+        if viewModel.hasToolUsage {
+            HStack {
+                Button {
+                    showingToolTimeline = true
+                } label: {
+                    HStack(spacing: ThemeSpacing.xs) {
+                        Image(systemName: "timeline.selection")
+                        Text("View Tool Timeline")
+                        Spacer()
+                        Text("\(viewModel.toolUsageCount) tools")
+                            .font(Theme.Typography.captionFont)
+                        Image(systemName: "chevron.right")
+                    }
+                    .font(Theme.Typography.footnoteFont)
+                    .foregroundColor(Theme.primary)
+                    .padding(.horizontal, ThemeSpacing.md)
+                    .padding(.vertical, ThemeSpacing.sm)
+                }
+            }
+            .background(Theme.primary.opacity(0.1))
+        }
+    }
+    
+    @ViewBuilder
+    private var messageInputArea: some View {
+        HStack(spacing: ThemeSpacing.sm) {
+            Button {
+                // Handle attachment
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(Theme.muted)
+            }
+            
+            TextField("Message Claude...", text: $messageText, axis: .vertical)
+                .font(Theme.Typography.bodyFont)
+                .foregroundColor(Theme.foreground)
+                .tint(Theme.primary)
+                .lineLimit(1...6)
+                .focused($isInputFocused)
+                .onSubmit {
+                    sendMessage()
+                }
+            
+            Button {
+                sendMessage()
+            } label: {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(messageText.isEmpty ? Theme.muted : Theme.primary)
+            }
+            .disabled(messageText.isEmpty || viewModel.isLoading)
+        }
+        .padding(.horizontal, ThemeSpacing.md)
+        .padding(.vertical, ThemeSpacing.sm)
+    }
+    
+    @ViewBuilder
+    private var inputSection: some View {
+        VStack(spacing: 0) {
+            toolTimelineButton
+            
+            Divider()
+                .background(Theme.border)
+            
+            messageInputArea
+        }
+        .background(Theme.card)
+    }
+    
+    @ViewBuilder
+    private var toolbarContent: some View {
+        HStack(spacing: ThemeSpacing.xs) {
+            if viewModel.tokenUsage > 0 {
+                Label("\(viewModel.tokenUsage)", systemImage: "cube")
+                    .font(Theme.Typography.captionFont)
+                    .foregroundColor(Theme.mutedForeground)
+            }
+            
+            Menu {
+                Button {
+                    // Clear chat
+                } label: {
+                    Label("Clear Chat", systemImage: "trash")
+                }
+                
+                Button {
+                    // Export chat
+                } label: {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .foregroundColor(Theme.primary)
+            }
+        }
+    }
+    
     var body: some View {
         ZStack {
             Theme.background
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Messages list with optimized scrolling
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(spacing: ThemeSpacing.md) {
-                            ForEach(viewModel.messages) { message in
-                                ChatMessageView(message: message)
-                                    .id(message.id)
-                                    .onAppear {
-                                        // Preload images when message appears
-                                        viewModel.preloadMessageContent(message)
-                                    }
-                                    .onDisappear {
-                                        // Clean up resources when message disappears
-                                        viewModel.cleanupMessageResources(message)
-                                    }
-                            }
-                            
-                            if viewModel.isLoading {
-                                ThinkingIndicator()
-                            }
-                        }
-                        .padding()
-                    }
-                    .onChange(of: viewModel.messages.count) { oldCount, newCount in
-                        // Only scroll to bottom for new messages, not for deletions
-                        if newCount > oldCount {
-                            // Debounce scrolling to prevent excessive animations
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
-                                }
-                            }
-                        }
-                    }
-                    .scrollDismissesKeyboard(.interactively)
-                }
-                
-                // Input area
-                VStack(spacing: 0) {
-                    // Tool timeline button
-                    if viewModel.hasToolUsage {
-                        HStack {
-                            Button {
-                                showingToolTimeline = true
-                            } label: {
-                                HStack(spacing: ThemeSpacing.xs) {
-                                    Image(systemName: "timeline.selection")
-                                    Text("View Tool Timeline")
-                                    Spacer()
-                                    Text("\(viewModel.toolUsageCount) tools")
-                                        .font(Theme.Typography.captionFont)
-                                    Image(systemName: "chevron.right")
-                                }
-                                .font(Theme.Typography.footnoteFont)
-                                .foregroundColor(Theme.primary)
-                                .padding(.horizontal, ThemeSpacing.md)
-                                .padding(.vertical, ThemeSpacing.sm)
-                            }
-                        }
-                        .background(Theme.primary.opacity(0.1))
-                    }
-                    
-                    Divider()
-                        .background(Theme.border)
-                    
-                    // Message input
-                    HStack(spacing: ThemeSpacing.sm) {
-                        // Attach button
-                        Button {
-                            // Handle attachment
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 28))
-                                .foregroundColor(Theme.muted)
-                        }
-                        
-                        // Text field
-                        TextField("Message Claude...", text: $messageText, axis: .vertical)
-                            .font(Theme.Typography.bodyFont)
-                            .foregroundColor(Theme.foreground)
-                            .tint(Theme.primary)
-                            .lineLimit(1...6)
-                            .focused($isInputFocused)
-                            .onSubmit {
-                                sendMessage()
-                            }
-                        
-                        // Send button
-                        Button {
-                            sendMessage()
-                        } label: {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .font(.system(size: 28))
-                                .foregroundColor(messageText.isEmpty ? Theme.muted : Theme.primary)
-                        }
-                        .disabled(messageText.isEmpty || viewModel.isLoading)
-                    }
-                    .padding(.horizontal, ThemeSpacing.md)
-                    .padding(.vertical, ThemeSpacing.sm)
-                }
-                .background(Theme.card)
+                messagesList
+                inputSection
             }
         }
         .navigationTitle(session.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                HStack(spacing: ThemeSpacing.xs) {
-                    // Token usage
-                    if viewModel.tokenUsage > 0 {
-                        Label("\(viewModel.tokenUsage)", systemImage: "cube")
-                            .font(Theme.Typography.captionFont)
-                            .foregroundColor(Theme.mutedForeground)
-                    }
-                    
-                    // Options menu
-                    Menu {
-                        Button {
-                            // Clear chat
-                        } label: {
-                            Label("Clear Chat", systemImage: "trash")
-                        }
-                        
-                        Button {
-                            // Export chat
-                        } label: {
-                            Label("Export", systemImage: "square.and.arrow.up")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .foregroundColor(Theme.primary)
-                    }
-                }
+                toolbarContent
             }
         }
         .sheet(isPresented: $showingToolTimeline) {
@@ -227,7 +240,7 @@ struct ChatMessageView: View {
     var body: some View {
         HStack(alignment: .top, spacing: ThemeSpacing.md) {
             // Avatar
-            if message.role == .user {
+            if message.role == "user" {
                 Spacer()
             } else {
                 Image(systemName: "brain")
@@ -239,34 +252,34 @@ struct ChatMessageView: View {
             }
             
             // Message bubble
-            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: ThemeSpacing.xs) {
+            VStack(alignment: message.role == "user" ? .trailing : .leading, spacing: ThemeSpacing.xs) {
                 // Message content
-                Text(message.content)
+                Text(message.content ?? "")
                     .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.foreground)
                     .padding(.horizontal, ThemeSpacing.md)
                     .padding(.vertical, ThemeSpacing.sm)
                     .background(
-                        message.role == .user ? Theme.primary : Theme.card
+                        message.role == "user" ? Theme.primary : Theme.card
                     )
                     .cornerRadius(Theme.CornerRadius.md)
                     .overlay(
                         RoundedRectangle(cornerRadius: Theme.CornerRadius.md)
                             .stroke(
-                                message.role == .user ? Color.clear : Theme.border,
+                                message.role == "user" ? Color.clear : Theme.border,
                                 lineWidth: 1
                             )
                     )
                 
-                // Timestamp
-                Text(message.formattedTime)
-                    .font(Theme.Typography.caption2Font)
-                    .foregroundColor(Theme.mutedForeground)
+                // Timestamp - MVP: Comment out for now
+                // Text(message.formattedTime)
+                //     .font(Theme.Typography.caption2Font)
+                //     .foregroundColor(Theme.mutedForeground)
             }
-            .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: message.role == .user ? .trailing : .leading)
+            .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: message.role == "user" ? .trailing : .leading)
             
             // Avatar spacer
-            if message.role == .user {
+            if message.role == "user" {
                 Image(systemName: "person.fill")
                     .font(.system(size: 20))
                     .foregroundColor(Theme.foreground)
@@ -319,9 +332,10 @@ struct ThinkingIndicator: View {
     }
     
     private func animateDots() {
-        withAnimation(.easeInOut(duration: 0.6).repeatForever()) {
-            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
-                dots = (dots + 1) % 3
+        // MVP: Simplified animation
+        Task { @MainActor in
+            withAnimation(.easeInOut(duration: 0.6).repeatForever()) {
+                self.dots = (self.dots + 1) % 3
             }
         }
     }

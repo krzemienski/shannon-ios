@@ -230,7 +230,7 @@ struct PullToRefreshIndicator: View {
                     .trim(from: 0, to: progress * 0.8)
                     .stroke(Theme.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                     .frame(width: 30, height: 30)
-                    .rotationEffect(.degrees(-90 + (progress * 360)))
+                    .rotationEffect(.degrees(Double(-90) + Double(progress * 360)))
                     .opacity(progress)
             }
         }

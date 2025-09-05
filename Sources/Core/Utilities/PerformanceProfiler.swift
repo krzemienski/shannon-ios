@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
 import os.log
 import QuartzCore
@@ -288,3 +289,4 @@ struct PerformanceMetric {
 // PerformanceReport is defined in Core/Telemetry/PerformanceMonitor.swift
 // Using the public PerformanceReport from PerformanceMonitor module
 // No typealias needed as it's a top-level struct
+#endif // os(iOS)

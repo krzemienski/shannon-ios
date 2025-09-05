@@ -120,14 +120,15 @@ public final class ChatCoordinator: BaseCoordinator, ObservableObject {
     
     func renameConversation(id: String, newTitle: String) {
         Task {
-            await dependencyContainer.chatStore.renameConversation(id: id, title: newTitle)
+            await dependencyContainer.chatStore.renameConversation(id, to: newTitle)
         }
     }
     
     func duplicateConversation(id: String) {
         Task {
-            let newConversation = await dependencyContainer.chatStore.duplicateConversation(id: id)
-            openConversation(id: newConversation.id)
+            if let newConversation = await dependencyContainer.chatStore.duplicateConversation(id) {
+                openConversation(id: newConversation.id)
+            }
         }
     }
     
@@ -178,10 +179,10 @@ public final class ChatCoordinator: BaseCoordinator, ObservableObject {
     // MARK: - Tool Execution
     
     func executeTool(toolId: String, in conversationId: String, parameters: [String: Any]) {
-        guard let viewModel = getChatViewModel(for: conversationId) else { return }
+        let viewModel = getChatViewModel(for: conversationId)
         
         Task {
-            await viewModel.executeTool(toolId: toolId, parameters: parameters)
+            await viewModel.executeTool(name: toolId, parameters: parameters)
         }
     }
     

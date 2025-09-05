@@ -1,0 +1,28 @@
+# Claude Code API Requirements
+# Generated from pyproject.toml
+
+# Core dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+httpx>=0.25.0
+aiofiles>=23.2.1
+structlog>=23.2.0
+asyncio-mqtt>=0.16.1
+python-multipart>=0.0.6
+pydantic-settings>=2.1.0
+
+# Database
+sqlalchemy>=2.0.23
+aiosqlite>=0.19.0
+alembic>=1.13.0
+
+# Authentication & Security
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# OpenAI SDK for compatibility
+openai>=1.0.0

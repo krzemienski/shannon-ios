@@ -57,9 +57,12 @@ public struct TerminalInputView: View {
                     .onChange(of: commandText) { newValue in
                         updateAutoComplete(for: newValue)
                     }
+                    // MVP: Comment out onKeyPress as KeyPress type not available
+                    /*
                     .onKeyPress { key in
                         handleKeyPress(key)
                     }
+                    */
                 
                 // Action buttons
                 HStack(spacing: 4) {
@@ -129,7 +132,7 @@ public struct TerminalInputView: View {
             historyIndex -= 1
         }
         
-        commandText = history[historyIndex]
+        commandText = history[historyIndex] ?? ""
     }
     
     private func navigateHistoryDown() {
@@ -137,7 +140,7 @@ public struct TerminalInputView: View {
         
         if historyIndex < history.count - 1 {
             historyIndex += 1
-            commandText = history[historyIndex]
+            commandText = history[historyIndex] ?? ""
         } else {
             // Restore saved command
             historyIndex = -1
@@ -179,6 +182,8 @@ public struct TerminalInputView: View {
     
     // MARK: - Key Handling
     
+    // MVP: Comment out handleKeyPress as KeyPress type doesn't exist
+    /*
     private func handleKeyPress(_ key: KeyEquivalent) -> KeyPress.Result {
         if showAutoComplete {
             switch key {
@@ -228,6 +233,7 @@ public struct TerminalInputView: View {
         
         return .ignored
     }
+    */
     
     private func clearInput() {
         commandText = ""

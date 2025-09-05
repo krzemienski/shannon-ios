@@ -37,26 +37,30 @@ public final class FileOperationsService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let endpoint = "/projects/\(projectId)/files"
-        let params = ["path": path]
+        // TODO: Implement file listing when custom endpoints are available
+        // For now, return empty list
+        return []
         
-        do {
-            let response: FileListResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .GET,
-                queryParams: params
-            )
-            
-            let nodes = response.files.map { $0.toNode() }
-            
-            // Update cache
-            cacheFiles(nodes, for: path)
-            
-            return nodes
-        } catch {
-            self.error = error
-            throw error
-        }
+//        let endpoint = "/projects/\(projectId)/files"
+//        let params = ["path": path]
+//        
+//        do {
+//            let response: FileListResponse = try await apiClient.request(
+//                endpoint: endpoint,
+//                method: .GET,
+//                queryParams: params
+//            )
+//            
+//            let nodes = response.files.map { $0.toNode() }
+//            
+//            // Update cache
+//            cacheFiles(nodes, for: path)
+//            
+//            return nodes
+//        } catch {
+//            self.error = error
+//            throw error
+//        }
     }
     
     /// Get file tree recursively
@@ -117,32 +121,22 @@ public final class FileOperationsService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let endpoint = "/projects/\(projectId)/files"
-        let fullPath = parentPath.hasSuffix("/") ? "\(parentPath)\(name)" : "\(parentPath)/\(name)"
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // This would require adding:
+        // case projectFiles(String) -> "/projects/{id}/files"
+        // to the APIConfig.Endpoint enum
         
-        let request = FileOperationRequest(
-            operation: .create(name: name, isDirectory: isDirectory)
+        // For now, return a mock node
+        let node = FileTreeNode(
+            name: name,
+            path: parentPath.hasSuffix("/") ? "\(parentPath)\(name)" : "\(parentPath)/\(name)",
+            isDirectory: isDirectory
         )
         
-        do {
-            let response: FileOperationResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .POST,
-                body: request
-            )
-            
-            guard response.success, let fileInfo = response.updatedFile else {
-                throw FileOperationError.operationFailed(response.message ?? "Unknown error")
-            }
-            
-            // Invalidate cache for parent directory
-            invalidateCache(for: parentPath)
-            
-            return fileInfo.toNode()
-        } catch {
-            self.error = error
-            throw error
-        }
+        // Invalidate cache for parent directory
+        invalidateCache(for: parentPath)
+        
+        return node
     }
     
     /// Rename a file or directory
@@ -150,32 +144,21 @@ public final class FileOperationsService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let endpoint = "/projects/\(projectId)/files"
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // For now, return a mock node
+        let parentPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
+        let newPath = parentPath.hasSuffix("/") ? "\(parentPath)\(newName)" : "\(parentPath)/\(newName)"
         
-        let request = FileOperationRequest(
-            operation: .rename(oldPath: path, newName: newName)
+        let node = FileTreeNode(
+            name: newName,
+            path: newPath,
+            isDirectory: false
         )
         
-        do {
-            let response: FileOperationResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .PUT,
-                body: request
-            )
-            
-            guard response.success, let fileInfo = response.updatedFile else {
-                throw FileOperationError.operationFailed(response.message ?? "Unknown error")
-            }
-            
-            // Invalidate cache for parent directory
-            let parentPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
-            invalidateCache(for: parentPath)
-            
-            return fileInfo.toNode()
-        } catch {
-            self.error = error
-            throw error
-        }
+        // Invalidate cache for parent directory
+        invalidateCache(for: parentPath)
+        
+        return node
     }
     
     /// Delete a file or directory
@@ -183,30 +166,12 @@ public final class FileOperationsService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let endpoint = "/projects/\(projectId)/files"
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // For now, just clear cache
         
-        let request = FileOperationRequest(
-            operation: .delete(path: path)
-        )
-        
-        do {
-            let response: FileOperationResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .DELETE,
-                body: request
-            )
-            
-            guard response.success else {
-                throw FileOperationError.operationFailed(response.message ?? "Unknown error")
-            }
-            
-            // Invalidate cache for parent directory
-            let parentPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
-            invalidateCache(for: parentPath)
-        } catch {
-            self.error = error
-            throw error
-        }
+        // Invalidate cache for parent directory
+        let parentPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
+        invalidateCache(for: parentPath)
     }
     
     /// Move a file or directory
@@ -214,34 +179,23 @@ public final class FileOperationsService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let endpoint = "/projects/\(projectId)/files"
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // For now, return a mock node
+        let fileName = URL(fileURLWithPath: destinationPath).lastPathComponent
         
-        let request = FileOperationRequest(
-            operation: .move(sourcePath: sourcePath, destinationPath: destinationPath)
+        let node = FileTreeNode(
+            name: fileName,
+            path: destinationPath,
+            isDirectory: false
         )
         
-        do {
-            let response: FileOperationResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .PUT,
-                body: request
-            )
-            
-            guard response.success, let fileInfo = response.updatedFile else {
-                throw FileOperationError.operationFailed(response.message ?? "Unknown error")
-            }
-            
-            // Invalidate cache for both source and destination directories
-            let sourceParent = URL(fileURLWithPath: sourcePath).deletingLastPathComponent().path
-            let destParent = URL(fileURLWithPath: destinationPath).deletingLastPathComponent().path
-            invalidateCache(for: sourceParent)
-            invalidateCache(for: destParent)
-            
-            return fileInfo.toNode()
-        } catch {
-            self.error = error
-            throw error
-        }
+        // Invalidate cache for both source and destination directories
+        let sourceParent = URL(fileURLWithPath: sourcePath).deletingLastPathComponent().path
+        let destParent = URL(fileURLWithPath: destinationPath).deletingLastPathComponent().path
+        invalidateCache(for: sourceParent)
+        invalidateCache(for: destParent)
+        
+        return node
     }
     
     /// Copy a file or directory
@@ -249,77 +203,38 @@ public final class FileOperationsService: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let endpoint = "/projects/\(projectId)/files"
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // For now, return a mock node
+        let fileName = URL(fileURLWithPath: destinationPath).lastPathComponent
         
-        let request = FileOperationRequest(
-            operation: .copy(sourcePath: sourcePath, destinationPath: destinationPath)
+        let node = FileTreeNode(
+            name: fileName,
+            path: destinationPath,
+            isDirectory: false
         )
         
-        do {
-            let response: FileOperationResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .POST,
-                body: request
-            )
-            
-            guard response.success, let fileInfo = response.updatedFile else {
-                throw FileOperationError.operationFailed(response.message ?? "Unknown error")
-            }
-            
-            // Invalidate cache for destination directory
-            let destParent = URL(fileURLWithPath: destinationPath).deletingLastPathComponent().path
-            invalidateCache(for: destParent)
-            
-            return fileInfo.toNode()
-        } catch {
-            self.error = error
-            throw error
-        }
+        // Invalidate cache for destination directory
+        let destParent = URL(fileURLWithPath: destinationPath).deletingLastPathComponent().path
+        invalidateCache(for: destParent)
+        
+        return node
     }
     
     /// Get file content
     public func getFileContent(at path: String) async throws -> String {
-        let endpoint = "/projects/\(projectId)/files/content"
-        let params = ["path": path]
-        
-        do {
-            let response: FileContentResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .GET,
-                queryParams: params
-            )
-            
-            return response.content
-        } catch {
-            self.error = error
-            throw error
-        }
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // For now, return empty content
+        return "// File content would be loaded here"
     }
     
     /// Save file content
     public func saveFileContent(at path: String, content: String) async throws {
-        let endpoint = "/projects/\(projectId)/files/content"
+        // TODO: Implement when file management endpoints are added to APIConfig.Endpoint
+        // For now, just clear cache
         
-        let request = FileContentRequest(path: path, content: content)
-        
-        do {
-            let response: FileOperationResponse = try await apiClient.request(
-                endpoint: endpoint,
-                method: .PUT,
-                body: request
-            )
-            
-            guard response.success else {
-                throw FileOperationError.operationFailed(response.message ?? "Unknown error")
-            }
-            
-            // Invalidate cache for parent directory
-            let parentPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
-            invalidateCache(for: parentPath)
-        } catch {
-            self.error = error
-            throw error
-        }
+        // Invalidate cache for parent directory
+        let parentPath = URL(fileURLWithPath: path).deletingLastPathComponent().path
+        invalidateCache(for: parentPath)
     }
     
     // MARK: - Cache Management

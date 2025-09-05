@@ -57,7 +57,7 @@ public class APIClient: ObservableObject {
     private let batchProcessor = BatchProcessor()  // Task 344: Batch processing
     
     // Connection pool (Task 340)
-    private let connectionPool = ConnectionPool(maxConnections: 6)
+    nonisolated(unsafe) private let connectionPool = ConnectionPool(maxConnections: 6)
     
     // Circuit breaker (Task 350)
     private let circuitBreaker = CircuitBreaker(
@@ -738,7 +738,7 @@ public class APIClient: ObservableObject {
         // Execute all batched requests in parallel
         await withTaskGroup(of: Void.self) { group in
             for request in requests {
-                group.addTask {
+                group.addTask { @Sendable [request] in
                     await request.execute()
                 }
             }
@@ -783,10 +783,10 @@ enum NetworkType {
 
 // RequestMetrics - Using type from NetworkModels.swift
 
-struct BatchRequest {
+struct BatchRequest: Sendable {
     let id: UUID
     let priority: RequestPriority
-    let execute: () async -> Void
+    let execute: @Sendable () async -> Void
 }
 
 struct RetryableRequest {
@@ -918,11 +918,11 @@ class LatencyMonitor {
 
 // Batch Processor (Task 344)
 class BatchProcessor {
-    func processBatch<T>(_ items: [T], batchSize: Int, processor: (T) async throws -> Void) async throws {
+    func processBatch<T: Sendable>(_ items: [T], batchSize: Int, processor: @escaping @Sendable (T) async throws -> Void) async throws {
         for batch in items.chunked(into: batchSize) {
             try await withThrowingTaskGroup(of: Void.self) { group in
                 for item in batch {
-                    group.addTask {
+                    group.addTask { @Sendable [item] in
                         try await processor(item)
                     }
                 }

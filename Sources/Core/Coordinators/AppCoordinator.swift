@@ -85,17 +85,18 @@ public final class AppCoordinator: BaseCoordinator, ObservableObject {
     
     // MARK: - Coordinator Lifecycle
     
-    @MainActor
     override func start() {
-        // Check if onboarding is needed
-        if dependencyContainer.appState.isFirstLaunch {
-            showOnboarding()
-        } else if !dependencyContainer.appState.isAuthenticated {
-            handleAuthenticationRequired()
+        Task { @MainActor in
+            // Check if onboarding is needed
+            if dependencyContainer.appState.isFirstLaunch {
+                showOnboarding()
+            } else if !dependencyContainer.appState.isAuthenticated {
+                handleAuthenticationRequired()
+            }
+            
+            // Start child coordinators
+            children.forEach { $0.start() }
         }
-        
-        // Start child coordinators
-        children.forEach { $0.start() }
     }
     
     // MARK: - Navigation

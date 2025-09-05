@@ -82,4 +82,40 @@ node_modules/
 
 # Task files
 tasks.json
-tasks/ 
+tasks/
+
+# Python / Backend
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Claude Code API Backend
+claude-code-api/.git/
+claude-code-api/venv/
+claude-code-api/__pycache__/
+claude-code-api/*.db
+claude-code-api/*.db-journal
+claude-code-api/.env
+claude_api.db 

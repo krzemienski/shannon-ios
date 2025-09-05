@@ -292,7 +292,7 @@ public final class ChatViewModel: ObservableObject {
                 if let choice = response.choices.first {
                     let assistantMessage = Message(
                         role: .assistant,
-                        content: choice.message.content,
+                        content: choice.message.content ?? "",
                         metadata: MessageMetadata(
                             model: response.model,
                             usage: response.usage.map { TokenUsage(
@@ -306,7 +306,7 @@ public final class ChatViewModel: ObservableObject {
                     addMessage(assistantMessage)
                 }
             }
-        } catch let apiError as APIConfig.APIError {
+        } catch let apiError as APIError {
             handleAPIError(apiError)
         } catch {
             handleError(error)
@@ -331,8 +331,10 @@ public final class ChatViewModel: ObservableObject {
         // Initialize streaming service if needed
         if streamingService == nil {
             let settingsStore = DependencyContainer.shared.settingsStore
+            let urlString = settingsStore.apiBaseURL ?? APIConfig.defaultBaseURL
+            let baseURL = URL(string: urlString) ?? URL(string: APIConfig.defaultBaseURL)!
             streamingService = StreamingChatService(
-                baseURL: settingsStore.apiBaseURL ?? APIConfig.defaultBaseURL,
+                baseURL: baseURL,
                 apiKey: settingsStore.apiKey
             )
         }
@@ -485,28 +487,36 @@ public final class ChatViewModel: ObservableObject {
         isLoading = true
         
         // Create tool execution message
+        var metadata = MessageMetadata()
+        metadata.toolCalls = [ToolCall(
+            id: UUID().uuidString,
+            name: name,
+            arguments: parameters.mapValues { AnyCodable($0) },
+            result: nil,
+            status: .pending
+        )]
+        
         let toolMessage = Message(
             role: .tool,
             content: "Executing tool: \(name)",
-            toolCall: ToolCall(
-                id: UUID().uuidString,
-                name: name,
-                arguments: parameters
-            )
+            metadata: metadata
         )
         addMessage(toolMessage)
         
         do {
             // Execute tool through API
-            let response = try await apiClient.executeTool(
-                name: name,
-                parameters: parameters
+            let request = ToolExecutionRequest(
+                toolName: name,
+                arguments: parameters.mapValues { AnyCodable($0) },
+                sessionId: nil,
+                timeout: nil
             )
+            let response = try await apiClient.executeTool(request)
             
             // Add tool response message
             let responseMessage = Message(
                 role: .toolResponse,
-                content: response.result
+                content: response.result?.value as? String ?? "Tool executed successfully"
             )
             addMessage(responseMessage)
             
@@ -547,12 +557,8 @@ public final class ChatViewModel: ObservableObject {
             errorMessage = "Backend server is not running. Please start the server and try again."
         case .unauthorized:
             errorMessage = "Invalid API key. Please check your settings."
-        case .rateLimited(let retryAfter):
-            if let retryAfter = retryAfter {
-                errorMessage = "Rate limited. Please wait \(Int(retryAfter)) seconds."
-            } else {
-                errorMessage = "Rate limited. Please wait a moment and try again."
-            }
+        case .rateLimited:
+            errorMessage = "Rate limited. Please wait a moment and try again."
         case .networkError(let error):
             errorMessage = "Network error: \(error.localizedDescription)"
         case .serverError(_, let message):
@@ -561,6 +567,8 @@ public final class ChatViewModel: ObservableObject {
             errorMessage = "Failed to process server response"
         case .invalidRequest(let message):
             errorMessage = message
+        @unknown default:
+            errorMessage = "An unexpected error occurred"
         }
         
         // Add error message to conversation

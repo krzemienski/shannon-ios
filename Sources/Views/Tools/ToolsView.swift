@@ -14,11 +14,19 @@ struct ToolsView: View {
     @State private var showingAddTool = false
     
     private var tools: [MCPTool] {
-        toolStore.availableTools
+        // MVP: Return empty array for now
+        []
+        // toolStore.availableTools
     }
     
     var filteredTools: [MCPTool] {
-        let categoryFiltered = selectedCategory == .all ? tools : tools.filter { $0.category == selectedCategory }
+        // MVP: Since tools array is empty, just return it
+        return []
+        /*
+        let categoryFiltered = selectedCategory == .all ? tools : tools.filter { 
+            // Would need to map between MCPToolCategory and ToolCategory
+            false
+        }
         
         if searchText.isEmpty {
             return categoryFiltered
@@ -27,6 +35,7 @@ struct ToolsView: View {
             $0.name.localizedCaseInsensitiveContains(searchText) ||
             $0.description.localizedCaseInsensitiveContains(searchText)
         }
+        */
     }
     
     var body: some View {
@@ -38,11 +47,11 @@ struct ToolsView: View {
                 // Category filter
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: ThemeSpacing.sm) {
-                        ForEach(ToolCategory.allCases, id: \.self) { category in
+                        ForEach(MCPToolCategory.allCases, id: \.self) { category in
                             ToolCategoryChip(
                                 category: category,
                                 isSelected: selectedCategory == category,
-                                count: tools.filter { category == .all || $0.category == category }.count
+                                count: 0 // MVP: Always 0 since tools is empty
                             ) {
                                 selectedCategory = category
                             }
@@ -89,7 +98,8 @@ struct ToolsView: View {
         }
         .sheet(isPresented: $showingAddTool) {
             AddToolView { newTool in
-                tools.append(newTool)
+                // MVP: Tool adding not implemented
+                // Would need to add to toolStore
             }
         }
     }
@@ -138,7 +148,8 @@ struct ToolCard: View {
             // Main content
             HStack(spacing: ThemeSpacing.md) {
                 // Tool icon
-                Image(systemName: tool.category.icon)
+                // MVP: Use a default icon since category mapping is complex
+                Image(systemName: "wrench")
                     .font(.system(size: 24))
                     .foregroundColor(isEnabled ? Theme.primary : Theme.muted)
                     .frame(width: 40, height: 40)
@@ -156,15 +167,14 @@ struct ToolCard: View {
                         .foregroundColor(Theme.mutedForeground)
                         .lineLimit(isExpanded ? nil : 2)
                     
-                    // Stats
+                    // Stats - MVP: Show version instead
                     HStack(spacing: ThemeSpacing.md) {
-                        Label("\(tool.usageCount) uses", systemImage: "chart.bar")
-                        if tool.lastUsed != nil {
-                            Label(tool.formattedLastUsed, systemImage: "clock")
+                        if let version = tool.version {
+                            Label("v\(version)", systemImage: "info.circle")
+                                .font(Theme.Typography.captionFont)
+                                .foregroundColor(Theme.muted)
                         }
                     }
-                    .font(Theme.Typography.captionFont)
-                    .foregroundColor(Theme.muted)
                 }
                 
                 Spacer()
@@ -182,44 +192,30 @@ struct ToolCard: View {
                     Divider()
                         .background(Theme.border)
                     
-                    // Parameters
-                    if !tool.parameters.isEmpty {
+                    // MVP: Show metadata instead of parameters
+                    if let metadata = tool.metadata {
                         VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
-                            Text("Parameters")
+                            Text("Server")
                                 .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.mutedForeground)
                             
-                            ForEach(tool.parameters, id: \.name) { param in
-                                HStack {
-                                    Text(param.name)
-                                        .font(Theme.Typography.footnoteFont)
-                                        .foregroundColor(Theme.foreground)
-                                    Spacer()
-                                    Text(param.type)
-                                        .font(Theme.Typography.captionFont)
-                                        .foregroundColor(Theme.muted)
-                                        .padding(.horizontal, ThemeSpacing.xs)
-                                        .padding(.vertical, 2)
-                                        .background(Theme.muted.opacity(0.2))
-                                        .cornerRadius(Theme.CornerRadius.sm)
-                                }
-                            }
+                            Text(tool.serverId)
+                                .font(Theme.Typography.footnoteFont)
+                                .foregroundColor(Theme.foreground)
                         }
                     }
                     
-                    // Configuration
-                    if tool.requiresConfig {
-                        Button {
-                            // Configure tool
-                        } label: {
-                            HStack {
-                                Image(systemName: "gear")
-                                Text("Configure")
-                            }
-                            .font(Theme.Typography.footnoteFont)
+                    // Configuration button - always show for MVP
+                    Button {
+                        // Configure tool
+                    } label: {
+                        HStack {
+                            Image(systemName: "gear")
+                            Text("Configure")
                         }
-                        .secondaryButton()
+                        .font(Theme.Typography.footnoteFont)
                     }
+                    .secondaryButton()
                 }
                 .padding([.horizontal, .bottom], ThemeSpacing.md)
             }
@@ -266,32 +262,6 @@ enum MCPToolCategory: String, CaseIterable {
 
 // MARK: - MCP Tool Model
 // Using MCPTool from MCPModels.swift instead
-
-/*
-struct MCPTool: Identifiable {
-    let id = UUID().uuidString
-    let name: String
-    let description: String
-    let category: MCPToolCategory
-    let usageCount: Int
-    let lastUsed: Date?
-    let requiresConfig: Bool
-    let parameters: [Parameter]
-    
-    struct Parameter {
-        let name: String
-        let type: String
-        let required: Bool
-    }
-    
-    var formattedLastUsed: String {
-        guard let lastUsed = lastUsed else { return "Never" }
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: lastUsed, relativeTo: Date())
-    }
-*/
-    
 // Removed mock data - now using real data from ToolStore
 
 // MARK: - Add Tool View
@@ -372,19 +342,33 @@ struct AddToolView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Add") {
-                        // Create new MCP tool with required fields
+                        // MVP: Create simplified MCP tool
+                        // Map MCPToolCategory to ToolCategory
+                        var toolCategory: ToolCategory = .custom
+                        switch selectedCategory {
+                        case .fileSystem:
+                            toolCategory = .filesystem
+                        case .codeAnalysis:
+                            toolCategory = .analysis
+                        case .git:
+                            toolCategory = .utility
+                        case .database:
+                            toolCategory = .database
+                        case .api:
+                            toolCategory = .network
+                        case .terminal:
+                            toolCategory = .utility
+                        default:
+                            toolCategory = .custom
+                        }
+                        
                         let newTool = MCPTool(
                             id: UUID().uuidString,
                             serverId: serverURL,
                             name: toolName,
                             description: toolDescription,
                             version: "1.0.0",
-                            category: selectedCategory == .fileSystem ? .filesystem : 
-                                     selectedCategory == .codeAnalysis ? .analysis :
-                                     selectedCategory == .git ? .utility :
-                                     selectedCategory == .database ? .database :
-                                     selectedCategory == .api ? .network :
-                                     selectedCategory == .terminal ? .utility : .custom,
+                            category: toolCategory,
                             inputSchema: JSONSchema(
                                 type: "object",
                                 properties: nil,

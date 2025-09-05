@@ -8,6 +8,24 @@
 import SwiftUI
 import Combine
 
+// MVP: Temporary stub service
+class TerminalService: ObservableObject {
+    @Published var output: String = ""
+    @Published var isConnected: Bool = false
+    
+    func connect() async throws {
+        isConnected = true
+    }
+    
+    func disconnect() {
+        isConnected = false
+    }
+    
+    func sendCommand(_ command: String) async throws -> String {
+        return "Command executed: \(command)"
+    }
+}
+
 /// View for displaying a single terminal session
 public struct TerminalSessionView: View {
     let session: SSHSession
@@ -157,35 +175,16 @@ public struct TerminalSessionView: View {
     }
     
     private func setupSession() {
-        guard let service = sessionManager.getService(for: session.id) else { return }
+        // MVP: Simplified - getService not available on SSHSessionManager
+        let service = TerminalService()  // Use stub service for now
         
-        // Connect terminal emulator to SSH session
+        // MVP: Simplified terminal connection
         Task {
             do {
-                let shellSession = try await service.createShellSession()
-                
-                // Pipe output to emulator
-                shellSession.outputStream
-                    .sink { data in
-                        Task { @MainActor in
-                            emulator.processData(data)
-                        }
-                    }
-                    .store(in: &shellSession.cancellables)
-                
-                // Pipe input from emulator to shell
-                emulator.inputStream
-                    .sink { data in
-                        Task {
-                            try? await shellSession.write(data)
-                        }
-                    }
-                    .store(in: &shellSession.cancellables)
-                
+                try await service.connect()
                 isInputFocused = true
-                
             } catch {
-                print("Failed to create shell session: \(error)")
+                print("Failed to connect: \(error)")
             }
         }
     }

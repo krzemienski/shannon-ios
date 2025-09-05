@@ -45,6 +45,7 @@ public enum SettingsDestination: Hashable {
 
 /// Manages navigation state across the app
 @MainActor
+@available(iOS 16.0, macOS 13.0, *)
 public final class NavigationCoordinator: ObservableObject {
     // MARK: - Navigation Paths
     
@@ -364,13 +365,22 @@ public extension View {
     /// Apply navigation coordinator to view
     func withNavigationCoordinator(_ coordinator: NavigationCoordinator) -> some View {
         self
-            .sheet(item: coordinator.$presentedSheet) { sheet in
+            .sheet(item: Binding<NavigationCoordinator.SheetType?>(
+                get: { coordinator.presentedSheet },
+                set: { coordinator.presentedSheet = $0 }
+            )) { sheet in
                 sheetContent(for: sheet)
             }
-            .fullScreenCover(item: coordinator.$presentedFullScreenCover) { cover in
+            .fullScreenCover(item: Binding<NavigationCoordinator.FullScreenCoverType?>(
+                get: { coordinator.presentedFullScreenCover },
+                set: { coordinator.presentedFullScreenCover = $0 }
+            )) { cover in
                 fullScreenCoverContent(for: cover)
             }
-            .alert(item: coordinator.$alertItem) { alert in
+            .alert(item: Binding<NavigationCoordinator.AlertItem?>(
+                get: { coordinator.alertItem },
+                set: { coordinator.alertItem = $0 }
+            )) { alert in
                 Alert(
                     title: Text(alert.title),
                     message: alert.message.map { Text($0) },
@@ -385,7 +395,7 @@ public extension View {
         case .newChat:
             NewConversationView(coordinator: nil)
         case .newProject:
-            NewProjectView()
+            NewProjectView(onSave: { _ in })
         case .newTerminalSession:
             Text("New Terminal Session") // Placeholder
         case .shareContent(let content):
@@ -393,11 +403,13 @@ public extension View {
         case .imageViewer(let image):
             ImageViewer(image: image)
         case .pdfViewer(let url):
-            PDFViewerView()
+            PDFViewerView(url: url)
         case .codeEditor(let content, let language):
-            CodeEditorView()
-        case .export(let data, let filename):
-            ExportDataView()
+            // Convert string language to ProgrammingLanguage enum
+            let programmingLanguage = ProgrammingLanguage(rawValue: language) ?? .plainText
+            CodeEditorView(text: .constant(content), language: .constant(programmingLanguage), fileName: "Untitled")
+        case .export(_, let filename):
+            Text("Export: \(filename)") // Placeholder for export functionality
         }
     }
     
@@ -405,9 +417,9 @@ public extension View {
     private func fullScreenCoverContent(for cover: NavigationCoordinator.FullScreenCoverType) -> some View {
         switch cover {
         case .onboarding:
-            OnboardingView(onComplete: {})
+            OnboardingView(showOnboarding: .constant(true))
         case .authentication:
-            AuthenticationView()
+            AuthenticationView(onSuccess: {})
         case .projectWizard:
             Text("Project Wizard") // Placeholder
         }

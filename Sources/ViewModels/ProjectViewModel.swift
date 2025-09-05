@@ -218,7 +218,7 @@ public final class ProjectViewModel: ObservableObject {
         
         if let config = project.sshConfig {
             sshHost = config.host
-            sshPort = config.port
+            sshPort = Int(config.port)
             sshUsername = config.username
             sshAuthMethod = config.authMethod
             sshPrivateKey = config.privateKeyPath ?? ""
@@ -235,8 +235,10 @@ public final class ProjectViewModel: ObservableObject {
         guard let project = selectedProject, canSaveSSHConfig else { return }
         
         let config = AppSSHConfig(
+            id: UUID().uuidString,
+            name: "\(project.name) SSH",
             host: sshHost,
-            port: sshPort,
+            port: UInt16(sshPort),
             username: sshUsername,
             authMethod: sshAuthMethod,
             privateKeyPath: sshPrivateKey.isEmpty ? nil : sshPrivateKey,
@@ -255,8 +257,10 @@ public final class ProjectViewModel: ObservableObject {
         isLoading = true
         
         let config = AppSSHConfig(
+            id: UUID().uuidString,
+            name: "Test SSH",
             host: sshHost,
-            port: sshPort,
+            port: UInt16(sshPort),
             username: sshUsername,
             authMethod: sshAuthMethod,
             privateKeyPath: sshPrivateKey.isEmpty ? nil : sshPrivateKey,
@@ -279,7 +283,7 @@ public final class ProjectViewModel: ObservableObject {
         isLoading = true
         
         do {
-            await sshManager.connect(config: config)
+            try await sshManager.connect(config: config)
             showSuccess(message: "Connected to SSH")
         } catch {
             handleError(error)

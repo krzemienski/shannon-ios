@@ -43,8 +43,9 @@ public final class SettingsCoordinator: BaseCoordinator, ObservableObject {
     
     override func start() {
         // Load current settings
-        Task {
-            await dependencyContainer.settingsStore.loadSettings()
+        let container = dependencyContainer
+        Task { @MainActor in
+            await container.settingsStore.loadSettings()
         }
     }
     
@@ -287,7 +288,7 @@ enum SettingsRoute: Hashable {
 
 // MARK: - Supporting Types
 
-enum SettingsSection: String, CaseIterable, Identifiable {
+public enum SettingsSection: String, CaseIterable, Identifiable {
     case general = "General"
     case api = "API"
     case ssh = "SSH"
@@ -297,7 +298,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
     case privacy = "Privacy"
     case about = "About"
     
-    var id: String { rawValue }
+    public var id: String { rawValue }
     
     var icon: String {
         switch self {

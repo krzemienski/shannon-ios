@@ -148,8 +148,18 @@ public final class MonitorViewModel: ObservableObject {
             .store(in: &cancellables)
         
         monitorStore.$activeConnections
-            .sink { [weak self] connections in
-                self?.activeConnections = connections
+            .sink { [weak self] monitorConnections in
+                // Convert SSHMonitorConnection to SSHConnection
+                self?.activeConnections = monitorConnections.map { monitorConn in
+                    SSHConnection(
+                        id: monitorConn.id,
+                        name: "\(monitorConn.username)@\(monitorConn.host)",
+                        host: monitorConn.host,
+                        port: monitorConn.port,
+                        username: monitorConn.username,
+                        authMethod: .password
+                    )
+                }
             }
             .store(in: &cancellables)
         
@@ -360,19 +370,19 @@ public enum MonitorTab: String, CaseIterable {
     }
 }
 
-struct ChartDataPoint {
+public struct ChartDataPoint {
     let timestamp: Date
     let value: Double
 }
 
-struct NetworkChartData {
+public struct NetworkChartData {
     let timestamp: Date
     let downloadSpeed: Int
     let uploadSpeed: Int
 }
 
 public struct MetricAlert: Identifiable {
-    let id = UUID()
+    public let id = UUID()
     let type: MetricType
     let severity: AlertSeverity
     let message: String
@@ -381,7 +391,7 @@ public struct MetricAlert: Identifiable {
 
 // MetricType is now defined in NetworkModels.swift
 
-enum AlertSeverity {
+public enum AlertSeverity {
     case info
     case warning
     case critical

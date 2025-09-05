@@ -54,7 +54,7 @@ struct TooltipView: View {
                     }
                     
                     Text(tooltip.title)
-                        .font(Theme.typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(.white)
                     
                     Spacer()
@@ -71,7 +71,7 @@ struct TooltipView: View {
                 
                 // Message
                 Text(tooltip.message)
-                    .font(Theme.typography.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(.white.opacity(0.9))
                     .fixedSize(horizontal: false, vertical: true)
                 
@@ -90,7 +90,7 @@ struct TooltipView: View {
             }
             .padding()
             .background(backgroundColor)
-            .cornerRadius(Theme.radius.medium)
+            .cornerRadius(Theme.Radius.md)
             .shadow(color: backgroundColor.opacity(0.3), radius: 10, x: 0, y: 5)
             
             // Arrow (if needed)
@@ -158,12 +158,12 @@ struct TooltipActionButton: View {
     var body: some View {
         Button(action: onTap) {
             Text(action.title)
-                .font(Theme.typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(foregroundColor)
                 .padding(.horizontal, Theme.spacing.md)
                 .padding(.vertical, Theme.spacing.xs)
                 .background(backgroundColor)
-                .cornerRadius(Theme.radius.small)
+                .cornerRadius(Theme.Radius.sm)
         }
     }
 }
@@ -279,7 +279,7 @@ struct HelpCenterView: View {
                     }
                     .padding()
                     .background(Theme.card)
-                    .cornerRadius(Theme.radius.medium)
+                    .cornerRadius(Theme.Radius.md)
                     .padding(.horizontal)
                     
                     // Categories
@@ -301,7 +301,7 @@ struct HelpCenterView: View {
                     // Popular articles
                     VStack(alignment: .leading, spacing: Theme.spacing.md) {
                         Text("Popular Articles")
-                            .font(Theme.typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(Theme.foreground)
                             .padding(.horizontal)
                         
@@ -315,7 +315,7 @@ struct HelpCenterView: View {
                     // FAQ section
                     VStack(alignment: .leading, spacing: Theme.spacing.md) {
                         Text("Frequently Asked Questions")
-                            .font(Theme.typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(Theme.foreground)
                             .padding(.horizontal)
                         
@@ -327,7 +327,7 @@ struct HelpCenterView: View {
                     // Contact support
                     VStack(spacing: Theme.spacing.md) {
                         Text("Still need help?")
-                            .font(Theme.typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(Theme.foreground)
                         
                         HStack(spacing: Theme.spacing.md) {
@@ -350,7 +350,7 @@ struct HelpCenterView: View {
                     }
                     .padding()
                     .background(Theme.card)
-                    .cornerRadius(Theme.radius.large)
+                    .cornerRadius(Theme.Radius.lg)
                     .padding()
                 }
             }
@@ -374,11 +374,11 @@ struct HelpArticleRow: View {
             HStack {
                 VStack(alignment: .leading, spacing: Theme.spacing.xs) {
                     Text(article.title)
-                        .font(Theme.typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                     
                     Text(article.category)
-                        .font(Theme.typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.muted)
                 }
                 
@@ -389,7 +389,7 @@ struct HelpArticleRow: View {
             }
             .padding()
             .background(Theme.card)
-            .cornerRadius(Theme.radius.medium)
+            .cornerRadius(Theme.Radius.md)
             .padding(.horizontal)
         }
         .buttonStyle(PlainButtonStyle())
@@ -411,7 +411,7 @@ struct FAQRow: View {
             } label: {
                 HStack {
                     Text(faq.question)
-                        .font(Theme.typography.headline)
+                        .font(Theme.Typography.headlineFont)
                         .foregroundColor(Theme.foreground)
                         .multilineTextAlignment(.leading)
                     
@@ -425,14 +425,14 @@ struct FAQRow: View {
             
             if isExpanded {
                 Text(faq.answer)
-                    .font(Theme.typography.body)
-                    .foregroundColor(Theme.secondaryForeground)
+                    .font(Theme.Typography.bodyFont)
+                    .foregroundColor(Theme.mutedForeground)
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .padding()
         .background(Theme.card)
-        .cornerRadius(Theme.radius.medium)
+        .cornerRadius(Theme.Radius.md)
         .padding(.horizontal)
     }
 }
@@ -447,12 +447,12 @@ struct CategoryChip: View {
     var body: some View {
         Button(action: onTap) {
             Text(title)
-                .font(Theme.typography.caption)
+                .font(Theme.Typography.captionFont)
                 .foregroundColor(isSelected ? Theme.background : Theme.foreground)
                 .padding(.horizontal, Theme.spacing.md)
                 .padding(.vertical, Theme.spacing.sm)
                 .background(isSelected ? Theme.primary : Theme.card)
-                .cornerRadius(Theme.radius.small)
+                .cornerRadius(Theme.Radius.sm)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -473,13 +473,13 @@ struct ContactButton: View {
                     .foregroundColor(Theme.primary)
                 
                 Text(title)
-                    .font(Theme.typography.caption)
+                    .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.foreground)
             }
             .frame(maxWidth: .infinity)
             .padding()
             .background(Theme.background)
-            .cornerRadius(Theme.radius.medium)
+            .cornerRadius(Theme.Radius.md)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -500,25 +500,25 @@ struct HelpArticleDetailView: View {
                     // Article content
                     VStack(alignment: .leading, spacing: Theme.spacing.md) {
                         Text(article.title)
-                            .font(Theme.typography.largeTitle)
+                            .font(Theme.Typography.largeTitleFont)
                             .foregroundColor(Theme.foreground)
                         
                         HStack {
                             Label(article.category, systemImage: "folder.fill")
-                                .font(Theme.typography.caption)
+                                .font(Theme.Typography.captionFont)
                                 .foregroundColor(Theme.muted)
                             
                             Spacer()
                             
                             Text("Updated: \(article.lastUpdated.formatted(date: .abbreviated, time: .omitted))")
-                                .font(Theme.typography.small)
-                                .foregroundColor(Theme.tertiaryForeground)
+                                .font(Theme.Typography.footnoteFont)
+                                .foregroundColor(Theme.mutedForeground)
                         }
                         
                         Divider()
                         
                         Text(article.content)
-                            .font(Theme.typography.body)
+                            .font(Theme.Typography.bodyFont)
                             .foregroundColor(Theme.foreground)
                         
                         // Video link (if available)
@@ -528,12 +528,12 @@ struct HelpArticleDetailView: View {
                                     Image(systemName: "play.circle.fill")
                                     Text("Watch Video Tutorial")
                                 }
-                                .font(Theme.typography.body)
+                                .font(Theme.Typography.bodyFont)
                                 .foregroundColor(Theme.primary)
                             }
                             .padding()
                             .background(Theme.primary.opacity(0.1))
-                            .cornerRadius(Theme.radius.medium)
+                            .cornerRadius(Theme.Radius.md)
                         }
                         
                         // Tags
@@ -542,12 +542,12 @@ struct HelpArticleDetailView: View {
                                 HStack(spacing: Theme.spacing.sm) {
                                     ForEach(article.tags, id: \.self) { tag in
                                         Text(tag)
-                                            .font(Theme.typography.small)
+                                            .font(Theme.Typography.footnoteFont)
                                             .foregroundColor(Theme.primary)
                                             .padding(.horizontal, Theme.spacing.sm)
                                             .padding(.vertical, Theme.spacing.xs)
                                             .background(Theme.primary.opacity(0.1))
-                                            .cornerRadius(Theme.radius.small)
+                                            .cornerRadius(Theme.Radius.sm)
                                     }
                                 }
                             }
@@ -558,7 +558,7 @@ struct HelpArticleDetailView: View {
                     // Feedback section
                     VStack(alignment: .leading, spacing: Theme.spacing.md) {
                         Text("Was this article helpful?")
-                            .font(Theme.typography.headline)
+                            .font(Theme.Typography.headlineFont)
                             .foregroundColor(Theme.foreground)
                         
                         HStack(spacing: Theme.spacing.md) {
@@ -587,20 +587,20 @@ struct HelpArticleDetailView: View {
                         
                         if isHelpful != nil {
                             Text("Thank you for your feedback!")
-                                .font(Theme.typography.body)
-                                .foregroundColor(Theme.secondaryForeground)
+                                .font(Theme.Typography.bodyFont)
+                                .foregroundColor(Theme.mutedForeground)
                         }
                     }
                     .padding()
                     .background(Theme.card)
-                    .cornerRadius(Theme.radius.large)
+                    .cornerRadius(Theme.Radius.lg)
                     .padding()
                     
                     // Related articles
                     if !article.relatedArticles.isEmpty {
                         VStack(alignment: .leading, spacing: Theme.spacing.md) {
                             Text("Related Articles")
-                                .font(Theme.typography.headline)
+                                .font(Theme.Typography.headlineFont)
                                 .foregroundColor(Theme.foreground)
                                 .padding(.horizontal)
                             
@@ -638,13 +638,13 @@ struct FeedbackButton: View {
                 Text(title)
                     .foregroundColor(isSelected ? color : Theme.foreground)
             }
-            .font(Theme.typography.body)
+            .font(Theme.Typography.bodyFont)
             .frame(maxWidth: .infinity)
             .padding()
             .background(isSelected ? color.opacity(0.1) : Theme.background)
-            .cornerRadius(Theme.radius.medium)
+            .cornerRadius(Theme.Radius.md)
             .overlay(
-                RoundedRectangle(cornerRadius: Theme.radius.medium)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .stroke(isSelected ? color : Theme.muted.opacity(0.3), lineWidth: 1)
             )
         }

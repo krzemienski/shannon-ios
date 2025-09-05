@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
 import CryptoKit
 import OSLog
@@ -881,4 +882,4 @@ private struct SecurityEvent {
 private let CTL_KERN = 1
 private let KERN_PROC = 14
 private let KERN_PROC_PID = 1
-private let P_TRACED = 0x00000800
+private let P_TRACED = 0x00000800#endif // os(iOS)

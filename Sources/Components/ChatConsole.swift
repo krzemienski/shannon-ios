@@ -20,7 +20,7 @@ struct ChatConsoleView: View {
         VStack(spacing: 0) {
             // Header
             ConsoleHeader(
-                status: $viewModel.connectionStatus,
+                status: viewModel.connectionStatus,
                 model: viewModel.currentModel,
                 showingTools: $showingTools
             )
@@ -85,7 +85,17 @@ struct ChatConsoleView: View {
             ToolsPanelView(tools: viewModel.availableTools)
         }
         .sheet(item: $selectedTool) { tool in
-            ToolDetailView(tool: tool)
+            // Convert ConsoleToolExecution to PanelToolInfo for ToolDetailView
+            let panelToolInfo = PanelToolInfo(
+                name: tool.name,
+                category: "Tool",
+                icon: tool.icon,
+                description: "Tool execution details",
+                usage: tool.input ?? "No input",
+                examples: [],
+                lastUsed: Date()
+            )
+            ToolDetailView(tool: panelToolInfo)
         }
     }
 }
@@ -105,7 +115,7 @@ struct ConsoleHeader: View {
                     .fill(statusColor)
                     .frame(width: 8, height: 8)
                 
-                Text(status.rawValue)
+                Text(statusText)
                     .font(Theme.Typography.captionFont)
                     .foregroundColor(Theme.mutedForeground)
             }
@@ -149,6 +159,17 @@ struct ConsoleHeader: View {
             return Theme.warning
         case .disconnected:
             return Theme.destructive
+        }
+    }
+    
+    private var statusText: String {
+        switch status {
+        case .connected:
+            return "Connected"
+        case .connecting:
+            return "Connecting"
+        case .disconnected:
+            return "Disconnected"
         }
     }
 }
@@ -231,6 +252,8 @@ struct RoleIndicator: View {
             return Theme.info
         case .error:
             return Theme.destructive
+        case .tool, .toolResponse:
+            return Theme.secondary
         }
     }
 }
@@ -303,7 +326,7 @@ struct ToolExecutionCard: View {
     
     private var statusColor: Color {
         switch tool.status {
-        case .pending:
+        case .idle:
             return Theme.mutedForeground
         case .running:
             return Theme.primary

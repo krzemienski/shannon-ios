@@ -352,10 +352,12 @@ public enum APIError: LocalizedError {
     case decodingError(Error)
     case serverError(Int, String?)
     case rateLimitExceeded
+    case rateLimited  // Added for ChatViewModel compatibility
     case unauthorized
     case authenticationFailed
     case invalidRequest(String)
     case timeout
+    case backendNotRunning  // Added for ChatListViewModel compatibility
     case unknown(String)
     
     public var errorDescription: String? {
@@ -372,6 +374,8 @@ public enum APIError: LocalizedError {
             return "Server error (\(code)): \(message ?? "Unknown error")"
         case .rateLimitExceeded:
             return "Rate limit exceeded"
+        case .rateLimited:
+            return "Rate limited - please wait before retrying"
         case .unauthorized:
             return "Unauthorized access"
         case .authenticationFailed:
@@ -380,6 +384,8 @@ public enum APIError: LocalizedError {
             return "Invalid request: \(message)"
         case .timeout:
             return "Request timeout"
+        case .backendNotRunning:
+            return "Backend server is not running. Please start the server."
         case .unknown(let message):
             return "Unknown error: \(message)"
         }

@@ -33,12 +33,12 @@ struct AuthenticationView: View {
                     // Title
                     VStack(spacing: Theme.spacing.sm) {
                         Text("Authentication Required")
-                            .font(Theme.typography.title)
+                            .font(Theme.Typography.titleFont)
                             .foregroundColor(Theme.foreground)
                         
                         Text("Enter your API credentials to continue")
-                            .font(Theme.typography.body)
-                            .foregroundColor(Theme.secondaryForeground)
+                            .font(Theme.Typography.bodyFont)
+                            .foregroundColor(Theme.mutedForeground)
                     }
                     
                     // Form
@@ -46,8 +46,8 @@ struct AuthenticationView: View {
                         // API Key Field
                         VStack(alignment: .leading, spacing: Theme.spacing.sm) {
                             Text("API Key")
-                                .font(Theme.typography.caption)
-                                .foregroundColor(Theme.secondaryForeground)
+                                .font(Theme.Typography.captionFont)
+                                .foregroundColor(Theme.mutedForeground)
                             
                             SecureField("Enter your Claude API key", text: $apiKey)
                                 .textFieldStyle(CyberpunkTextFieldStyle())
@@ -60,8 +60,8 @@ struct AuthenticationView: View {
                         ) {
                             VStack(alignment: .leading, spacing: Theme.spacing.sm) {
                                 Text("Base URL (Optional)")
-                                    .font(Theme.typography.caption)
-                                    .foregroundColor(Theme.secondaryForeground)
+                                    .font(Theme.Typography.captionFont)
+                                    .foregroundColor(Theme.mutedForeground)
                                 
                                 TextField("https://api.example.com", text: $baseURL)
                                     .textFieldStyle(CyberpunkTextFieldStyle())
@@ -69,13 +69,13 @@ struct AuthenticationView: View {
                                     .keyboardType(.URL)
                                 
                                 Text("Leave empty to use the default API endpoint")
-                                    .font(Theme.typography.small)
-                                    .foregroundColor(Theme.tertiaryForeground)
+                                    .font(Theme.Typography.caption2Font)
+                                    .foregroundColor(Theme.mutedForeground)
                             }
                             .padding(.top, Theme.spacing.md)
                         }
                         .tint(Theme.primary)
-                        .font(Theme.typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.primary)
                     }
                     .padding(.horizontal)
@@ -87,32 +87,33 @@ struct AuthenticationView: View {
                                 .foregroundColor(Theme.destructive)
                             
                             Text(errorMessage)
-                                .font(Theme.typography.small)
+                                .font(Theme.Typography.caption2Font)
                                 .foregroundColor(Theme.destructive)
                             
                             Spacer()
                         }
                         .padding()
                         .background(Theme.destructive.opacity(0.1))
-                        .cornerRadius(Theme.radius.md)
+                        .cornerRadius(Theme.Radius.md)
                         .padding(.horizontal)
                     }
                     
                     // Buttons
                     VStack(spacing: Theme.spacing.md) {
                         CyberpunkButton(
-                            title: "Authenticate",
-                            style: .primary,
-                            isLoading: isLoading
-                        ) {
-                            authenticate()
-                        }
+                            "Authenticate",
+                            variant: .primary,
+                            isLoading: isLoading,
+                            action: {
+                                authenticate()
+                            }
+                        )
                         .disabled(apiKey.isEmpty)
                         
                         Button("Learn how to get an API key") {
                             openAPIKeyGuide()
                         }
-                        .font(Theme.typography.caption)
+                        .font(Theme.Typography.captionFont)
                         .foregroundColor(Theme.primary)
                     }
                     .padding(.horizontal)
@@ -132,22 +133,23 @@ struct AuthenticationView: View {
         Task {
             do {
                 // Save credentials
-                await DependencyContainer.shared.settingsStore.updateAPIConfiguration(
+                DependencyContainer.shared.settingsStore.updateAPIConfiguration(
                     apiKey: apiKey,
                     baseURL: baseURL.isEmpty ? nil : baseURL
                 )
                 
                 // Configure API client
                 DependencyContainer.shared.apiClient.setAPIKey(apiKey)
-                if !baseURL.isEmpty {
-                    DependencyContainer.shared.apiClient.setBaseURL(baseURL)
+                if !baseURL.isEmpty, let url = URL(string: baseURL) {
+                    DependencyContainer.shared.apiClient.setBaseURL(url)
                 }
                 
                 // Test connection
                 let isValid = try await DependencyContainer.shared.apiClient.testConnection()
                 
                 if isValid {
-                    await DependencyContainer.shared.appState.setAuthenticated(true)
+                    // MVP: Skip setting authenticated state
+                    // await DependencyContainer.shared.appState.setAuthenticated(true)
                     
                     await MainActor.run {
                         onSuccess()
@@ -181,11 +183,11 @@ struct CyberpunkTextFieldStyle: TextFieldStyle {
             .padding()
             .background(Theme.card)
             .overlay(
-                RoundedRectangle(cornerRadius: Theme.radius.md)
+                RoundedRectangle(cornerRadius: Theme.Radius.md)
                     .stroke(Theme.primary.opacity(0.3), lineWidth: 1)
             )
-            .cornerRadius(Theme.radius.md)
-            .font(Theme.typography.body)
+            .cornerRadius(Theme.Radius.md)
+            .font(Theme.Typography.bodyFont)
             .foregroundColor(Theme.foreground)
     }
 }

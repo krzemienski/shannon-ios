@@ -55,7 +55,7 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     
     override func start() {
         // Load initial projects
-        Task {
+        Task { @MainActor in
             await dependencyContainer.projectStore.loadProjects()
         }
     }
@@ -76,7 +76,9 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     
     func openProject(id: String) {
         selectedProjectId = id
-        dependencyContainer.projectStore.setActiveProject(id)
+        if let project = dependencyContainer.projectStore.projects.first(where: { $0.id == id }) {
+            dependencyContainer.projectStore.setActiveProject(project)
+        }
         
         // Navigate to project detail
         navigationPath.append(ProjectRoute.detail(id))
@@ -90,19 +92,18 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     func createProject(name: String, path: String, sshConfig: SSHConfiguration?) {
         isShowingNewProject = false
         
-        Task {
-            let project = await dependencyContainer.projectStore.createProject(
-                name: name,
-                path: path,
-                sshConfig: sshConfig
-            )
-            openProject(id: project.id)
-        }
+        let project = dependencyContainer.projectStore.createProject(
+            name: name,
+            path: path
+        )
+        openProject(id: project.id)
     }
     
     func deleteProject(id: String) {
-        Task {
-            await dependencyContainer.projectStore.deleteProject(id: id)
+        Task { @MainActor in
+            if let project = dependencyContainer.projectStore.projects.first(where: { $0.id == id }) {
+                dependencyContainer.projectStore.deleteProject(project)
+            }
             
             // If deleted project was selected, select another
             if selectedProjectId == id {
@@ -122,14 +123,14 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func updateProject(_ project: Project) {
-        Task {
-            await dependencyContainer.projectStore.updateProject(project)
+        dependencyContainer.projectStore.updateProject(project) { _ in
+            // Updates are handled by the closure passed to updateProject
         }
     }
     
     func duplicateProject(id: String) {
-        Task {
-            let newProject = await dependencyContainer.projectStore.duplicateProject(id: id)
+        if let project = dependencyContainer.projectStore.projects.first(where: { $0.id == id }) {
+            let newProject = dependencyContainer.projectStore.duplicateProject(project)
             openProject(id: newProject.id)
         }
     }
@@ -142,17 +143,21 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func updateSSHConfig(for projectId: String, config: SSHConfiguration) {
-        Task {
-            await dependencyContainer.projectStore.updateSSHConfig(
-                projectId: projectId,
-                config: config
+        if let project = dependencyContainer.projectStore.projects.first(where: { $0.id == projectId }) {
+            let appConfig = AppSSHConfig(
+                name: project.name,
+                host: config.host,
+                port: config.port,
+                username: config.username,
+                authMethod: AppSSHAuthMethod.password
             )
+            dependencyContainer.projectStore.updateSSHConfig(for: project, config: appConfig)
         }
     }
     
     func testSSHConnection(for projectId: String) async -> Bool {
-        guard let project = dependencyContainer.projectStore.getProject(id: projectId),
-              let sshConfig = project.sshConfiguration else {
+        guard let project = dependencyContainer.projectStore.getProject(by: projectId),
+              let sshConfig = project.sshConfig else {
             return false
         }
         
@@ -160,8 +165,8 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func connectSSH(for projectId: String) async throws {
-        guard let project = dependencyContainer.projectStore.getProject(id: projectId),
-              let sshConfig = project.sshConfiguration else {
+        guard let project = dependencyContainer.projectStore.getProject(by: projectId),
+              let sshConfig = project.sshConfig else {
             throw ProjectError.noSSHConfiguration
         }
         
@@ -180,11 +185,13 @@ public final class ProjectsCoordinator: BaseCoordinator, ObservableObject {
     }
     
     func updateEnvironmentVariables(for projectId: String, variables: [String: String]) {
-        Task {
-            await dependencyContainer.projectStore.updateEnvironmentVariables(
-                projectId: projectId,
-                variables: variables
-            )
+        Task { @MainActor in
+            if let project = dependencyContainer.projectStore.getProject(by: projectId) {
+                dependencyContainer.projectStore.updateEnvironmentVariables(
+                    for: project,
+                    variables: variables
+                )
+            }
         }
     }
     

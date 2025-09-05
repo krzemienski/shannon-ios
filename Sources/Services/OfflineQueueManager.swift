@@ -97,7 +97,7 @@ public class OfflineQueueManager: ObservableObject {
             await persistenceManager.saveQueue(queuedRequests)
         }
         
-        logger.debug("Queued request: \(request.url?.absoluteString ?? "unknown") [Priority: \(priority)]")
+        logger.debug("Queued request: \(request.url?.absoluteString ?? "unknown") [Priority: \(String(describing: priority))]")
         
         // Try to process immediately if online
         if networkMonitor?.isConnected == true {
@@ -129,7 +129,7 @@ public class OfflineQueueManager: ObservableObject {
     func getStatistics() -> QueueStatistics {
         let pendingCount = queuedRequests.filter { $0.status == .pending }.count
         let retryingCount = queuedRequests.filter { $0.status == .retrying }.count
-        let failedRequests = queuedRequests.filter { $0.status == .failed }
+        _ = queuedRequests.filter { $0.status == .failed }  // For future use
         
         return QueueStatistics(
             totalQueued: queuedRequests.count,
@@ -156,7 +156,7 @@ public class OfflineQueueManager: ObservableObject {
         isProcessing = true
         defer { isProcessing = false }
         
-        logger.info("Starting queue processing [\(queuedRequests.count) requests]")
+        logger.info("Starting queue processing [\(self.queuedRequests.count) requests]")
         
         // Process requests by priority
         while let queuedRequest = priorityQueue.dequeue() {
@@ -166,7 +166,7 @@ public class OfflineQueueManager: ObservableObject {
         // Persist updated queue
         await persistenceManager.saveQueue(queuedRequests)
         
-        logger.info("Queue processing complete [Processed: \(processedCount), Failed: \(failedCount)]")
+        logger.info("Queue processing complete [Processed: \(self.processedCount), Failed: \(self.failedCount)]")
     }
     
     private func processRequest(_ queuedRequest: QueuedRequest) async {
@@ -208,10 +208,10 @@ public class OfflineQueueManager: ObservableObject {
         // Log success
         logger.info("Request processed successfully: \(request.request.url?.absoluteString ?? "unknown")")
         
-        // Notify if callback provided
-        if let callback = request.metadata.successCallback {
-            callback(data, response)
-        }
+        // MVP: Callbacks commented out
+        // if let callback = request.metadata.successCallback {
+        //     callback(data, response)
+        // }
     }
     
     private func handleFailure(for request: QueuedRequest, error: Error) async {
@@ -238,10 +238,10 @@ public class OfflineQueueManager: ObservableObject {
             
             logger.error("Request failed permanently: \(error.localizedDescription)")
             
-            // Notify if callback provided
-            if let callback = request.metadata.failureCallback {
-                callback(error)
-            }
+            // MVP: Callbacks commented out
+            // if let callback = request.metadata.failureCallback {
+            //     callback(error)
+            // }
         }
         
         // Update in queue
@@ -349,7 +349,7 @@ public class OfflineQueueManager: ObservableObject {
 // MARK: - Supporting Types
 
 /// Queued request structure
-struct QueuedRequest: Codable, Identifiable {
+struct QueuedRequest: Codable, Identifiable, Sendable {
     let id: UUID
     let request: URLRequest
     let priority: RequestPriority
@@ -444,14 +444,15 @@ struct QueuedRequest: Codable, Identifiable {
 }
 
 /// Request metadata
-struct RequestMetadata: Codable {
+struct RequestMetadata: Codable, Sendable {
     var tag: String?
     var userInfo: [String: String] = [:]
     var expiresAt: Date?
     var requiresWiFi: Bool = false
     var allowsCellular: Bool = true
-    var successCallback: ((Data, HTTPURLResponse) -> Void)?
-    var failureCallback: ((Error) -> Void)?
+    // MVP: Callbacks commented out - can't be Sendable
+    // var successCallback: ((Data, HTTPURLResponse) -> Void)?
+    // var failureCallback: ((Error) -> Void)?
     
     enum CodingKeys: String, CodingKey {
         case tag, userInfo, expiresAt, requiresWiFi, allowsCellular
@@ -459,7 +460,7 @@ struct RequestMetadata: Codable {
 }
 
 /// Queue status
-enum QueueStatus: String, Codable {
+enum QueueStatus: String, Codable, Sendable {
     case pending
     case processing
     case retrying
@@ -506,7 +507,7 @@ enum OfflineQueueError: LocalizedError {
 // MARK: - Queue Persistence
 
 /// Manages persistent storage of the queue
-class QueuePersistenceManager {
+class QueuePersistenceManager: @unchecked Sendable {
     private let logger = Logger(subsystem: "com.claudecode.ios", category: "QueuePersistence")
     private let fileManager = FileManager.default
     private let queueFileName = "offline_queue.json"

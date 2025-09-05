@@ -367,7 +367,7 @@ struct CardView_Previews: PreviewProvider {
                     }
                     
                     // Interactive card
-                    InteractiveCard(action: {}) {
+                    LegacyInteractiveCard(action: {}) {
                         HStack {
                             Image(systemName: "hand.tap.fill")
                                 .foregroundColor(Theme.primary)
@@ -395,11 +395,11 @@ struct CardView_Previews: PreviewProvider {
                     )
                     
                     // Metric card
-                    MetricCard(
+                    LegacyMetricCard(
                         title: "Tokens Used",
                         value: "1,234,567",
                         change: 12.5,
-                        sparklineData: [10, 15, 8, 22, 18, 25, 30, 28, 35, 42, 38, 45]
+                        sparklineData: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
                     )
                 }
                 .padding()

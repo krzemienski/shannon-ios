@@ -61,7 +61,7 @@ struct FilePreviewView: View {
                 }
             }
             .sheet(isPresented: $isSharePresented) {
-                ShareSheet(items: [fileURL])
+                ShareSheet(activityItems: [fileURL])
             }
         }
         .onAppear {
@@ -210,7 +210,7 @@ struct PDFPreviewView: View {
     
     var body: some View {
         if let pdfDocument = pdfDocument {
-            PDFKitView(document: pdfDocument)
+            PDFKitView(url: fileURL)
         } else {
             ProgressView()
                 .onAppear {
@@ -264,26 +264,26 @@ struct AudioPreviewView: View {
     @State private var duration: Double = 0
     
     var body: some View {
-        VStack(spacing: Theme.largeSpacing) {
+        VStack(spacing: Theme.spacing.lg) {
             Spacer()
             
             // Audio visualization
             Image(systemName: "music.note.list")
                 .font(.system(size: 80))
-                .foregroundColor(Theme.accent)
+                .foregroundColor(Theme.primary)
             
             Text(fileURL.lastPathComponent)
-                .font(Theme.titleFont)
+                .font(Theme.Typography.titleFont)
                 .foregroundColor(Theme.foreground)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
             // Progress
-            VStack(spacing: Theme.smallSpacing) {
+            VStack(spacing: Theme.spacing.sm) {
                 Slider(value: $currentTime, in: 0...max(duration, 1)) { _ in
                     player?.seek(to: CMTime(seconds: currentTime, preferredTimescale: 1))
                 }
-                .accentColor(Theme.accent)
+                .accentColor(Theme.primary)
                 
                 HStack {
                     Text(formatTime(currentTime))
@@ -297,10 +297,10 @@ struct AudioPreviewView: View {
                         .foregroundColor(Theme.mutedForeground)
                 }
             }
-            .padding(.horizontal, Theme.largeSpacing)
+            .padding(.horizontal, Theme.spacing.lg)
             
             // Controls
-            HStack(spacing: Theme.largeSpacing) {
+            HStack(spacing: Theme.spacing.lg) {
                 Button {
                     player?.seek(to: CMTime(seconds: max(currentTime - 15, 0), preferredTimescale: 1))
                 } label: {
@@ -319,7 +319,7 @@ struct AudioPreviewView: View {
                 } label: {
                     Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.system(size: 64))
-                        .foregroundColor(Theme.accent)
+                        .foregroundColor(Theme.primary)
                 }
                 
                 Button {
@@ -442,17 +442,17 @@ struct UnsupportedFileView: View {
     let fileURL: URL
     
     var body: some View {
-        VStack(spacing: Theme.largeSpacing) {
+        VStack(spacing: Theme.spacing.lg) {
             Image(systemName: "doc.questionmark")
                 .font(.system(size: 64))
                 .foregroundColor(Theme.mutedForeground)
             
             Text("Cannot Preview File")
-                .font(Theme.titleFont)
+                .font(Theme.Typography.titleFont)
                 .foregroundColor(Theme.foreground)
             
             Text(fileName)
-                .font(Theme.bodyFont)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
@@ -473,17 +473,17 @@ struct FilePreviewErrorStateView: View {
     let message: String
     
     var body: some View {
-        VStack(spacing: Theme.mediumSpacing) {
+        VStack(spacing: Theme.spacing.md) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
                 .foregroundColor(Theme.destructive)
             
             Text("Error Loading File")
-                .font(Theme.titleFont)
+                .font(Theme.Typography.titleFont)
                 .foregroundColor(Theme.foreground)
             
             Text(message)
-                .font(Theme.bodyFont)
+                .font(Theme.Typography.bodyFont)
                 .foregroundColor(Theme.mutedForeground)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)

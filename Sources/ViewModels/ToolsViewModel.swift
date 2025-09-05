@@ -19,7 +19,7 @@ public final class ToolsViewModel: ObservableObject {
     @Published public var favoriteTools: [Tool] = []
     @Published public var toolExecutions: [ToolExecution] = []
     @Published public var selectedTool: Tool?
-    @Published public var selectedCategory: ToolCategory?
+    @Published public var selectedCategory: ToolStoreCategory?
     @Published public var searchText = ""
     @Published public var isExecuting = false
     @Published public var showToolDetail = false
@@ -47,7 +47,7 @@ public final class ToolsViewModel: ObservableObject {
     
     // MARK: - Computed Properties
     
-    public var categorizedTools: [ToolCategory: [Tool]] {
+    public var categorizedTools: [ToolStoreCategory: [Tool]] {
         Dictionary(grouping: filteredTools, by: { $0.category })
     }
     
@@ -172,7 +172,7 @@ public final class ToolsViewModel: ObservableObject {
     }
     
     /// Select category filter
-    public func selectCategory(_ category: ToolCategory?) {
+    public func selectCategory(_ category: ToolStoreCategory?) {
         selectedCategory = category
     }
     

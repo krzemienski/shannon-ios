@@ -29,7 +29,7 @@ struct ProjectsView: View {
         }
         return viewModel.projects.filter {
             $0.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.description.localizedCaseInsensitiveContains(searchText)
+            ($0.description ?? "").localizedCaseInsensitiveContains(searchText)
         }
     }
     
@@ -150,7 +150,7 @@ struct ProjectCard: View {
                     .lineLimit(1)
                 
                 // Description
-                Text(project.description)
+                Text(project.description ?? "")
                     .font(Theme.Typography.footnoteFont)
                     .foregroundColor(Theme.mutedForeground)
                     .lineLimit(2)
@@ -332,127 +332,37 @@ struct InlineNewProjectView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                Theme.background
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: ThemeSpacing.lg) {
-                        // Basic Info
-                        VStack(spacing: ThemeSpacing.md) {
-                            CustomTextField(
-                                title: "Project Name",
-                                text: $name,
-                                placeholder: "My Awesome Project",
-                                icon: "folder"
-                            )
-                            
-                            VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
-                                Text("Description")
-                                    .font(Theme.Typography.captionFont)
-                                    .foregroundColor(Theme.mutedForeground)
-                                
-                                TextEditor(text: $description)
-                                    .font(Theme.Typography.bodyFont)
-                                    .foregroundColor(Theme.foreground)
-                                    .scrollContentBackground(.hidden)
-                                    .background(Theme.input)
-                                    .cornerRadius(Theme.Radius.sm)
-                                    .frame(minHeight: 80, maxHeight: 120)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: Theme.Radius.sm)
-                                            .stroke(Theme.border, lineWidth: 1)
-                                    )
-                                    .overlay(alignment: .topLeading) {
-                                        if description.isEmpty {
-                                            Text("Brief description of your project...")
-                                                .font(Theme.Typography.bodyFont)
-                                                .foregroundColor(Theme.muted)
-                                                .padding(.horizontal, 4)
-                                                .padding(.vertical, 8)
-                                                .allowsHitTesting(false)
-                                        }
-                                    }
-                            }
-                            
-                            // Icon selector
-                            VStack(alignment: .leading, spacing: ThemeSpacing.sm) {
-                                Text("Icon")
-                                    .font(Theme.Typography.captionFont)
-                                    .foregroundColor(Theme.mutedForeground)
-                                
-                                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: ThemeSpacing.sm) {
-                                    ForEach(icons, id: \.self) { icon in
-                                        Button {
-                                            selectedIcon = icon
-                                        } label: {
-                                            Image(systemName: icon)
-                                                .font(.system(size: 24))
-                                                .foregroundColor(selectedIcon == icon ? Theme.foreground : Theme.muted)
-                                                .frame(width: 48, height: 48)
-                                                .background(selectedIcon == icon ? Theme.primary : Theme.card)
-                                                .cornerRadius(Theme.Radius.sm)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: Theme.Radius.sm)
-                                                        .stroke(selectedIcon == icon ? Theme.primary : Theme.border, lineWidth: 1)
-                                                )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        Divider()
-                            .background(Theme.border)
-                        
-                        // SSH Configuration
-                        VStack(spacing: ThemeSpacing.md) {
-                            Toggle(isOn: $enableSSH) {
-                                Label("Enable SSH Monitoring", systemImage: "terminal")
-                                    .font(Theme.Typography.headlineFont)
-                                    .foregroundColor(Theme.foreground)
-                            }
-                            .tint(Theme.primary)
-                            
-                            if enableSSH {
-                                CustomTextField(
-                                    title: "Host",
-                                    text: $sshHost,
-                                    placeholder: "192.168.1.100 or example.com",
-                                    icon: "network"
-                                )
-                                
-                                CustomTextField(
-                                    title: "Port",
-                                    text: $sshPort,
-                                    placeholder: "22",
-                                    icon: "number",
-                                    keyboardType: .numberPad
-                                )
-                                
-                                CustomTextField(
-                                    title: "Username",
-                                    text: $sshUsername,
-                                    placeholder: "developer",
-                                    icon: "person"
-                                )
-                                
-                                // Auth method picker
-                                VStack(alignment: .leading, spacing: ThemeSpacing.xs) {
-                                    Text("Authentication")
-                                        .font(Theme.Typography.captionFont)
-                                        .foregroundColor(Theme.mutedForeground)
-                                    
-                                    Picker("Authentication", selection: $sshAuthMethod) {
-                                        Text("Password").tag(0)
-                                        Text("SSH Key").tag(1)
-                                    }
-                                    .pickerStyle(.segmented)
-                                }
-                            }
+            Form {
+                // Basic Info Section
+                Section("Basic Info") {
+                    TextField("Project Name", text: $name)
+                    TextField("Description", text: $description)
+                    
+                    // Simplified icon selector
+                    Picker("Icon", selection: $selectedIcon) {
+                        ForEach(icons, id: \.self) { icon in
+                            Label(icon, systemImage: icon)
+                                .tag(icon)
                         }
                     }
-                    .padding()
+                }
+                
+                // SSH Configuration Section  
+                Section("SSH Configuration") {
+                    Toggle("Enable SSH Monitoring", isOn: $enableSSH)
+                    
+                    if enableSSH {
+                        TextField("Host", text: $sshHost)
+                        TextField("Port", text: $sshPort)
+                            .keyboardType(.numberPad)
+                        TextField("Username", text: $sshUsername)
+                        
+                        Picker("Authentication", selection: $sshAuthMethod) {
+                            Text("Password").tag(0)
+                            Text("SSH Key").tag(1)
+                        }
+                        .pickerStyle(.segmented)
+                    }
                 }
             }
             .navigationTitle("New Project")
@@ -462,32 +372,19 @@ struct InlineNewProjectView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .tint(Theme.foreground)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Create") {
-                        let sshConfig = enableSSH ? Project.SSHConfig(
-                            host: sshHost,
-                            port: Int(sshPort) ?? 22,
-                            username: sshUsername,
-                            authMethod: sshAuthMethod == 0 ? .password : .publicKey
-                        ) : nil
-                        
+                        // MVP: Simplified project creation
                         let newProject = Project(
                             name: name.isEmpty ? "Untitled Project" : name,
-                            description: description,
-                            icon: selectedIcon,
-                            isActive: true,
-                            sessionCount: 0,
-                            toolCount: 0,
-                            lastUpdated: Date(),
-                            sshConfig: sshConfig
+                            path: "/Users/project/\(name)",
+                            description: description.isEmpty ? "No description" : description
                         )
                         onSave(newProject)
                         dismiss()
                     }
-                    .tint(Theme.primary)
                     .disabled(name.isEmpty)
                 }
             }

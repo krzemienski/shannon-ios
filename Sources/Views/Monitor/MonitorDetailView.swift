@@ -15,15 +15,15 @@ struct MonitorDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text(monitorType.rawValue)  // Use rawValue since MonitorType is defined in MonitorCoordinator
-                    .font(Theme.title)
+                    .font(Theme.Typography.titleFont)
                     .foregroundColor(Theme.foreground)
                 
                 Text("Detailed monitoring data for \(monitorType.rawValue)")
-                    .font(Theme.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                 
                 // Placeholder for charts and metrics
-                RoundedRectangle(cornerRadius: Theme.smallRadius)
+                RoundedRectangle(cornerRadius: Theme.Radius.sm)
                     .fill(Theme.card)
                     .frame(height: 200)
                     .overlay(

@@ -350,9 +350,10 @@ public class OnboardingService: ObservableObject {
     
     private func applyPreferences(_ preferences: OnboardingUserPreferences) {
         // Apply theme
-        if let theme = ColorScheme(rawValue: preferences.theme) {
-            ThemeManager.shared.setColorScheme(theme)
-        }
+        // MVP: Theme application commented out - mismatched types
+        // if let theme = ColorScheme(rawValue: preferences.theme) {
+        //     ThemeManager.shared.setColorScheme(theme)
+        // }
         
         // Apply other preferences
         userDefaults.set(preferences.enableAnalytics, forKey: "enableAnalytics")
@@ -398,10 +399,15 @@ public class OnboardingService: ObservableObject {
     }
     
     private func checkNotificationStatus() async -> Bool {
-        let settings = await UNUserNotificationCenter.current().notificationSettings()
-        let isEnabled = settings.authorizationStatus == .authorized
-        permissionStatuses[.notifications] = isEnabled
-        return isEnabled
+        return await withCheckedContinuation { continuation in
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                let isEnabled = settings.authorizationStatus == .authorized
+                Task { @MainActor in
+                    self.permissionStatuses[.notifications] = isEnabled
+                }
+                continuation.resume(returning: isEnabled)
+            }
+        }
     }
     
     private func requestCameraPermission() async -> Bool {

@@ -23,14 +23,14 @@ public class NetworkConfiguration: ObservableObject {
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "com.claudecode.network.monitor")
     
-    @Published public var currentHostIP: String = "192.168.0.155"
+    @Published public var currentHostIP: String = "localhost"  // Use localhost for simulator
     @Published public var isConnected: Bool = false
     @Published public var connectionType: ConnectionType = .unknown
     @Published public var backendStatus: BackendStatus = .unknown
     
     // Host machine IP detection
     private var detectedHostIP: String?
-    private let defaultHostIP = "192.168.0.155"  // Fallback IP
+    private let defaultHostIP = "localhost"  // Use localhost as default for simulator
     
     // MARK: - Types
     
@@ -88,13 +88,24 @@ public class NetworkConfiguration: ObservableObject {
     
     /// Get all possible localhost URLs to try
     public func getLocalhostVariants() -> [String] {
+        #if targetEnvironment(simulator)
+        // For simulator, prioritize localhost
+        return [
+            "http://localhost:8000/v1",       // Standard localhost
+            "http://127.0.0.1:8000/v1",       // Loopback address
+            "http://host.docker.internal:8000/v1", // Docker host if backend in container
+            "http://0.0.0.0:8000/v1"          // All interfaces
+        ]
+        #else
+        // For device, use actual host IP
         let hostIP = getActiveHostIP()
         return [
             "http://\(hostIP):8000/v1",      // Primary: Host machine IP
-            "http://localhost:8000/v1",       // Localhost (simulator only)
+            "http://localhost:8000/v1",       // Localhost fallback
             "http://127.0.0.1:8000/v1",       // Loopback
             "http://0.0.0.0:8000/v1"          // All interfaces
         ]
+        #endif
     }
     
     /// Test backend connectivity with multiple endpoints

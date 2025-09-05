@@ -165,16 +165,16 @@ struct ChatRowView: View {
 
 // MARK: - Chat Session Model
 
-struct ChatSession: Identifiable {
-    var id: String  // Made mutable for backend integration
-    let title: String
-    let lastMessage: String
-    let timestamp: Date
-    let icon: String
-    let tags: [String]
+public struct ChatSession: Identifiable {
+    public var id: String  // Made mutable for backend integration
+    public let title: String
+    public let lastMessage: String
+    public let timestamp: Date
+    public let icon: String
+    public let tags: [String]
     
     // Default initializer for new sessions
-    init(title: String,
+    public init(title: String,
          lastMessage: String,
          timestamp: Date,
          icon: String,
@@ -189,7 +189,7 @@ struct ChatSession: Identifiable {
     
     // Removed duplicate initializer - already defined above
     
-    var formattedDate: String {
+    public var formattedDate: String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: timestamp, relativeTo: Date())

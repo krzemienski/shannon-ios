@@ -56,7 +56,8 @@ public struct MockResponseProvider {
             usage: Usage(
                 promptTokens: 10,
                 completionTokens: 15,
-                totalTokens: 25
+                totalTokens: 25,
+                cachedTokens: nil
             ),
             systemFingerprint: "mock-fingerprint"
         )

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
 
 /// Token type for syntax highlighting
@@ -371,3 +372,4 @@ struct LanguageDefinition {
     let functionPattern: String
     let operatorCharacters: String
 }
+#endif // os(iOS)

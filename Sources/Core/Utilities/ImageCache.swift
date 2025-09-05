@@ -5,6 +5,7 @@
 //  Image caching system for improved performance and memory management
 //
 
+#if os(iOS)
 import UIKit
 import SwiftUI
 import Combine
@@ -272,3 +273,4 @@ enum ImageCacheError: LocalizedError {
         }
     }
 }
+#endif // os(iOS)

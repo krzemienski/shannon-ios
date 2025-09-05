@@ -11,7 +11,7 @@ import Combine
 
 // MARK: - Tooltip Model
 
-public struct Tooltip: Identifiable, Codable {
+public struct Tooltip: Identifiable, Codable, Equatable {
     public let id: String
     public let targetId: String
     public let title: String
@@ -51,7 +51,7 @@ public struct Tooltip: Identifiable, Codable {
         case afterDelay
     }
     
-    public struct TooltipAction: Codable {
+    public struct TooltipAction: Codable, Equatable {
         public let title: String
         public let actionId: String
         public let style: ActionStyle

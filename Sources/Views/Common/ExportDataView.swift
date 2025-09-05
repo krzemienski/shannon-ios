@@ -19,11 +19,11 @@ struct ExportDataView: View {
                     .foregroundColor(Theme.primary)
                 
                 Text("Export Data")
-                    .font(Theme.title)
+                    .font(Theme.Typography.titleFont)
                     .foregroundColor(Theme.foreground)
                 
                 Text("Export functionality coming soon")
-                    .font(Theme.body)
+                    .font(Theme.Typography.bodyFont)
                     .foregroundColor(Theme.mutedForeground)
                 
                 Spacer()

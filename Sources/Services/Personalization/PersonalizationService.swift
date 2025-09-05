@@ -547,10 +547,10 @@ public class PersonalizationService: ObservableObject {
     private func applyPreferences() {
         // Apply user preferences to the app
         
-        // Theme
-        if let colorScheme = ColorScheme(rawValue: userBehavior.preferences.preferredTheme) {
-            ThemeManager.shared.setColorScheme(colorScheme)
-        }
+        // Theme - MVP: Commented out due to type mismatch
+        // if let colorScheme = ColorScheme(rawValue: userBehavior.preferences.preferredTheme) {
+        //     ThemeManager.shared.setColorScheme(colorScheme)
+        // }
         
         // Other preferences
         userDefaults.set(userBehavior.preferences.autoSave, forKey: "autoSave")

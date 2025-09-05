@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
 import OSLog
 
@@ -687,3 +688,4 @@ public struct SanitizationResult {
     public var hasErrors: Bool { !errors.isEmpty }
     public var hasWarnings: Bool { !warnings.isEmpty }
 }
+#endif // os(iOS)

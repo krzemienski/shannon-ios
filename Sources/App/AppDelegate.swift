@@ -5,6 +5,7 @@
 //  Handles push notification registration and app lifecycle events
 //
 
+#if os(iOS)
 import UIKit
 import UserNotifications
 
@@ -17,13 +18,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Setup push notifications
         setupPushNotifications()
         
+        // TODO: Implement notification handling
         // Check if app was launched from notification
+        /*
         if let launchOptions = launchOptions,
            let notification = launchOptions[.remoteNotification] as? [AnyHashable: Any] {
             Task {
                 await NotificationManager.shared.processRemoteNotification(notification)
             }
         }
+        */
         
         return true
     }
@@ -34,14 +38,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-        PushNotificationService.shared.registerDeviceToken(deviceToken)
+        // TODO: Implement PushNotificationService
+        // PushNotificationService.shared.registerDeviceToken(deviceToken)
     }
     
     func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        PushNotificationService.shared.handleRegistrationError(error)
+        // TODO: Implement PushNotificationService
+        // PushNotificationService.shared.handleRegistrationError(error)
         print("Failed to register for remote notifications: \(error.localizedDescription)")
     }
     
@@ -54,7 +60,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) {
         // Handle silent push notifications
         Task {
-            let result = await PushNotificationService.shared.handleSilentPush(userInfo)
+            // TODO: Implement PushNotificationService
+            // let result = await PushNotificationService.shared.handleSilentPush(userInfo)
+            let result = UIBackgroundFetchResult.noData
             completionHandler(result)
         }
     }
@@ -67,6 +75,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
         // Handle deep links
+        // TODO: Implement DeepLinkHandler
+        /*
         if let deepLink = DeepLinkHandler.handleURL(url) {
             Task {
                 await NotificationManager.shared.handleDeepLink(deepLink)
@@ -74,6 +84,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             }
             return true
         }
+        */
         
         return false
     }
@@ -95,8 +106,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Clear badge when app becomes active
         Task {
-            await PushNotificationService.shared.clearBadge()
-            await NotificationManager.shared.processQueuedNotifications()
+            // TODO: Implement notification services
+            // await PushNotificationService.shared.clearBadge()
+            // await NotificationManager.shared.processQueuedNotifications()
         }
     }
     
@@ -121,7 +133,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     private func setupPushNotifications() {
         // Configure notification center
-        UNUserNotificationCenter.current().delegate = PushNotificationService.shared
+        // TODO: Implement PushNotificationService
+        // UNUserNotificationCenter.current().delegate = PushNotificationService.shared
         
         // Request provisional authorization on first launch
         if !UserDefaults.standard.bool(forKey: "hasRequestedNotificationPermission") {
@@ -142,12 +155,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             }
         } else {
             // Check current authorization status
-            Task {
-                let settings = await UNUserNotificationCenter.current().notificationSettings()
-                
-                if settings.authorizationStatus == .authorized ||
-                   settings.authorizationStatus == .provisional {
-                    await UIApplication.shared.registerForRemoteNotifications()
+            Task { @MainActor in
+                // Get notification settings synchronously to avoid Sendable issue
+                UNUserNotificationCenter.current().getNotificationSettings { settings in
+                    Task { @MainActor in
+                        if settings.authorizationStatus == .authorized ||
+                           settings.authorizationStatus == .provisional {
+                            UIApplication.shared.registerForRemoteNotifications()
+                        }
+                    }
                 }
             }
         }
@@ -173,3 +189,4 @@ extension AppDelegate {
         // Called when the user discards a scene session
     }
 }
+#endif // os(iOS)

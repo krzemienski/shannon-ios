@@ -83,15 +83,22 @@ public final class ChatListViewModel: ObservableObject {
         error = nil
         
         do {
+            // Create session request
+            let request = CreateSessionRequest(
+                title: session.title.isEmpty ? "New Chat" : session.title,
+                model: "claude-3-5-haiku-20241022",
+                metadata: nil
+            )
+            
             // Create session info
-            let sessionInfo = try await apiClient.createSession()
+            let sessionInfo = try await apiClient.createSession(request)
             
             // Convert to local ChatSession model
             let newSession = ChatSession(
                 id: sessionInfo.id,
                 title: session.title.isEmpty ? "New Chat" : session.title,
                 lastMessage: "",
-                timestamp: sessionInfo.createdAt ?? Date(),
+                timestamp: sessionInfo.createdAt,
                 icon: iconForChat(session.title),
                 tags: []
             )
@@ -106,9 +113,8 @@ public final class ChatListViewModel: ObservableObject {
             logger.error("Failed to create session: \(error)")
             self.error = error
             showError = true
-            throw error
-        } finally {
             isLoading = false
+            throw error
         }
     }
     
@@ -118,7 +124,7 @@ public final class ChatListViewModel: ObservableObject {
         error = nil
         
         do {
-            let success = try await apiClient.deleteSession(sessionId: session.id)
+            let success = try await apiClient.deleteSession(id: session.id)
             
             if success {
                 sessions.removeAll { $0.id == session.id }
@@ -128,16 +134,15 @@ public final class ChatListViewModel: ObservableObject {
             logger.error("Failed to delete session: \(error)")
             self.error = error
             showError = true
-            throw error
-        } finally {
             isLoading = false
+            throw error
         }
     }
     
     /// Get session details
     public func getSessionDetails(_ sessionId: String) async throws -> SessionInfo {
         do {
-            return try await apiClient.getSessionInfo(sessionId: sessionId)
+            return try await apiClient.getSession(id: sessionId)
         } catch {
             logger.error("Failed to get session details: \(error)")
             throw error
@@ -159,14 +164,14 @@ public final class ChatListViewModel: ObservableObject {
                     id: sessionInfo.id,
                     title: sessionInfo.projectId ?? "Chat Session",
                     lastMessage: extractLastMessage(from: sessionInfo),
-                    timestamp: sessionInfo.updatedAt ?? sessionInfo.createdAt ?? Date(),
+                    timestamp: sessionInfo.updatedAt,
                     icon: iconForChat(sessionInfo.projectId ?? ""),
                     tags: extractTags(from: sessionInfo)
                 )
             }
             
-            logger.info("Loaded \(sessions.count) sessions from backend")
-        } catch let apiError as APIConfig.APIError {
+            logger.info("Loaded \(self.sessions.count) sessions from backend")
+        } catch let apiError as APIError {
             handleAPIError(apiError)
         } catch {
             logger.error("Failed to load sessions: \(error)")
@@ -249,7 +254,7 @@ public final class ChatListViewModel: ObservableObject {
     }
     
     private func showBackendError() {
-        error = APIConfig.APIError.backendNotRunning
+        error = APIError.backendNotRunning
         showError = true
         
         // Provide helpful message

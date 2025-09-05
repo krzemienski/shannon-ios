@@ -143,6 +143,13 @@ public final class SettingsStore: ObservableObject {
         }
     }
     
+    // MARK: - Monitoring Settings
+    @Published public var monitoringEnabled: Bool = false {
+        didSet {
+            UserDefaults.standard.set(monitoringEnabled, forKey: Keys.monitoringEnabled)
+        }
+    }
+    
     // MARK: - Developer Settings
     @Published public var debugMode: Bool = true { // Enabled by default for development
         didSet {
@@ -295,6 +302,9 @@ public final class SettingsStore: ObservableObject {
         enableBackgroundRefresh = userDefaults.bool(forKey: Keys.enableBackgroundRefresh)
         enableTelemetry = userDefaults.bool(forKey: Keys.enableTelemetry)
         
+        // Load monitoring settings
+        monitoringEnabled = userDefaults.bool(forKey: Keys.monitoringEnabled)
+        
         // Load developer settings
         debugMode = userDefaults.bool(forKey: Keys.debugMode)
         showNetworkActivity = userDefaults.bool(forKey: Keys.showNetworkActivity)
@@ -344,6 +354,7 @@ public final class SettingsStore: ObservableObject {
         saveHistory = true
         enableBackgroundRefresh = true
         enableTelemetry = false
+        monitoringEnabled = false
         debugMode = false
         showNetworkActivity = false
     }
@@ -417,6 +428,9 @@ public final class SettingsStore: ObservableObject {
         // Background
         static let enableBackgroundRefresh = "settings.enableBackgroundRefresh"
         static let enableTelemetry = "settings.enableTelemetry"
+        
+        // Monitoring
+        static let monitoringEnabled = "settings.monitoringEnabled"
         
         // Developer
         static let debugMode = "settings.debugMode"

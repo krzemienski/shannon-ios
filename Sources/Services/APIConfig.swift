@@ -5,16 +5,17 @@ struct APIConfig {
     // MARK: - Base Configuration
     
     /// Host machine IP address for simulator connectivity
-    /// This is the IP address of your Mac on the local network
-    private static let hostMachineIP = "192.168.0.155"
+    /// For simulator, we can use localhost directly since backend runs on same machine
+    /// For device testing, update this to your Mac's IP address
+    private static let hostMachineIP = "127.0.0.1"  // Changed to localhost for simulator
     
     /// Determine the correct base URL based on the runtime environment
     private static var localhostURL: String {
         #if targetEnvironment(simulator)
-        // iOS Simulator needs to use host machine IP, not localhost
-        return "http://\(hostMachineIP):8000/v1"
+        // iOS Simulator can use localhost directly when backend is on same machine
+        return "http://localhost:8000/v1"
         #else
-        // On device, use actual IP or configured URL
+        // On device, use actual IP or configured URL (update hostMachineIP for device testing)
         return "http://\(hostMachineIP):8000/v1"
         #endif
     }
@@ -28,10 +29,10 @@ struct APIConfig {
     
     /// Alternative localhost configurations
     public static let localhostVariants = [
-        "http://localhost:8000/v1",          // Standard localhost
-        "http://127.0.0.1:8000/v1",          // Loopback address
-        "http://\(hostMachineIP):8000/v1",   // Host machine IP
-        "http://0.0.0.0:8000/v1"             // All interfaces
+        "http://localhost:8000/v1",          // Standard localhost (works in simulator)
+        "http://127.0.0.1:8000/v1",          // Loopback address (works in simulator)
+        "http://host.docker.internal:8000/v1", // Docker host if backend in container
+        "http://10.0.2.2:8000/v1"            // Android emulator host (if needed)
     ]
     
     /// Alternative base URLs for different environments

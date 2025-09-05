@@ -16,9 +16,7 @@ struct CoordinatorView: View {
         ZStack {
             // Main content
             if coordinator.isShowingOnboarding {
-                OnboardingView {
-                    coordinator.completeOnboarding()
-                }
+                OnboardingView(showOnboarding: .constant(false))
                 .transition(.asymmetric(
                     insertion: .move(edge: .trailing),
                     removal: .move(edge: .leading)
@@ -95,9 +93,7 @@ struct CoordinatorView: View {
                 coordinator.handleAuthenticationSuccess()
             }
         case .onboarding:
-            OnboardingView {
-                coordinator.completeOnboarding()
-            }
+            OnboardingView(showOnboarding: .constant(false))
         case .pdfViewer(let url):
             PDFViewerView(url: url)
         case .codeEditor(let path):
@@ -179,7 +175,7 @@ struct ChatNavigationView: View {
     @ViewBuilder
     private func chatDestination(for route: ChatRoute) -> some View {
         switch route {
-        case .conversation(let id):
+        case .conversation(_):
             // Create a temporary ChatSession for the given ID
             // In production, this should fetch from state/store
             ChatView(session: ChatSession(
@@ -226,8 +222,13 @@ struct ProjectsNavigationView: View {
     private func projectDestination(for route: ProjectRoute) -> some View {
         switch route {
         case .detail(let id):
-            // TODO: Get project name from store/state
-            ProjectDetailView(projectId: id, projectName: "Project")
+            // TODO: Get project from store/state
+            // For MVP, create a temporary project
+            ProjectDetailView(project: Project(
+                name: "Project \(id)",
+                path: "/Users/project/\(id)",
+                description: "MVP Project"
+            ))
                 .environmentObject(coordinator)
         case .sshConfig(let id):
             SSHConfigurationView(
@@ -241,8 +242,8 @@ struct ProjectsNavigationView: View {
                 }
             )
             .environmentObject(coordinator)
-        case .environmentVariables(let id):
-            EnvironmentVariablesView(projectId: id)
+        case .environmentVariables(_):
+            EnvironmentVariablesView()
                 .environmentObject(coordinator)
         case .fileEditor(let projectId, let filePath):
             FileEditorView(projectId: projectId, filePath: filePath)

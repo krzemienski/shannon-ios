@@ -4,6 +4,7 @@
 
 import Foundation
 import OSLog
+#if os(iOS)
 import UIKit
 import Combine
 
@@ -459,3 +460,4 @@ public struct MetricsExport: Codable {
         self.gauges = gauges
     }
 }
+#endif // os(iOS)
